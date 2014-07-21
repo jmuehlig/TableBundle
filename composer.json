@@ -1,0 +1,30 @@
+{
+    "name" : "pzad/tablebundle",
+    "description" : "Bundle for creating tables.",
+    "type" : "symfony-bundle",
+    "authors" : [{
+        "name" : "Jan Mühlig",
+        "email" : "mail@janmuehlig.de"
+    }],
+    "keywords" : [
+        "symfony table bundle"
+    ],
+    "license" : [
+        "MIT"
+    ],
+    "require" : {
+    },
+    "autoload" : {
+        "psr-0" : {
+            "PZAD\\TableBundle" : ""
+        }
+    },
+    "target-dir" : "PZAD/TableBundle",
+    "repositories" : [{
+	}],
+    "extra" : {
+    "branch-alias" : {
+            "dev-master" : "2.2-dev"
+        }
+    }
+}

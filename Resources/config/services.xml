@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <!--
+    <parameters>
+        <parameter key="pzad_table.example.class">PZAD\TableBundle\Example</parameter>
+    </parameters>
+	-->
+    <services>
+		<service id="pzad.table.twig" class="PZAD\TableBundle\Twig\TableExtension">
+			<tag name="twig.extension" />
+			<argument type="service" id="service_container" />
+			<argument type="service" id="router" />
+		</service>
+		<service id="pzad.table_filter.twig" class="PZAD\TableBundle\Twig\TableFilterExtension">
+			<tag name="twig.extension" />
+		</service>
+		<service id="pzad.table" class="PZAD\TableBundle\Table\TableFactory" scope="request">
+			<argument type="service" id="service_container" />
+			<argument type="service" id="doctrine.orm.entity_manager" />
+			<argument type="service" id="request" />
+			<argument type="service" id="router" />
+		</service>
+    </services>
+</container>
