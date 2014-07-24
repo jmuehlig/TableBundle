@@ -1,14 +1,27 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace PZAD\TableBundle\Table\Type;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use PZAD\TableBundle\Table\Row\Row;
+use PZAD\TableBundle\Table\Column\EntityColumn;
+use PZAD\TableBundle\Table\TableBuilder;
+use PZAD\TableBundle\Table\Column\ColumnInterface;
 
 /**
- * Abstract table type.
+ * The abstract table type which user defined table types based on.
+ * User defined table types have to implement the abstract methods
+ * `buildTable`, `getName` and `setDefaultOptions`.
+ * Further they can implement the methos `buildQuery`, `refineQuery` 
+ * and `getRowAttributes`.
+ * 
+ * The table type injects the container and the entity manager.
+ * 
+ * @author Jan Mühlig <mail@janmuehlig.de>
+ * @since 1.0.0
  */
 abstract class AbstractTableType
 {
@@ -17,43 +30,43 @@ abstract class AbstractTableType
 	 * 
 	 * @var ContainerInterface 
 	 */
-	private $_container;
+	protected $container;
 	
 	/**
 	 * EntityManager.
 	 * 
 	 * @var EntityManager 
 	 */
-	private $_entityManager;
+	protected $entityManager;
 	
 	public final function getContainer()
 	{
-		return $this->_container;
+		return $this->container;
 	}
 
 	public final function getEntityManager()
 	{
-		return $this->_entityManager;
+		return $this->entityManager;
 	}
 
 	public final function setContainer(ContainerInterface $container)
 	{
-		$this->_container = $container;
+		$this->container = $container;
 	}
 
 	public final function setEntityManager(EntityManager $entityManager)
 	{
-		$this->_entityManager = $entityManager;
+		$this->entityManager = $entityManager;
 	}
 	
 	/**
 	 * Generates the attributes for a row at
 	 * the given index.
 	 * 
-	 * @param Row\Row $row Row.
+	 * @param Row $row Row.
 	 * @return array Array with attributes (e.g. class)
 	 */
-	public function getRowAttributes(Row\Row $row)
+	public function getRowAttributes(Row $row)
 	{
 		return array();
 	}
@@ -75,14 +88,12 @@ abstract class AbstractTableType
 		
 		foreach($columns as $column)
 		{
-			/* @var $column Column\ColumnInterface */
-			if($column instanceof Column\EntityColumn)
+			/* @var $column ColumnInterface */
+			if($column instanceof EntityColumn)
 			{
 				$queryBuilder->leftJoin(sprintf('t.%s', $column->getName()), strtolower($column->getName()));
 			}
 		}
-		
-		return $queryBuilder;
 	}
 	
 	/**
@@ -93,10 +104,7 @@ abstract class AbstractTableType
 	 * 
 	 * @return QueryBuilder					Refined QueryBuilder.
 	 */
-	public function refineQuery(QueryBuilder $queryBuilder)
-	{
-		return $queryBuilder;
-	}
+	public function refineQuery(QueryBuilder $queryBuilder) { ; }
 	
 	public abstract function buildTable(TableBuilder $builder);
 	

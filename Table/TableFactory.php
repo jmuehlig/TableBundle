@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Routing\RouterInterface;
+use PZAD\TableBundle\Table\Type\AbstractTableType;
 
 /**
  * TableFactory.

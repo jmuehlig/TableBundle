@@ -6,11 +6,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use PZAD\TableBundle\Table\Column\ColumnInterface;
 
 /**
- * The TableBuilder is concerned for the
- * visualised columns.
+ * The TableBuilder is concerned for the visualised columns.
  * Columns will added by the table type to the table builder.
  *
- * @author Jan Mühlig
+ * @author Jan Mühlig <mail@janmuehlig.de>
+ * @since 1.0.0
  */
 class TableBuilder
 {
