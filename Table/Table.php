@@ -11,9 +11,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use PZAD\TableBundle\Table\Column\ColumnInterface;
+use PZAD\TableBundle\Table\Type\AbstractTableType;
+use PZAD\TableBundle\Table\Type\PaginatableInterface;
+use PZAD\TableBundle\Table\Type\SortableInterface;
 
 /**
- * Table.
+ * The table forms the core class of the bundle.
+ * It will be build by the table builder and represented
+ * by the table view.
+ * 
+ * @author Jan Mühlig <mail@janmuehlig.de>
+ * @since 1.0.0
  */
 class Table
 {
@@ -311,8 +319,9 @@ class Table
 	{
 		// Build the QueryBuilder and give the table type
 		// the chance to refine the query, e.g. with where-conditions.
-		$queryBuilder = $this->tableType->buildQuery(
-			$this->entityManager->createQueryBuilder(),
+		$queryBuilder = $this->entityManager->createQueryBuilder();
+		$this->tableType->buildQuery(
+			$queryBuilder,
 			$this->tableBuilder->getColumns(),
 			$this->options['data_entity']
 		);
@@ -367,8 +376,9 @@ class Table
 		// Set up the query builder, if pagination is in use.
 		if($this->resolvePaginationOptions() === true)
 		{
-			$countQuery = $this->tableType->buildQuery(
-				$this->entityManager->createQueryBuilder(),
+			$countQuery = $this->entityManager->createQueryBuilder();
+			$this->tableType->buildQuery(
+				$countQuery,
 				$this->tableBuilder->getColumns(),
 				$this->options['data_entity']
 			);
@@ -476,11 +486,9 @@ class Table
 	 */
 	private function resolvePaginationOptions()
 	{
-		$pagination = $this->options['pagination'];
-		
 		// Only rehash the pagination options,
 		// if pagination is used in the table type.
-		if($pagination === false)
+		if($this->tableType instanceof PaginatableInterface === false)
 		{
 			$this->pagination = array();
 			return false;
@@ -497,8 +505,11 @@ class Table
 			'li_class_disabled' => 'disabled'
 		));
 		
+		// Set the defaults by the table type.
+		$this->tableType->setPaginatableDefaultOptions($paginationOptionsResolver);
+		
 		// Resolve the options.
-		$this->pagination = $paginationOptionsResolver->resolve($pagination);
+		$this->pagination = $paginationOptionsResolver->resolve(array());
 		
 		// Read the current page from $request-object.
 		$this->pagination['page'] = ((int) $this->request->get( $this->pagination['param'] )) - 1;
@@ -508,11 +519,9 @@ class Table
 	
 	private function resolveSortableOptions()
 	{
-		$sortable = $this->options['sortable'];
-		
 		// Only rehash the sortable options,
 		// if sort is used in the table type.
-		if($sortable === false)
+		if($this->tableType instanceof SortableInterface === false)
 		{
 			$this->sortable = array();
 			return false;
@@ -529,8 +538,11 @@ class Table
 			'class_desc' => ''
 		));
 		
+		// Set the defaults by the table type.
+		$this->tableType->setSortableDefaultOptions($sortableOptionsResolver);
+		
 		// Resolve the options.
-		$this->sortable = $sortableOptionsResolver->resolve($sortable);
+		$this->sortable = $sortableOptionsResolver->resolve(array());
 		
 		// Read the column and direction from $request-object.
 		$column = $this->request->get( $this->sortable['param_column'] );
