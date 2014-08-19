@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * abstract column.
  *
  * @author Jan Mühlig
+ * @since 1.0.0
  */
 abstract class AbstractColumn implements ColumnInterface
 {

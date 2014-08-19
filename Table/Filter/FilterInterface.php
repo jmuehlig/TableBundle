@@ -4,16 +4,12 @@ namespace PZAD\TableBundle\Table\Filter;
 
 /**
  * Interface for adding filters to the table.
+ * 
+ * @author Jan Mühlig <mail@janmuehlig.de>
+ * @since 1.0.0
  */
 interface FilterInterface
-{
-	/**
-	 * Renders the filter.
-	 * 
-	 * @return string			HTML output.
-	 */
-	public function render();
-	
+{	
 	/**
 	 * Here are your options. 
 	 * Do whatever you want with these.
