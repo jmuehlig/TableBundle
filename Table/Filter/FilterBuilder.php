@@ -28,27 +28,9 @@ class FilterBuilder
 		$this->_entityManager = $entityManager;
 	}
 	
-	/**
-	 * Adds a new filter for the table.
-	 * 
-	 * @param string $columnName	Name of the column which is filtered.
-	 * @param int $operator			Operator.
-	 * @param array $options		Options for the filter:
-	 *									attr			CSS-Attributes for the input.
-	 *									label			Label for the input.
-	 *									placeholder		Placeholder for the input, if it is a text input.
-	 *									values			Array or entity, if the column is an entity column.
-	 */
-	public function add($columnName, $operator, array $options = array())
+	public function add($type, $name, $options)
 	{
-		$attributes = Utils::getOption('attr', $options);
-		$placeholder = Utils::getOption('placeholder', $options);
-		$label = Utils::getOption('label', $options, $columnName);
-		$values = Utils::getOption('values', $options, array());
 		
-		$this->_filters[$columnName] = new Filter($columnName, $operator, $label, $placeholder, $values, $attributes);
-		
-		return $this;
 	}
 	
 	public function setButton($name, array $options)

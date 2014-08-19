@@ -9,8 +9,4 @@ namespace PZAD\TableBundle\Table\Filter;
  */
 class TextFilter extends AbstractFilter
 {
-	public function render()
-	{
-		
-	}
 }

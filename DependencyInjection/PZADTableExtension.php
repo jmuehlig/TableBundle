@@ -8,9 +8,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
 /**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
+ * Extension for the TableBundle.
+ * 
+ * @author Jan Mühlig <mail@janmuehlig.de>
  */
 class PZADTableExtension extends Extension
 {
@@ -19,12 +19,28 @@ class PZADTableExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
+		$this->loadServices($container);
+		$this->loadConfig($configs, $container);
+    }
+	
+	private function loadServices(ContainerBuilder $container)
+	{
+		$loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
+	}
+	
+	private function loadConfig(array $configs, ContainerBuilder $container)
+	{		
+		$configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+		$container->setParameter('pzad_table.columns', array_merge($config['columns'], $configuration->getDefaultColumns()));
+		$container->setParameter('pzad_table.filters', array_merge($config['filters'], $configuration->getDefaultFilters()));
 		
-		//$container->compile();
-    }
+	}
+	
+	public function getAlias()
+	{
+		return 'pzad_table';
+	}
 }

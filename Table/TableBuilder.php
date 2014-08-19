@@ -45,13 +45,13 @@ class TableBuilder
 		$this->addedColumns = array();
 		
 		// Register standard columns.
-		$this->registeredColumns = array();
-		$this->registerColumnType(Column\ColumnType::CONTENT, 'PZAD\TableBundle\Table\Column\ContentColumn');
-		$this->registerColumnType(Column\ColumnType::ENTITY, 'PZAD\TableBundle\Table\Column\EntityColumn');
-		$this->registerColumnType(Column\ColumnType::DATE, 'PZAD\TableBundle\Table\Column\DateColumn');
-		$this->registerColumnType(Column\ColumnType::TEXT, 'PZAD\TableBundle\Table\Column\TextColumn');
-		$this->registerColumnType(Column\ColumnType::NUMBER, 'PZAD\TableBundle\Table\Column\NumberColumn');
-		$this->registerColumnType(Column\ColumnType::COUNTER, 'PZAD\TableBundle\Table\Column\CounterColumn');
+		$this->registeredColumns = $this->container->getParameter('pzad_table.columns');
+//		$this->registerColumnType(Column\ColumnType::CONTENT, 'PZAD\TableBundle\Table\Column\ContentColumn');
+//		$this->registerColumnType(Column\ColumnType::ENTITY, 'PZAD\TableBundle\Table\Column\EntityColumn');
+//		$this->registerColumnType(Column\ColumnType::DATE, 'PZAD\TableBundle\Table\Column\DateColumn');
+//		$this->registerColumnType(Column\ColumnType::TEXT, 'PZAD\TableBundle\Table\Column\TextColumn');
+//		$this->registerColumnType(Column\ColumnType::NUMBER, 'PZAD\TableBundle\Table\Column\NumberColumn');
+//		$this->registerColumnType(Column\ColumnType::COUNTER, 'PZAD\TableBundle\Table\Column\CounterColumn');
 	}
 	
 	/**

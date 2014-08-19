@@ -7,7 +7,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Description of AbstractFilter
  *
- * @author Jan Mühlig
+ * @author Jan Mühlig <mail@janmuehlig.de>
+ * @since 1.0.0
  */
 abstract class AbstractFilter implements FilterInterface
 {
