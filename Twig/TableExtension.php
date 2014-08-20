@@ -2,19 +2,31 @@
 
 namespace PZAD\TableBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RouterInterface;
+use PZAD\TableBundle\Table\Filter\FilterRenderer;
 use PZAD\TableBundle\Table\TableRenderer;
 use PZAD\TableBundle\Table\TableView;
-use PZAD\TableBundle\Table\Filter\FilterInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Twig_Environment;
+use Twig_Extension;
+use Twig_Function_Method;
 
-class TableExtension extends \Twig_Extension
+class TableExtension extends Twig_Extension
 {
-	protected $renderer;
-
+	/**
+	 * @var TableRenderer
+	 */
+	protected $tableRenderer;
+	
+	/**
+	 * @var FilterRenderer
+	 */
+	protected $filterRenderer;
+	
 	function __construct(ContainerInterface $container, RouterInterface $router)
 	{
-		$this->renderer = new TableRenderer($container, $container->get('request'), $router);
+		$this->tableRenderer = new TableRenderer($container, $container->get('request'), $router);
+		$this->filterRenderer = new FilterRenderer($container);
 	}
 	
 	public function getName()
@@ -25,77 +37,49 @@ class TableExtension extends \Twig_Extension
 	public function getFunctions()
 	{
 		return array(
-			'table' => new \Twig_Function_Method($this, 'getTableContent', array('is_safe' => array('html'))),
-			'table_begin' => new \Twig_Function_Method($this, 'getTableBeginContent', array('is_safe' => array('html'))),
-			'table_head' => new \Twig_Function_Method($this, 'getTableHeadContent', array('is_safe' => array('html'))),
-			'table_body' => new \Twig_Function_Method($this, 'getTableBodyContent', array('is_safe' => array('html'))),
-			'table_end' => new \Twig_Function_Method($this, 'getTableEndContent', array('is_safe' => array('html'))),
-			'table_pagination' => new \Twig_Function_Method($this, 'getTablePaginationContent', array('is_safe' => array('html'))),
-			'table_filter' => new \Twig_Function_Method($this, 'getFilterContent', array('is_safe' => array('html'), 'needs_environment' => true))
+			'table' => new Twig_Function_Method($this, 'getTableContent', array('is_safe' => array('html'))),
+			'table_begin' => new Twig_Function_Method($this, 'getTableBeginContent', array('is_safe' => array('html'))),
+			'table_head' => new Twig_Function_Method($this, 'getTableHeadContent', array('is_safe' => array('html'))),
+			'table_body' => new Twig_Function_Method($this, 'getTableBodyContent', array('is_safe' => array('html'))),
+			'table_end' => new Twig_Function_Method($this, 'getTableEndContent', array('is_safe' => array('html'))),
+			'table_pagination' => new Twig_Function_Method($this, 'getTablePaginationContent', array('is_safe' => array('html'))),
+			'table_filter' => new Twig_Function_Method($this, 'getFilterContent', array('is_safe' => array('html')))
 		);
 	}
 	
 	public function getTableContent(TableView $tableView)
 	{
-		return $this->renderer->render($tableView);
+		return $this->tableRenderer->render($tableView);
 	}
 	
 	public function getTableBeginContent(TableView $tableView)
 	{
-		return $this->renderer->renderBegin($tableView);
+		return $this->tableRenderer->renderBegin($tableView);
 	}
 	
 	public function getTableHeadContent(TableView $tableView)
 	{
-		return $this->renderer->renderHead($tableView);
+		return $this->tableRenderer->renderHead($tableView);
 	}
 	
 	public function getTableBodyContent(TableView $tableView)
 	{
-		return $this->renderer->renderBody($tableView);
+		return $this->tableRenderer->renderBody($tableView);
 	}
 	
 	public function getTableEndContent(TableView $tableView = null)
 	{
-		return $this->renderer->renderEnd();
+		return $this->tableRenderer->renderEnd();
 	}
 	
 	public function getTablePaginationContent(TableView $tableView)
 	{
-		return $this->renderer->renderPagination($tableView);
+		return $this->tableRenderer->renderPagination($tableView);
 	}
 	
-	public function getFilterContent(\Twig_Environment $twigEnviroment, $filters)
+	public function getFilterContent($filter)
 	{
-		if($filters instanceof TableView)
-		{
-			$filters = $filters->getFilters();
-		}
-		
-		if(is_array($filters))
-		{
-			$content = "";
-			foreach($filters as $filter)
-			{
-				$content .= sprintf("%s <br />", $this->getSingleFilterContent($twigEnviroment, $filter));
-			}
-			
-			return $content;
-		}
-		else
-		{
-			return $this->getSingleFilterContent($twigEnviroment, $filters);
-		}
-	}
-	
-	public function getSingleFilterContent(\Twig_Environment $twigEnviroment, FilterInterface $filter)
-	{
-		$filterClass = get_class($filter);
-		$template = sprintf('PZADTableBundle:Filter:%s%s.html.twig', strtolower($filterClass{1}), substr($filterClass, 1));
-		
-		return $twigEnviroment->render($template, array(
-			'filter' => $filter
-		));
+		return $this->filterRenderer->renderFilter($filter);
 	}
 }
 

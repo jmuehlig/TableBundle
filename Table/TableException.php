@@ -104,7 +104,7 @@ class TableException extends \Exception
 	
 	public static function columnClassNotImplementingInterface($class)
 	{
-		$message = "The column type class: %s does not implement the ColumnInterface.";
+		$message = 'The column type class "%s" does not implement the ColumnInterface.';
 		throw new TableException(sprintf($message, $class));
 	}
 		

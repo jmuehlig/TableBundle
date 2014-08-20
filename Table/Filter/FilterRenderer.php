@@ -2,9 +2,8 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\Table;
-use PZAD\TableBundle\Table\Utils;
-use PZAD\TableBundle\Table\Column\ColumnType;
+use PZAD\TableBundle\Table\TableView;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filter renderer.
@@ -12,96 +11,59 @@ use PZAD\TableBundle\Table\Column\ColumnType;
 class FilterRenderer
 {
 	/**
-	 * Table, which filters will be rendered.
-	 * 
-	 * @var Table
+	 * @var ContainerInterface
 	 */
-	private $_table;
+	private $container;
 	
-	public function __construct(Table $table)
+	public function __construct(ContainerInterface $container)
 	{
-		$this->_table = $table;
+		$this->container = $container;
 	}
 	
-	public function render()
+	/**
+	 * Renders the given filter(s).
+	 * 
+	 * @param array|FilterInterface|TableView
+	 */
+	public function renderFilter($filter)
 	{
-		$content = $this->renderStart();
+		$content = "<form>";
 		
-		$filters = $this->_table->getFilters();
-		foreach($filters as $key => $filter)
+		if($filter instanceof FilterInterface)
 		{
-			/* @var $filter Filter */
-			$content .= sprintf("%s<br />", $this->renderFilter($filter));
+			$content .= $this->renderSingleFilter($filter);
 		}
-		
-		return $content . $this->renderButton() . $this->renderEnd();
-	}
-	
-	public function renderStart()
-	{
-		return sprintf("<form method=\"GET\" name=\"%s\">", $this->_table->getName());
-	}
-	
-	public function renderEnd()
-	{
-		return "</form>";
-	}
-	
-	public function renderFilter(Filter $filter)
-	{
-		return sprintf('<span>%s: </span><span>%s</span>', $this->renderFilterLabel($filter), $this->renderFilterInput($filter));
-	}
-	
-	public function renderFilterInput(Filter $filter)
-	{
-		$value = $this->_table->getRequest()->get($filter->getColumnName(), null);
-				
-		if($filter->getValues() !== null && count($filter->getValues()) > 0)
+		else if($filter instanceof TableView)
 		{
-			$content = sprintf('<select name="%s"%s>', $filter->getColumnName(), Utils::renderAttributesContent($filter->getAttributes()));
-			foreach($filter->getValues() as $key => $value)
-			{
-				$selected = $value == $key ? ' selected="selected"' : '';
-				$content .= sprintf('<option value="%s"%s>%s</option>', $key, $selected, $value);
-			}
-			$content .= '</select>';
-			return $content;
+			$content .= $this->renderSetOfFilters($filter->getFilters());
+		}
+		else if(is_array($filter))
+		{
+			$content .= $this->renderSetOfFilters($filter);
 		}
 		else
 		{
-			return sprintf(
-				'<input type="text" name="%s" value="%s" placeholder="%s"%s />',
-				$filter->getColumnName(),
-				$value,
-				$filter->getPlaceholder(),
-				Utils::renderAttributesContent($filter->getAttributes())
-			);
+			FilterException::isNoValidFilter(get_class($filter));
 		}
-	}
-	
-	public function renderFilterLabel(Filter $filter)
-	{
-		return $filter->getLabel();
-	}
-	
-	public function renderButton()
-	{
-		$options = $this->_table->getFilterButtonOptions();
-		$name = Utils::getOption('name', $options, 'submitFilter');
-		$attributes = Utils::getOption('attributes', $options, array());
-		$label = Utils::getOption('label', $options, $name);
 		
-		return sprintf('<input type="submit" value="%s"%s />', $name, $label, Utils::renderAttributesContent($attributes));
+		$content .= "</form>";
+		
+		return $content;
 	}
 	
-	public function __get($filterName)
+	private function renderSingleFilter(FilterInterface $filter)
 	{
-		$filters = $this->_table->getFilters();
-		if(!array_key_exists($filters, $filterName))
+		return $filter->render($this->container);
+	}
+	
+	private function renderSetOfFilters(array $filters)
+	{
+		$content = "";
+		foreach($filters as $filter)
 		{
-			FilterException::FilterNotFound($filterName);
+			$content .= sprintf("%s <br />", $this->renderSingleFilter($filter));
 		}
 		
-		return $filters[$filterName];
+		return $content;
 	}
 }

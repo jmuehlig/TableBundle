@@ -5,10 +5,13 @@ namespace PZAD\TableBundle\Table\Filter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Description of AbstractFilter
+ * The AbstractFilter implements the base methods like setOptions
+ * and getter of each option, given by the FilterInterface.
+ * The method for rendering must be implemented by each specific
+ * filter itself.
  *
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0
+ * @author 	Jan Mühlig <mail@janmuehlig.de>
+ * @since 	1.0.0
  */
 abstract class AbstractFilter implements FilterInterface
 {
@@ -46,6 +49,13 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var array 
 	 */
 	protected $attributes;
+	
+	/**
+	 * All not clear resolved options.
+	 * 
+	 * @var array
+	 */
+	protected $furtherOptions;
 
 	public function getAttributes()
 	{
@@ -70,6 +80,11 @@ abstract class AbstractFilter implements FilterInterface
 	public function getOperator()
 	{
 		return $this->operator;
+	}
+	
+	public function getFurtherOptions()
+	{
+		return $this->getFurtherOptions();
 	}
 
 	public function setName($name)
@@ -96,10 +111,19 @@ abstract class AbstractFilter implements FilterInterface
 		// Resolve options.
 		$resolvedOptions = $optionsResolver->resolve($options);
 		
-		$this->columns = $resolvedOptions['columns'];
+		$this->columns = is_array($resolvedOptions['columns']) ? $resolvedOptions['columns'] : array($resolvedOptions['columns']);
 		$this->label = $resolvedOptions['label'];
 		$this->operator = $resolvedOptions['operator'];
 		$this->attributes = $resolvedOptions['attr'];
+		
+		$this->furtherOptions = array();
+		foreach($resolvedOptions as $key => $option)
+		{
+			if(!in_array($key, array('columns','label','operator','attr')))
+			{
+				$this->furtherOptions[$key] = $option;
+			}
+		}
 		
 		FilterOperator::validate($this->operator);
 	}

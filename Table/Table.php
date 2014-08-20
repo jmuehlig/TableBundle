@@ -134,9 +134,9 @@ class Table
 	{
 		$this->tableBuilder = new TableBuilder($this->container);
 		
-		if($tableType instanceof Filter\FilterInterface)
+		if($tableType instanceof Type\FilterableInterface)
 		{
-			$this->filterBuilder = new Filter\FilterBuilder($this->entityManager);
+			$this->filterBuilder = new Filter\FilterBuilder($this->container);
 		}
 		
 		$this->tableType = $tableType;
@@ -226,9 +226,10 @@ class Table
 		
 		// Build the filters, if the table type implements 
 		// the FilterInterface
-		if($this->tableType instanceof Filter\FilterInterface)
+		if($this->tableType instanceof Type\FilterableInterface)
 		{
 			$this->tableType->buildFilter($this->filterBuilder);
+			$this->filters = $this->filterBuilder->getFilters();
 		}
 		
 		// Fetch data from the database.

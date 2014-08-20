@@ -31,18 +31,20 @@ class Configuration implements ConfigurationInterface
 	public function getDefaultColumns() 
 	{
 		return array(
-			'content' => 'PZAD\TableBundle\Table\Column\ContentColumn',
-			'entity' =>  'PZAD\TableBundle\Table\Column\EntityColumn',
-			'date' =>    'PZAD\TableBundle\Table\Column\DateColumn',
-			'text' =>    'PZAD\TableBundle\Table\Column\TextColumn',
-			'number' =>  'PZAD\TableBundle\Table\Column\NumberColumn',
-			'counter' => 'PZAD\TableBundle\Table\Column\CounterColumn'
+			'content'	=> 'PZAD\TableBundle\Table\Column\ContentColumn',
+			'entity'	=> 'PZAD\TableBundle\Table\Column\EntityColumn',
+			'date'		=> 'PZAD\TableBundle\Table\Column\DateColumn',
+			'text'		=> 'PZAD\TableBundle\Table\Column\TextColumn',
+			'number'	=> 'PZAD\TableBundle\Table\Column\NumberColumn',
+			'counter'	=> 'PZAD\TableBundle\Table\Column\CounterColumn'
 		);
 	}
 	
 	public function getDefaultFilters()
 	{
-		return array();
+		return array(
+			'text'		=> 'PZAD\TableBundle\Table\Filter\TextFilter'
+		);
 	}
 			
 }
