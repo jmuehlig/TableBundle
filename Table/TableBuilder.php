@@ -29,7 +29,7 @@ class TableBuilder
 	 * 
 	 * @var array 
 	 */
-	private $addedColumns;
+	private $columns;
 	
 	/**
 	 * Registered column classes.
@@ -42,16 +42,10 @@ class TableBuilder
 	{
 		$this->container = $container;
 		
-		$this->addedColumns = array();
+		$this->columns = array();
 		
 		// Register standard columns.
 		$this->registeredColumns = $this->container->getParameter('pzad_table.columns');
-//		$this->registerColumnType(Column\ColumnType::CONTENT, 'PZAD\TableBundle\Table\Column\ContentColumn');
-//		$this->registerColumnType(Column\ColumnType::ENTITY, 'PZAD\TableBundle\Table\Column\EntityColumn');
-//		$this->registerColumnType(Column\ColumnType::DATE, 'PZAD\TableBundle\Table\Column\DateColumn');
-//		$this->registerColumnType(Column\ColumnType::TEXT, 'PZAD\TableBundle\Table\Column\TextColumn');
-//		$this->registerColumnType(Column\ColumnType::NUMBER, 'PZAD\TableBundle\Table\Column\NumberColumn');
-//		$this->registerColumnType(Column\ColumnType::COUNTER, 'PZAD\TableBundle\Table\Column\CounterColumn');
 	}
 	
 	/**
@@ -65,7 +59,7 @@ class TableBuilder
 	 */
 	public function add($type, $name, array $options)
 	{
-		if(array_key_exists($name, $this->addedColumns))
+		if(array_key_exists($name, $this->columns))
 		{
 			TableException::duplicatedColumnName($name);
 		}
@@ -87,44 +81,13 @@ class TableBuilder
 			$column->setContainer($this->container);
 		}
 		
-		$this->addedColumns[$name] = $column;
-		
-		return $this;
-	}
-	
-	/**
-	 * Registeres a new type for columns. 
-	 * 
-	 * @param string $type		Type of the column.
-	 * @param string $class		Class for the column type (with namespace).
-	 * 
-	 * @return TableBuilder
-	 */
-	public function registerColumnType($type, $class)
-	{
-		if(array_key_exists($type, $this->registeredColumns))
-		{
-			TableException::columnTypeAlreadyRegistered($type);
-		}
-		
-		if(!class_exists($class))
-		{
-			TableException::columnClassNotFound($class);
-		}
-		
-		$columnType = new $class;
-		if(!$columnType instanceof Column\ColumnInterface)
-		{
-			TableException::columnClassNotImplementingInterface($class);
-		}
-		
-		$this->registeredColumns[$type] = $class;
+		$this->columns[$name] = $column;
 		
 		return $this;
 	}
 	
 	public function getColumns()
 	{
-		return $this->addedColumns;
+		return $this->columns;
 	}
 }

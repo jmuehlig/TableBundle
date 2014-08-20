@@ -1,4 +1,5 @@
 <?php
+
 namespace PZAD\TableBundle\Table\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;

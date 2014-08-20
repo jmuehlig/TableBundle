@@ -12,9 +12,27 @@ class FilterException extends \Exception
 		parent::__construct($message);
 	}
 	
-	public static function FilterTypeNotLegal($filterType)
+	public static function typeNotAllowed($filterType, array $legalFilterTypes)
 	{
-		$message = sprintf('FilterType "%s" is not a valid Type. Use FilterType::ENTITY or FilterType::PROPERTY.', $filterType);
+		$message = sprintf('The filter type "%s" is not valid. Valid types are "%s"', $filterType, implode(",", $legalFilterTypes));
+		throw new FilterException($message);
+	}
+	
+	public static function duplicatedFilterName($name)
+	{
+		$message = sprintf('Duplicated name for the filter "%s".', $name);
+		throw new FilterException($message);
+	}
+	
+	public static function filterClassNotImplementingInterface($class)
+	{
+		$message = sprintf('The filter type class "%s" does not implement the FilterInterface.', $class);
+		throw new FilterException($message);
+	}
+	
+	public static function isNoValidFilter($filter)
+	{
+		$message = sprintf('The given filter "%s" is no valid filter. This can not be rendered.', $filter);
 		throw new FilterException($message);
 	}
 	

@@ -2,6 +2,8 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * Interface for adding filters to the table.
  * 
@@ -49,4 +51,11 @@ interface FilterInterface
 	 * @return array			Attributes for every row (tr).
 	 */
 	public function getAttributes();
+	
+	/**
+	 * Renders the filter.
+	 * 
+	 * @param ContainerInterface $container
+	 */
+	public function render(ContainerInterface $container);
 }

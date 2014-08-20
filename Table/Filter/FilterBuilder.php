@@ -2,8 +2,7 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
-use Doctrine\ORM\EntityManager;
-use PZAD\TableBundle\Table\Utils;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builder for building table filters.
@@ -13,47 +12,51 @@ class FilterBuilder
 	/**
 	 * @var array
 	 */
-	private $_filters;
-	
-	private $_buttonOptions;
+	private $filters;
 	
 	/**
-	 * @var EntityManager 
+	 * @var array
 	 */
-	private $_entityManager;
+	private $registeredFilters;
 	
-	public function __construct(EntityManager $entityManager)
+	public function __construct(ContainerInterface $container)
 	{
-		$this->_filters = array();
-		$this->_entityManager = $entityManager;
+		$this->filters = array();
+		
+		$this->registeredFilters = $container->getParameter('pzad_table.filters');
 	}
 	
 	public function add($type, $name, $options)
 	{
+		if(array_key_exists($name, $this->filters))
+		{
+			FilterException::duplicatedFilterName($name);
+		}
 		
-	}
-	
-	public function setButton($name, array $options)
-	{
-		$attributes = Utils::getOption('attr', $options, array());
-		$label = Utils::getOption('label', $options, $name);
+		$type = strtolower($type);
+		if(!array_key_exists($type, $this->registeredFilters))
+		{
+			FilterException::typeNotAllowed($type, array_keys($this->registeredFilters));
+		}
 		
-		$this->_buttonOptions = array(
-			'name' => $name,
-			'label' => $label,
-			'attributes' => $attributes
-		);
+		$filter = new $this->registeredFilters[$type];
+		/* @var $filter FilterInterface */
+		
+		if(!$filter instanceof FilterInterface)
+		{
+			FilterException::filterClassNotImplementingInterface($filter);
+		}
+		
+		$filter->setName($name);
+		$filter->setOptions($options);
+		
+		$this->filters[$name] = $filter;
 		
 		return $this;
 	}
 	
 	public function getFilters()
 	{
-		return $this->_filters;
-	}
-	
-	public function getButtonOptions()
-	{
-		return $this->_buttonOptions;
+		return $this->filters;
 	}
 }
