@@ -49,13 +49,6 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var array 
 	 */
 	protected $attributes;
-	
-	/**
-	 * All not clear resolved options.
-	 * 
-	 * @var array
-	 */
-	protected $furtherOptions;
 
 	public function getAttributes()
 	{
@@ -81,11 +74,6 @@ abstract class AbstractFilter implements FilterInterface
 	{
 		return $this->operator;
 	}
-	
-	public function getFurtherOptions()
-	{
-		return $this->getFurtherOptions();
-	}
 
 	public function setName($name)
 	{
@@ -96,35 +84,48 @@ abstract class AbstractFilter implements FilterInterface
 	{
 		$optionsResolver = new OptionsResolver();
 		
-		// Set required.
-		$optionsResolver->setRequired(array(
-			'columns'
-		));
-		
 		// Set defaults.
 		$optionsResolver->setDefaults(array(
+			'columns' => array(),
 			'label' => '',
 			'operator' => FilterOperator::EQ,
 			'attr' => array()
 		));
 		
+		// Set this filter default options.
+		$this->setDefaultFilterOptions($optionsResolver);
+
 		// Resolve options.
 		$resolvedOptions = $optionsResolver->resolve($options);
 		
-		$this->columns = is_array($resolvedOptions['columns']) ? $resolvedOptions['columns'] : array($resolvedOptions['columns']);
+		// Set intern properties from options.
+		if(!is_array($resolvedOptions['columns']))
+		{
+			$this->columns = array($resolvedOptions['columns']);
+		}
+		else if(count($resolvedOptions['columns']) < 1)
+		{
+			$this->columns = array($this->getName());
+		}
+		else
+		{
+			$this->columns = $resolvedOptions['columns'];
+		}
+
 		$this->label = $resolvedOptions['label'];
 		$this->operator = $resolvedOptions['operator'];
 		$this->attributes = $resolvedOptions['attr'];
 		
-		$this->furtherOptions = array();
-		foreach($resolvedOptions as $key => $option)
-		{
-			if(!in_array($key, array('columns','label','operator','attr')))
-			{
-				$this->furtherOptions[$key] = $option;
-			}
-		}
-		
 		FilterOperator::validate($this->operator);
+		
+		return $resolvedOptions;
 	}
+	
+	/**
+	 * Possibility for the filter to resolve his
+	 * own options.
+	 * 
+	 * @param OptionsResolver $optionsResolver
+	 */
+	protected abstract function setDefaultFilterOptions(OptionsResolver $optionsResolver);
 }

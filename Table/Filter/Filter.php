@@ -4,6 +4,8 @@ namespace PZAD\TableBundle\Table\Filter;
 
 /**
  * Represents a filter.
+ * 
+ * @deprecated since version 1.0.0
  */
 class Filter
 {
