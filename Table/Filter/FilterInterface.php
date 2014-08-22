@@ -53,6 +53,12 @@ interface FilterInterface
 	public function getAttributes();
 	
 	/**
+	 * @return boolean			Returns True, if this filter needs the <form>-enviroment,
+	 *							including the submit und reset buttons. False, otherwise.
+	 */
+	public function needsFormEnviroment();
+	
+	/**
 	 * Renders the filter.
 	 * 
 	 * @param ContainerInterface $container
