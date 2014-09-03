@@ -3,29 +3,28 @@
 namespace PZAD\TableBundle\Twig;
 
 use PZAD\TableBundle\Table\Filter\FilterRenderer;
-use PZAD\TableBundle\Table\TableRenderer;
+use PZAD\TableBundle\Table\Renderer\RendererInterface;
 use PZAD\TableBundle\Table\TableView;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Twig_Environment;
 use Twig_Extension;
 use Twig_Function_Method;
 
 class TableExtension extends Twig_Extension
 {
-	/**
-	 * @var TableRenderer
-	 */
-	protected $tableRenderer;
 	
 	/**
 	 * @var FilterRenderer
 	 */
 	protected $filterRenderer;
 	
+	/**
+	 * @var RendererInterface
+	 */
+	protected $tableRenderer;
+	
 	function __construct(ContainerInterface $container, RouterInterface $router)
 	{
-		$this->tableRenderer = new TableRenderer($container, $container->get('request'), $router);
 		$this->filterRenderer = new FilterRenderer($container);
 	}
 	
@@ -49,11 +48,19 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableContent(TableView $tableView)
 	{
-		return $this->tableRenderer->render($tableView);
+		return sprintf("%s\n %s\n %s\n %s\n %s",
+			$this->getTableBeginContent($tableView),
+			$this->getTableHeadContent($tableView),
+			$this->getTableBodyContent($tableView),
+			$this->getTableEndContent($tableView),
+			$this->getTablePaginationContent($tableView)				
+		);
 	}
 	
 	public function getTableBeginContent(TableView $tableView)
 	{
+		$this->tableRenderer = $tableView->getTableRenderer();
+		
 		return $this->tableRenderer->renderBegin($tableView);
 	}
 	

@@ -2,18 +2,26 @@
 
 namespace PZAD\TableBundle\Table;
 
+use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Iterator;
 use PZAD\TableBundle\Table\Column\ColumnInterface;
+use PZAD\TableBundle\Table\Filter\Filter;
+use PZAD\TableBundle\Table\Filter\FilterBuilder;
+use PZAD\TableBundle\Table\Filter\FilterInterface;
+use PZAD\TableBundle\Table\Filter\FilterOperator;
+use PZAD\TableBundle\Table\Renderer\DefaultRenderer;
+use PZAD\TableBundle\Table\Row\Row;
 use PZAD\TableBundle\Table\Type\AbstractTableType;
 use PZAD\TableBundle\Table\Type\PaginatableInterface;
 use PZAD\TableBundle\Table\Type\SortableInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * The table forms the core class of the bundle.
@@ -35,7 +43,7 @@ class Table
 	/**
 	 * FilterBuilder for this table.
 	 * 
-	 * @var Filter\FilterBuilder
+	 * @var FilterBuilder
 	 */
 	protected $filterBuilder;
 	
@@ -112,7 +120,7 @@ class Table
 	 * 
 	 * @var array
 	 */
-	private $filters;
+	private $filterValues;
 	
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
 	{
@@ -126,7 +134,7 @@ class Table
 		// Set up rows, filters and optionsResolver
 		// for the table type.
 		$this->rows = array();
-		$this->filters = array();
+		$this->filterValues = array();
 		$this->options = array();
 	}
 	
@@ -136,7 +144,7 @@ class Table
 		
 		if($tableType instanceof Type\FilterableInterface)
 		{
-			$this->filterBuilder = new Filter\FilterBuilder($this->container);
+			$this->filterBuilder = new FilterBuilder($this->container);
 		}
 		
 		$this->tableType = $tableType;
@@ -178,7 +186,7 @@ class Table
 		return $this->router;
 	}
 	
-	public function getRowAttributes(Row\Row $row)
+	public function getRowAttributes(Row $row)
 	{
 		$attr = $this->tableType->getRowAttributes($row);
 		if(!is_array($attr))
@@ -192,7 +200,7 @@ class Table
 	/**
 	 * Creates a table renderer, rendering this table.
 	 * 
-	 * @return TableRenderer Table renderer.
+	 * @return View of the table.
 	 */
 	public function createView()
 	{
@@ -200,9 +208,10 @@ class Table
 		
 		return new TableView(
 			$this->tableType->getName(),
+			$this->options['renderer'],
 			$this->tableBuilder->getColumns(),
 			$this->rows,
-			$this->filters,
+			$this->filterValues,
 			$this->pagination,
 			$this->sortable,
 			$this->options['empty_value'],
@@ -229,7 +238,7 @@ class Table
 		if($this->tableType instanceof Type\FilterableInterface)
 		{
 			$this->tableType->buildFilter($this->filterBuilder);
-			$this->filters = $this->filterBuilder->getFilters();
+			$this->filterValues = $this->filterBuilder->getFilters();
 		}
 		
 		// Fetch data from the database.
@@ -249,7 +258,7 @@ class Table
 		// Additional increment the counter for each row.
 		foreach($data as $object)
 		{
-			$row = new Row\Row($object, ++$count);
+			$row = new Row($object, ++$count);
 			$row->setAttributes( $this->tableType->getRowAttributes($row) );
 			
 			$this->rows[] = $row;
@@ -299,11 +308,17 @@ class Table
 			'empty_value' => 'No data found.',
 			'attr' => array(),
 			'head_attr' => array(),
-			'pagination' => false,
-			'sortable' => false
+			'renderer' => new DefaultRenderer($this->container, $this->request, $this->router)
 		));
 		
+		// Pass table type options.
 		$this->tableType->setDefaultOptions($optionsResolver);
+		
+		// Allowed values.
+		$optionsResolver->setAllowedTypes(array(
+			'attr' => 'array',
+			'head_attr' => 'array'
+		));
 		
 		$this->options = $optionsResolver->resolve(array());
 	}
@@ -314,7 +329,7 @@ class Table
 	 * tableType.getQuery method and using pagination
 	 * and sort, if they are enabled.
 	 * 
-	 * @return \Iterator
+	 * @return Iterator
 	 */
 	private function getData()
 	{
@@ -409,7 +424,6 @@ class Table
 	}
 	
 	/**
-	 * TODO: Refactor.
 	 * Sets up the filter part to the QueryBuilder.
 	 * 
 	 * @param	QueryBuilder $queryBuilder	Applies the filter query options
@@ -418,57 +432,60 @@ class Table
 	 */
 	protected function applyFilters(QueryBuilder $queryBuilder)
 	{
-		if($this->tableType instanceof Filter\FilterInterface)
+		if($this->tableType instanceof Type\FilterableInterface)
 		{
 			$this->resolveFilterOptions();
-			$filters = $this->getFilters();
-			$isFirstWhere = true;
 			
-			foreach($this->filters as $filterName => $filterValue)
+			$whereStatements = array();
+			foreach($this->filterBuilder->getFilters() as $filter)
 			{
-				$filter = $filters[$filterName];
-				/* @var $filter Filter\Filter */
+				/* @var $filter FilterInterface */
+				
+				$value = $this->getFilterValue($filter);
 				
 				if($filter->getValues() !== null && is_array($filter->getValues()) && count($filter->getValues()) > 0)
 				{
 					$values = $filter->getValues();
-					if(!array_key_exists($filterValue, $values))
+					if(!array_key_exists($value, $values))
 					{
 						continue;
 					}
-					$filterValue = $values[$filterValue];
+					$value = $values[$value];
 				}
 				
-				$whereStatement = null;
 				switch($filter->getOperator())
 				{
-					case Filter\FilterOperator::LIKE:
-						$whereStatement = 't.%s like %:%s%'; break;
-					case Filter\FilterOperator::LT:
-						$whereStatement = 't.%s < :%s'; break;
-					case Filter\FilterOperator::GT:
-						$whereStatement = 't.%s > :%s'; break;
-					case Filter\FilterOperator::LEQ:
-						$whereStatement = 't.%s <= :%s'; break;
-					case Filter\FilterOperator::GEQ:
-						$whereStatement = 't.%s >= :%s'; break;
-					case Filter\FilterOperator::NOT_EQ:
-						$whereStatement = 't.%s <> :%s'; break;
-					case Filter\FilterOperator::NOT_LIKE:
-						$whereStatement = 't.%s not like %:%s%'; break;
-					default: $whereStatement = 't.%s = :%s';
+					case FilterOperator::EQ:
+						$singleStatement = 't.%s = :%s'; break;
+					case FilterOperator::LT:
+						$singleStatement = 't.%s < :%s'; break;
+					case FilterOperator::GT:
+						$singleStatement = 't.%s > :%s'; break;
+					case FilterOperator::LEQ:
+						$singleStatement = 't.%s <= :%s'; break;
+					case FilterOperator::GEQ:
+						$singleStatement = 't.%s >= :%s'; break;
+					case FilterOperator::NOT_EQ:
+						$singleStatement = 't.%s <> :%s'; break;
+					case FilterOperator::NOT_LIKE:
+						$singleStatement = 't.%s not like %%:%s%%'; break;
+					default:
+						$singleStatement = 't.%s% like %%:%s%%';
 				}
 				
-				if($isFirstWhere)
-				{
-					$queryBuilder->where(sprintf($whereStatement, $filterName, $filterName));
-					$isFirstWhere = false;
-				}
-				else
-				{
-					$queryBuilder->orWhere(sprintf($whereStatement, $filterName, $filterName));
-				}
-				$queryBuilder->setParameter($filterName, $filterValue);
+				$whereStatements[] = sprintf($singleStatement, $filter->getName(), $filter->getName());
+				$queryBuilder->setParameter($filter->getName(), $value);
+			}
+
+			$whereStatement = sprintf("(%s)", implode(' and ', $whereStatements));
+			$isFirstWhere = strpos(strtolower($queryBuilder->getDQL()), 'where') !== false;
+			if($isFirstWhere)
+			{
+				$queryBuilder->where($whereStatement);
+			}
+			else
+			{
+				$queryBuilder->andWhere($whereStatement);
 			}
 		}
 	}
@@ -597,15 +614,25 @@ class Table
 	
 	private function resolveFilterOptions()
 	{
-		foreach($this->getFilters() as $filter)
+		foreach($this->filterBuilder->getFilters() as $filter)
 		{
-			/* @var $filter Filter\Filter */
+			/* @var $filter FilterInterface */
 			
-			$filterValue = $this->request->get($filter->getColumnName(), null);
-			if($filterValue !== null)
-			{
-				$this->filters[$filter->getColumnName()] = trim($filterValue);
-			}
+//			$filterValue = $this->request->get($filter->getName(), null);
+//			if($filterValue !== null)
+//			{
+//				$this->filterValues[$filter->getColumnName()] = trim($filterValue);
+//			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @param FilterInterface $filter
+	 * @return string					Value of the filters name in the request object.
+	 */
+	private function getFilterValue(FilterInterface $filter)
+	{
+		return $this->request->get($filter->getName(), null);
 	}
 }
