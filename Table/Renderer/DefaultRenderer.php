@@ -1,17 +1,21 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace PZAD\TableBundle\Table\Renderer;
 
+use PZAD\TableBundle\Table\Column\ColumnInterface;
+use PZAD\TableBundle\Table\Row\Row;
+use PZAD\TableBundle\Table\TableView;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use PZAD\TableBundle\Table\Row\Row;
-use PZAD\TableBundle\Table\Column\ColumnInterface;
 
 /**
- * Renderer for a table.
+ * Default renderer for a table.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0.0
  */
-class TableRenderer
+class DefaultRenderer implements RendererInterface
 {	
 	/**
 	 * Container.
@@ -158,9 +162,11 @@ class TableRenderer
 	/**
 	 * Render the table end (</table>).
 	 * 
+	 * @param $tableView TableView	View of the table.
+	 * 
 	 * @return string HTML Code.
 	 */
-	public function renderEnd()
+	public function renderEnd(TableView $tableView = null)
 	{
 		return "</table>";
 	}

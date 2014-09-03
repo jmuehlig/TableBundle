@@ -2,6 +2,8 @@
 
 namespace PZAD\TableBundle\Table;
 
+use PZAD\TableBundle\Table\Renderer\RendererInterface;
+
 /**
  * TablieView
  * 
@@ -20,6 +22,12 @@ class TableView
 	 * @var string 
 	 */
 	protected $name;
+	
+	/**
+	 * Renderer of the table.
+	 * @var RendererInterface
+	 */
+	protected $tableRenderer;
 	
 	/**
 	 * Rows of the table, represented as array
@@ -96,10 +104,11 @@ class TableView
 	 */
 	protected $rowAttributes;
 	
-	public function __construct($name, array $columns, array $rows, array $filters, array $pagination, array $sortable, $emptyValue, array $attributes, array $headAttributes)
+	public function __construct($name, RendererInterface $renderer, array $columns, array $rows, array $filters, array $pagination, array $sortable, $emptyValue, array $attributes, array $headAttributes)
 	{
 		// Set up the class vars.
 		$this->name				= $name;
+		$this->tableRenderer	= $renderer;
 		$this->columns			= $columns;
 		$this->rows				= $rows;
 		$this->filters			= $filters;
@@ -114,6 +123,11 @@ class TableView
 	public function getName()
 	{
 		return $this->name;
+	}
+	
+	public function getTableRenderer()
+	{
+		return $this->tableRenderer;
 	}
 	
 	public function getRows()
