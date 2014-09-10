@@ -333,31 +333,7 @@ class Table
 	 */
 	private function getData()
 	{
-		// Build the QueryBuilder and give the table type
-		// the chance to refine the query, e.g. with where-conditions.
-		$queryBuilder = $this->entityManager->createQueryBuilder();
-		$this->tableType->buildQuery(
-			$queryBuilder,
-			$this->tableBuilder->getColumns(),
-			$this->options['data_entity']
-		);
-		$this->tableType->refineQuery($queryBuilder);
-		
-		// Apply sortable to the query builder.
-		$this->applySortable($queryBuilder);
-		
-		// Apply filters to the query builder.
-		$this->applyFilters($queryBuilder);
-		
-		// Apply pagination to the query builder and
-		// return a paginator, if pagination is in use.
-		if($this->applyPagination($queryBuilder) === true)
-		{
-			return new Paginator($queryBuilder->getQuery(), $fetchJoinCollection = false);
-		}
-		
-		// If pagination is not in use, return the query with all results.
-		return $queryBuilder->getQuery()->getResult();
+		return $this->tableType->getDataSource($this->container);
 	}
 	
 	/**

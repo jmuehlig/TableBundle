@@ -2,14 +2,12 @@
 
 namespace PZAD\TableBundle\Table\Type;
 
+use Doctrine\ORM\EntityManager;
+use PZAD\TableBundle\Table\DataSource\DataSourceInterface;
+use PZAD\TableBundle\Table\Row\Row;
+use PZAD\TableBundle\Table\TableBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use PZAD\TableBundle\Table\Row\Row;
-use PZAD\TableBundle\Table\Column\EntityColumn;
-use PZAD\TableBundle\Table\TableBuilder;
-use PZAD\TableBundle\Table\Column\ColumnInterface;
 
 /**
  * The abstract table type which user defined table types based on.
@@ -20,8 +18,8 @@ use PZAD\TableBundle\Table\Column\ColumnInterface;
  * 
  * The table type injects the container and the entity manager.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0.0
  */
 abstract class AbstractTableType
 {
@@ -72,40 +70,12 @@ abstract class AbstractTableType
 	}
 	
 	/**
-	 * Builds the query for this table type.
+	 * Returns the data source, the table gets the data from.
 	 * 
-	 * @param QueryBuilder $queryBuilder
-	 * @param array $columns
-	 * @param string $entity
-	 * 
-	 * @return QueryBuilder Builder with builded query.
+	 * @return DataSourceInterface
 	 */
-	public function buildQuery(QueryBuilder $queryBuilder, array $columns, $entity)
-	{
-		$queryBuilder
-			->select('t')
-			->from($entity, 't');
-		
-		foreach($columns as $column)
-		{
-			/* @var $column ColumnInterface */
-			if($column instanceof EntityColumn)
-			{
-				$queryBuilder->leftJoin(sprintf('t.%s', $column->getName()), strtolower($column->getName()));
-			}
-		}
-	}
-	
-	/**
-	 * Here you can refine your builded query, e.g. with where clauses.
-	 * 
-	 * @param QueryBuilder $queryBuilder	The QueryBuilder, build by
-	 *										the method `buildQuery`.
-	 * 
-	 * @return QueryBuilder					Refined QueryBuilder.
-	 */
-	public function refineQuery(QueryBuilder $queryBuilder) { ; }
-	
+	public abstract function getDataSource(ContainerInterface $container);
+
 	public abstract function buildTable(TableBuilder $builder);
 	
 	/**

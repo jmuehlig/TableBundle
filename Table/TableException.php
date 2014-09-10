@@ -107,5 +107,10 @@ class TableException extends \Exception
 		$message = 'The column type class "%s" does not implement the ColumnInterface.';
 		throw new TableException(sprintf($message, $class));
 	}
-		
+	
+	public static function noQueryBuilderOrConstraintsArray($input)
+	{
+		$message = 'You have to pass a QuersBuilder or constraints array, not "%s"';
+		throw new TableException(sprintf($message, $input));
+	}
 }
