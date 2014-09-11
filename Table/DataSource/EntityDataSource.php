@@ -45,7 +45,7 @@ class EntityDataSource extends QueryBuilderDataSource
 			$this->queryBuilder = $this->createQueryBuilder($container, $columns);
 		}
 		
-		parent::getData($container, $columns, $filters, $pagination, $sortable);
+		return parent::getData($container, $columns, $filters, $pagination, $sortable);
 	}
 	
 	public function getCountPages(ContainerInterface $container, array $columns, array $filters = null, \PZAD\TableBundle\Table\Model\PaginationOptionsContainer $pagination = null)
@@ -55,7 +55,7 @@ class EntityDataSource extends QueryBuilderDataSource
 			$this->queryBuilder = $this->createQueryBuilder($container, $columns);
 		}
 		
-		parent::getCountPages($container, $columns, $filters, $pagination);
+		return parent::getCountPages($container, $columns, $filters, $pagination);
 	}
 	
 	/**
@@ -71,7 +71,7 @@ class EntityDataSource extends QueryBuilderDataSource
 		$queryBuilder = $container->get('doctrine')->getManager()->createQueryBuilder();
 		/* @var $queryBuilder QueryBuilder */
 		
-		$queryBuilder->select()->from($this->entity, 't');
+		$queryBuilder->select('t')->from($this->entity, 't');
 		
 		foreach($columns as $column)
 		{

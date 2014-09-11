@@ -108,9 +108,9 @@ class TableException extends \Exception
 		throw new TableException(sprintf($message, $class));
 	}
 	
-	public static function noQueryBuilderOrConstraintsArray($input)
+	public static function noQueryBuilder()
 	{
-		$message = 'You have to pass a QuersBuilder or constraints array, not "%s"';
-		throw new TableException(sprintf($message, $input));
+		$message = 'You have to pass a QueryBuilder into the DataSource.';
+		throw new TableException($message);
 	}
 }

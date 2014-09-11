@@ -2,6 +2,8 @@
 
 namespace PZAD\TableBundle\Table;
 
+use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
+use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
 use PZAD\TableBundle\Table\Renderer\RendererInterface;
 
 /**
@@ -60,7 +62,7 @@ class TableView
 	 * Only, if pagination is defined by
 	 * the table type.
 	 * 
-	 * @var array
+	 * @var PaginationOptionsContainer
 	 */
 	protected $pagination;
 	
@@ -69,7 +71,7 @@ class TableView
 	 * Only, if sortable is defined by
 	 * the table type.
 	 * 
-	 * @var array 
+	 * @var SortableOptionsContainer 
 	 */
 	protected $sortable;
 	
@@ -104,7 +106,7 @@ class TableView
 	 */
 	protected $rowAttributes;
 	
-	public function __construct($name, RendererInterface $renderer, array $columns, array $rows, array $filters, array $pagination, array $sortable, $emptyValue, array $attributes, array $headAttributes)
+	public function __construct($name, RendererInterface $renderer, array $columns, array $rows, array $filters, PaginationOptionsContainer $pagination, SortableOptionsContainer $sortable, $emptyValue, array $attributes, array $headAttributes)
 	{
 		// Set up the class vars.
 		$this->name				= $name;

@@ -4,14 +4,12 @@ namespace PZAD\TableBundle\Table;
 
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Iterator;
 use PZAD\TableBundle\Table\Column\ColumnInterface;
-use PZAD\TableBundle\Table\Filter\Filter;
 use PZAD\TableBundle\Table\Filter\FilterBuilder;
 use PZAD\TableBundle\Table\Filter\FilterInterface;
-use PZAD\TableBundle\Table\Filter\FilterOperator;
+use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
+use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
 use PZAD\TableBundle\Table\Renderer\DefaultRenderer;
 use PZAD\TableBundle\Table\Row\Row;
 use PZAD\TableBundle\Table\Type\AbstractTableType;
@@ -100,7 +98,7 @@ class Table
 	 * Rehashed pagination information.
 	 * NULL, if pagination is disabled.
 	 * 
-	 * @var array 
+	 * @var PaginationOptionsContainer 
 	 */
 	private $pagination;
 	
@@ -108,7 +106,7 @@ class Table
 	 * Rehased sort information.
 	 * NULL, if sort is disabled.
 	 * 
-	 * @var array
+	 * @var SortableOptionsContainer
 	 */
 	private $sortable;
 	
@@ -171,21 +169,6 @@ class Table
 		return $columns[$columnName];
 	}
 	
-	public function getContainer()
-	{
-		return $this->container;
-	}
-
-	public function getRequest()
-	{
-		return $this->request;
-	}
-
-	public function getRouter()
-	{
-		return $this->router;
-	}
-	
 	public function getRowAttributes(Row $row)
 	{
 		$attr = $this->tableType->getRowAttributes($row);
@@ -226,10 +209,7 @@ class Table
 	 * Last are stored in the rows-array.
 	 */
 	private function buildTable()
-	{
-		// Resolve all options, defined in the table type.
-		$this->resolveOptions();
-		
+	{		
 		// Build the type (adding all columns).
 		$this->tableType->buildTable($this->tableBuilder);
 		
@@ -241,52 +221,36 @@ class Table
 			$this->filterValues = $this->filterBuilder->getFilters();
 		}
 		
-		// Fetch data from the database.
-		$data = $this->getData();
+		// Resolve all options, defined in the table type.
+		$this->resolveOptions();
 		
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
 		// For example, the counter should start at 11, if 
 		// the table is on page 2 and uses 10 rows per page.
 		$count = 0;
-		if(count($this->pagination) > 0)
+		if($this->pagination !== null)
 		{
-			$count = $this->pagination['page'] * $this->pagination['rows_per_page'];
+			$count = $this->pagination->getCurrentPage() * $this->pagination->getItemsPerRow();
 		}
 
 		// Store the data items as Row-Object in the $rows class var.
 		// Additional increment the counter for each row.
-		foreach($data as $object)
+		$data = $this->tableType->getDataSource($this->container)->getData(
+			$this->container,
+			$this->tableBuilder->getColumns(),
+			$this->filterBuilder->getFilters(),
+			$this->pagination, 
+			$this->sortable
+		);
+
+		foreach($data as $dataRow)
 		{
-			$row = new Row($object, ++$count);
+			$row = new Row($dataRow, ++$count);
 			$row->setAttributes( $this->tableType->getRowAttributes($row) );
 			
 			$this->rows[] = $row;
 		}
-				
-		// Build the filters, if the type supports the filter interface.
-		// TODO: Refactor
-//		if($this->tableType instanceof Filter\FilterInterface)
-//		{
-//			$this->tableType->buildFilter($this->filterBuilder);
-//			foreach($this->filterBuilder->getFilters() as $filter)
-//			{
-//				/* @var $filter Filter\Filter */
-//				$column = $this->getColumn($filter->getColumnName());
-//				if($column instanceof Column\EntityColumn && is_string($filter->getValues()))
-//				{
-//					$repository = $this->entityManager->getRepository($filter->getValues());
-//					$values = array();
-//					foreach($repository->findAll() as $item)
-//					{
-//						$values[$item->getId()] = $item;
-//					}
-//					
-//					$filter->setValues($values);
-//				}
-//			}
-//		}
-//		
 	}
 	
 	/**
@@ -299,9 +263,6 @@ class Table
 	protected function resolveOptions()
 	{
 		$optionsResolver = new OptionsResolver();
-		
-		// Set the required options for the table type.
-		$optionsResolver->setRequired(array('data_entity'));
 		
 		// Set the defailt options for the table type.
 		$optionsResolver->setDefaults(array(
@@ -321,6 +282,15 @@ class Table
 		));
 		
 		$this->options = $optionsResolver->resolve(array());
+		
+		// Resolve options of pagination.
+		$this->resolvePaginationOptions();
+		
+		// Resolve sortable options.
+		$this->resolveSortableOptions();
+		
+		// Resole filter options.
+		$this->resolveFilterOptions();
 	}
 
 
@@ -335,137 +305,7 @@ class Table
 	{
 		return $this->tableType->getDataSource($this->container);
 	}
-	
-	/**
-	 * Sets up the sortable part to the QueryBuilder.
-	 * 
-	 * @param	QueryBuilder $queryBuilder	Applies the sortable query options
-	 *										to the query builder, also used by
-	 *										the table type.
-	 */
-	protected function applySortable(QueryBuilder $queryBuilder)
-	{
-		// Set up the query builder.
-		if($this->resolveSortableOptions() === true)
-		{
-			$queryBuilder->orderBy(sprintf('t.%s', $this->sortable['column']), $this->sortable['direction']);
-		}
-	}
-	
-	/**
-	 * Sets up the pagination part to the QueryBuilder.
-	 * 
-	 * @param	QueryBuilder $queryBuilder	Applies the pagination query options
-	 *										to the query builder, also used by
-	 *										the table type.
-	 * 
-	 * @return boolean						True, if the pagination was applied (if
-	 *										and only if pagination is in use).
-	 *										False, otherwise.
-	 */
-	protected function applyPagination(QueryBuilder $queryBuilder)
-	{
-		// Set up the query builder, if pagination is in use.
-		if($this->resolvePaginationOptions() === true)
-		{
-			$countQuery = $this->entityManager->createQueryBuilder();
-			$this->tableType->buildQuery(
-				$countQuery,
-				$this->tableBuilder->getColumns(),
-				$this->options['data_entity']
-			);
-			$this->tableType->refineQuery($countQuery);
-			
-			$countItems = $countQuery->select('count(t)')->getQuery()->getSingleScalarResult();
-			$countPages = ceil($countItems / $this->pagination['rows_per_page']);
-			if($countPages < 1)
-			{
-				$countPages = 1;
-			}
-			$this->pagination['count_pages'] = $countPages;
 
-			if($this->pagination['page'] < 0 || $this->pagination['page'] > $countPages - 1)
-			{
-				throw new NotFoundHttpException();
-			}
-
-			$queryBuilder
-				->setFirstResult($this->pagination['page'] * $this->pagination['rows_per_page'])
-				->setMaxResults($this->pagination['rows_per_page']);
-
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Sets up the filter part to the QueryBuilder.
-	 * 
-	 * @param	QueryBuilder $queryBuilder	Applies the filter query options
-	 *										to the query builder, also used by
-	 *										the table type.
-	 */
-	protected function applyFilters(QueryBuilder $queryBuilder)
-	{
-		if($this->tableType instanceof Type\FilterableInterface)
-		{
-			$this->resolveFilterOptions();
-			
-			$whereStatements = array();
-			foreach($this->filterBuilder->getFilters() as $filter)
-			{
-				/* @var $filter FilterInterface */
-				
-				$value = $this->getFilterValue($filter);
-				
-				if($filter->getValues() !== null && is_array($filter->getValues()) && count($filter->getValues()) > 0)
-				{
-					$values = $filter->getValues();
-					if(!array_key_exists($value, $values))
-					{
-						continue;
-					}
-					$value = $values[$value];
-				}
-				
-				switch($filter->getOperator())
-				{
-					case FilterOperator::EQ:
-						$singleStatement = 't.%s = :%s'; break;
-					case FilterOperator::LT:
-						$singleStatement = 't.%s < :%s'; break;
-					case FilterOperator::GT:
-						$singleStatement = 't.%s > :%s'; break;
-					case FilterOperator::LEQ:
-						$singleStatement = 't.%s <= :%s'; break;
-					case FilterOperator::GEQ:
-						$singleStatement = 't.%s >= :%s'; break;
-					case FilterOperator::NOT_EQ:
-						$singleStatement = 't.%s <> :%s'; break;
-					case FilterOperator::NOT_LIKE:
-						$singleStatement = 't.%s not like %%:%s%%'; break;
-					default:
-						$singleStatement = 't.%s% like %%:%s%%';
-				}
-				
-				$whereStatements[] = sprintf($singleStatement, $filter->getName(), $filter->getName());
-				$queryBuilder->setParameter($filter->getName(), $value);
-			}
-
-			$whereStatement = sprintf("(%s)", implode(' and ', $whereStatements));
-			$isFirstWhere = strpos(strtolower($queryBuilder->getDQL()), 'where') !== false;
-			if($isFirstWhere)
-			{
-				$queryBuilder->where($whereStatement);
-			}
-			else
-			{
-				$queryBuilder->andWhere($whereStatement);
-			}
-		}
-	}
-	
 	/**
 	 * Builds the _pagination-array from the current tableBuilder.
 	 * 
@@ -474,9 +314,6 @@ class Table
 	 *	param:				Name of the request-parameter for the page.
 	 *	page:				Current page.
 	 *	classes:			Classes for rendering, containing classnames for "ul", "li", "li-active" and "li-disabled".
-	 * 
-	 * @return boolean		True, if pagination is in use.
-	 *						False, otherwise.
 	 */
 	private function resolvePaginationOptions()
 	{
@@ -484,8 +321,8 @@ class Table
 		// if pagination is used in the table type.
 		if($this->tableType instanceof PaginatableInterface === false)
 		{
-			$this->pagination = array();
-			return false;
+			$this->pagination = null;
+			return;
 		}
 		
 		// Configure the options resolver for the pagination.
@@ -503,12 +340,20 @@ class Table
 		$this->tableType->setPaginatableDefaultOptions($paginationOptionsResolver);
 		
 		// Resolve the options.
-		$this->pagination = $paginationOptionsResolver->resolve(array());
+		$pagination = $paginationOptionsResolver->resolve(array());
 		
-		// Read the current page from $request-object.
-		$this->pagination['page'] = ((int) $this->request->get( $this->pagination['param'] )) - 1;
-		
-		return true;
+		// Setup options container.
+		$this->pagination = new PaginationOptionsContainer(
+			$pagination['param'],
+			$pagination['rows_per_page'],
+			((int) $this->request->get( $pagination['param'] )) - 1,
+			array(
+				'ul' => $pagination['ul_class'],
+				'li' => $pagination['li_class'],
+				'li_active' => $pagination['li_class_active'],
+				'li_disabled' => $pagination['li_class_disabled']
+			)
+		);
 	}
 	
 	private function resolveSortableOptions()
@@ -517,8 +362,8 @@ class Table
 		// if sort is used in the table type.
 		if($this->tableType instanceof SortableInterface === false)
 		{
-			$this->sortable = array();
-			return false;
+			$this->sortable = null;
+			return;
 		}
 		
 		// Configure the options resolver for the sortable options.
@@ -536,15 +381,16 @@ class Table
 		$this->tableType->setSortableDefaultOptions($sortableOptionsResolver);
 		
 		// Resolve the options.
-		$this->sortable = $sortableOptionsResolver->resolve(array());
+		$sortable = $sortableOptionsResolver->resolve(array());
 		
 		// Read the column and direction from $request-object.
-		$column = $this->request->get( $this->sortable['param_column'] );
-		$direction = $this->request->get( $this->sortable['param_direction'] );
+		$column = $this->request->get( $sortable['param_column'] );
+		$direction = $this->request->get( $sortable['param_direction'] );
 		
+		// Find column and direction if the are empty.
 		if($column === null)
 		{
-			if($this->sortable['empty_column'] === null)
+			if($sortable['empty_column'] === null)
 			{
 				// If no default column is defined, look for the first sortable.
 				foreach($this->tableBuilder->getColumns() as $tmpColumn)
@@ -565,13 +411,13 @@ class Table
 			}
 			else
 			{
-				$column = $this->sortable['empty_column'];
+				$column = $sortable['empty_column'];
 			}
 		}
 		
 		if($direction === null)
 		{
-			$direction = $this->sortable['empty_direction'];
+			$direction = $sortable['empty_direction'];
 		}
 		
 		// Set the values of column and direction in the sortable options array.
@@ -579,13 +425,20 @@ class Table
 		$this->sortable['direction'] = $direction;
 		
 		// Require a sortable column, otherwise redirect to 404.
-		$sortedColumn = $this->getColumn($this->sortable['column']);
+		$sortedColumn = $this->getColumn($column);
 		if($sortedColumn->isSortable() !== true)
 		{
 			throw new NotFoundHttpException();
 		}
 		
-		return true;
+		// Set up options container.
+		$this->sortable = new SortableOptionsContainer(
+			$sortable['param_direction'],
+			$sortable['param_column'],
+			$direction,
+			$column,
+			array('asc' => $sortable['class_asc'], 'desc' => 'class_desc')
+		);
 	}
 	
 	private function resolveFilterOptions()
@@ -602,13 +455,18 @@ class Table
 		}
 	}
 	
-	/**
-	 * 
-	 * @param FilterInterface $filter
-	 * @return string					Value of the filters name in the request object.
-	 */
-	private function getFilterValue(FilterInterface $filter)
+	public function getContainer()
 	{
-		return $this->request->get($filter->getName(), null);
+		return $this->container;
+	}
+
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	public function getRouter()
+	{
+		return $this->router;
 	}
 }
