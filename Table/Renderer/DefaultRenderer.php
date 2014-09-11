@@ -182,7 +182,7 @@ class DefaultRenderer implements RendererInterface
 	{
 		$pagination = $tableView->getPagination();
 		
-		if(!is_array($pagination) || count($pagination) === 0)
+		if(true || $pagination === null)
 		{
 			return;
 		}
@@ -285,37 +285,40 @@ class DefaultRenderer implements RendererInterface
 	{
 		$sortable = $tableView->getSortable();
 		
-		if(!$column->isSortable() || !is_array($sortable) || count($sortable) === 0)
+		if(!$column->isSortable() || $sortable === null)
 		{
 			return $column->getLabel();
 		}
 		
-		$isSortedColumn = $sortable['column'] == $column->getName() ? true : false;
+		$isSortedColumn = $sortable->getColumnName() == $column->getName() ? true : false;
 		if($isSortedColumn)
 		{
-			$direction = $sortable['direction'] == 'asc' ? 'desc' : 'asc';
+			$direction = $sortable->getDirection() == 'asc' ? 'desc' : 'asc';
 		}
 		else
 		{
-			$direction = $sortable['empty_direction'];
+//			$direction = $sortable['empty_direction'];
+			$direction = $sortable->getDirection() == 'asc' ? 'desc' : 'asc';
 		}
 		
 		$routeParams = array(
-			$sortable['param_column'] => $column->getName(),
-			$sortable['param_direction'] => $direction
+			$sortable->getParamColumnName() => $column->getName(),
+			$sortable->getParamDirectionName() => $direction
 		);
 		
 		$pagination = $tableView->getPagination();
-		if($pagination !== null && count($pagination) > 0)
+		if($pagination !== null)
 		{
-			$routeParams[$pagination['param']] = 1;
+			$routeParams[$pagination->getParameterName()] = 1;
 		}
 
+		$classes = $sortable->getClasses();
+		
 		return sprintf(
 			"<a href=\"%s\">%s</a> %s",
 			$this->generateUrl($routeParams),
 			$column->getLabel(),
-			$isSortedColumn ? sprintf("<span class=\"%s\"></span>", $sortable[sprintf('class_%s', $sortable['direction'])]) : ''
+			$isSortedColumn ? sprintf("<span class=\"%s\"></span>", $classes[$sortable->getDirection()]) : ''
 		);
 	}
 	

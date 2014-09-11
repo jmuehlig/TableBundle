@@ -9,6 +9,7 @@ use PZAD\TableBundle\Table\Filter\FilterInterface;
 use PZAD\TableBundle\Table\Filter\FilterOperator;
 use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
 use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
+use PZAD\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -32,29 +33,39 @@ class QueryBuilderDataSource implements DataSourceInterface
 	 */
 	protected $queryBuilder;
 
-	public function __construct(QueryBuilder $queryBuilder)
+	public function __construct(QueryBuilder $queryBuilder = null)
 	{
 		$this->queryBuilder = $queryBuilder;
 	}
 	
 	public function getData(ContainerInterface $container, array $columns, array $filters = null, PaginationOptionsContainer $pagination = null, SortableOptionsContainer $sortable = null)
 	{
+		if($this->queryBuilder === null)
+		{
+			TableException::noQueryBuilder();
+		}
+		
 		$queryBuilder = clone $this->queryBuilder;
 		
 		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
 		
+		$aliases = $queryBuilder->getRootAliases();
+		
 		if($sortable !== null)
 		{
-			$queryBuilder->orderBy($sortable->getColumnName(), $sortable->getDirection());
+			$queryBuilder->orderBy(sprintf('%s.%s', $aliases[0], $sortable->getColumnName()), $sortable->getDirection());
 		}
 		
 		if($pagination !== null)
 		{
+			$countPages = $this->getCountPages($container, $columns, $filters, $pagination);
 			if(	$pagination->getCurrentPage() < 0
-				|| $pagination->getCurrentPage() > $this->getCountPages($container, $columns, $filters, $pagination) - 1
+				|| $pagination->getCurrentPage() > $countPages
 			)
 			{
-				throw new NotFoundHttpException();
+				
+				print_r($countPages);
+				throw new NotFoundHttpException(sprintf("%s < 0 || %s > %s", $pagination->getCurrentPage(), $pagination->getCurrentPage(), $countPages));
 			}
 			
 			$queryBuilder->setFirstResult($pagination->getCurrentPage() * $pagination->getItemsPerRow());
@@ -68,9 +79,16 @@ class QueryBuilderDataSource implements DataSourceInterface
 	
 	public function getCountPages(ContainerInterface $container, array $columns, array $filters = null, PaginationOptionsContainer $pagination = null)
 	{
+		if($this->queryBuilder === null)
+		{
+			TableException::noQueryBuilder();
+		}
+		
 		$queryBuilder = clone $this->queryBuilder;
 		
-		$queryBuilder->select('count(*)');
+		$aliases = $queryBuilder->getRootAliases();
+		
+		$queryBuilder->select(sprintf('count(%s)', $aliases[0]));
 		
 		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
 		
@@ -100,32 +118,41 @@ class QueryBuilderDataSource implements DataSourceInterface
 		{
 			/* @var $filter FilterInterface */
 			
+			$filterValue = $request->attributes->get($filter->getName());
+			if($filterValue === null || trim($filterValue) === "")
+			{
+				continue;
+			}
+			
 			foreach($filter->getColumns() as $column)
 			{
 				/* @var $column ColumnInterface */
 
-				$whereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column->getName(), $filter->getName());
+				$whereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column, $filter->getName());
 			}
 			
 			if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
 			{
-				$queryBuilder->setParameter($filter->getName(), '%' . $request->attributes->get($filter->getName()) . '%');
+				$queryBuilder->setParameter($filter->getName(), '%' . $filterValue . '%');
 			}
 			else
 			{
-				$queryBuilder->setParameter($filter->getName(), $request->attributes->get($filter->getName()));
+				$queryBuilder->setParameter($filter->getName(), $filterValue);
 			}
 		}
 		
-		$whereStatement = implode(' and ', $whereParts);
-		
-		if(strpos(strtolower($queryBuilder->getDQL()), 'where') === false)
+		if(count($whereParts) > 0)
 		{
-			$queryBuilder->where($whereStatement);
-		}
-		else
-		{
-			$queryBuilder->andWhere($whereStatement);
+			$whereStatement = implode(' and ', $whereParts);
+
+			if(strpos(strtolower($queryBuilder->getDQL()), 'where') === false)
+			{
+				$queryBuilder->where($whereStatement);
+			}
+			else
+			{
+				$queryBuilder->andWhere($whereStatement);
+			}
 		}
 	}
 	
