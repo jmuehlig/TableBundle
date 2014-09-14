@@ -1,7 +1,6 @@
 services:
     pzad.table.twig:
         class: PZAD\TableBundle\Twig\TableExtension
-        arguments: ["@service_container","@router"]
         tags:
             - { name: twig.extension }
     pzad.table:

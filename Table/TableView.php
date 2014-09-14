@@ -2,6 +2,7 @@
 
 namespace PZAD\TableBundle\Table;
 
+use PZAD\TableBundle\Table\Model\FilterOptionsContainer;
 use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
 use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
 use PZAD\TableBundle\Table\Renderer\RendererInterface;
@@ -67,6 +68,15 @@ class TableView
 	protected $pagination;
 	
 	/**
+	 * Options for the table filters.
+	 * Only, if filter are defined by
+	 * the table type.
+	 * 
+	 * @var FilterOptionsContainer 
+	 */
+	protected $filter;
+	
+	/**
 	 * Options for the table sorting.
 	 * Only, if sortable is defined by
 	 * the table type.
@@ -106,7 +116,26 @@ class TableView
 	 */
 	protected $rowAttributes;
 	
-	public function __construct($name, RendererInterface $renderer, array $columns, array $rows, array $filters, PaginationOptionsContainer $pagination, SortableOptionsContainer $sortable, $emptyValue, array $attributes, array $headAttributes)
+	/**
+	 * Number of total pages, 1 if pagination
+	 * is not available.
+	 * 
+	 * @var int
+	 */
+	protected $totalPages;
+	
+	/**
+	 * Number of total items.
+	 * 
+	 * @var int
+	 */
+	protected $totalItems;
+	
+	public function __construct($name, RendererInterface $renderer, array $columns, array $rows,
+		array $filters, PaginationOptionsContainer $pagination, SortableOptionsContainer $sortable,
+		FilterOptionsContainer $filter, $emptyValue, array $attributes, array $headAttributes,
+		$totalPages, $totalItems
+	)
 	{
 		// Set up the class vars.
 		$this->name				= $name;
@@ -116,9 +145,12 @@ class TableView
 		$this->filters			= $filters;
 		$this->pagination		= $pagination;
 		$this->sortable			= $sortable;
+		$this->filter			= $filter;
 		$this->emptyValue		= $emptyValue;
 		$this->attributes		= $attributes;
 		$this->headAttributes	= $headAttributes;
+		$this->totalPages		= $totalPages;
+		$this->totalItems		= $totalItems;
 	}
 	
 	// Begin of getters for the class vars.
@@ -156,6 +188,11 @@ class TableView
 	{
 		return $this->sortable;
 	}
+	
+	public function getFilter()
+	{
+		return $this->filter;
+	}
 
 	public function getEmptyValue()
 	{
@@ -170,5 +207,15 @@ class TableView
 	public function getHeadAttributes()
 	{
 		return $this->headAttributes;
+	}
+	
+	public function getTotalPages()
+	{
+		return $this->totalPages;
+	}
+
+	public function getTotalItems()
+	{
+		return $this->totalItems;
 	}
 }

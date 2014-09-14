@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Iterator;
 use PZAD\TableBundle\Table\Column\ColumnInterface;
 use PZAD\TableBundle\Table\Filter\FilterBuilder;
-use PZAD\TableBundle\Table\Filter\FilterInterface;
+use PZAD\TableBundle\Table\Model\FilterOptionsContainer;
 use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
 use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
 use PZAD\TableBundle\Table\Renderer\DefaultRenderer;
@@ -111,6 +111,14 @@ class Table
 	private $sortable;
 	
 	/**
+	 * Rehashed filter information.
+	 * NULL, if filter is disabled.
+	 * 
+	 * @var FilterOptionsContainer
+	 */
+	private $filter;
+	
+	/**
 	 * Used filters of this table:
 	 * name => value.
 	 * Empty array, if type of the table
@@ -119,6 +127,20 @@ class Table
 	 * @var array
 	 */
 	private $filterValues;
+	
+	/**
+	 * Number of total pages.
+	 * 
+	 * @var int
+	 */
+	private $totalPages = 1;
+	
+	/**
+	 * Number of total items.
+	 * 
+	 * @var int
+	 */
+	private $totalItems;
 	
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
 	{
@@ -197,9 +219,12 @@ class Table
 			$this->filterValues,
 			$this->pagination,
 			$this->sortable,
+			$this->filter,
 			$this->options['empty_value'],
 			$this->options['attr'],
-			$this->options['head_attr']
+			$this->options['head_attr'],
+			$this->totalPages,
+			$this->totalItems
 		);
 	}
 	
@@ -291,6 +316,25 @@ class Table
 		
 		// Resole filter options.
 		$this->resolveFilterOptions();
+		
+		// Read total items.
+		$this->totalItems = $this->tableType->getDataSource($this->container)->getCountItems(
+			$this->container,
+			$this->tableBuilder->getColumns(),
+			$this->filterBuilder->getFilters()
+		);
+		
+		// Read total pages.
+		if($this->pagination !== null)
+		{
+			$countPages = ceil($this->totalItems / $this->pagination->getItemsPerRow());
+			if(	$this->pagination->getCurrentPage() < 0 || $this->pagination->getCurrentPage() > $countPages)
+			{
+				throw new NotFoundHttpException();
+			}
+		
+			$this->totalPages = $countPages < 1 ? 1 : $countPages;
+		}
 	}
 
 
@@ -354,6 +398,8 @@ class Table
 				'li_disabled' => $pagination['li_class_disabled']
 			)
 		);
+		
+		
 	}
 	
 	private function resolveSortableOptions()
@@ -420,10 +466,6 @@ class Table
 			$direction = $sortable['empty_direction'];
 		}
 		
-		// Set the values of column and direction in the sortable options array.
-		$this->sortable['column'] = $column;
-		$this->sortable['direction'] = $direction;
-		
 		// Require a sortable column, otherwise redirect to 404.
 		$sortedColumn = $this->getColumn($column);
 		if($sortedColumn->isSortable() !== true)
@@ -443,16 +485,45 @@ class Table
 	
 	private function resolveFilterOptions()
 	{
-		foreach($this->filterBuilder->getFilters() as $filter)
+		if($this->tableType instanceof Type\FilterableInterface === false)
 		{
-			/* @var $filter FilterInterface */
-			
-//			$filterValue = $this->request->get($filter->getName(), null);
-//			if($filterValue !== null)
-//			{
-//				$this->filterValues[$filter->getColumnName()] = trim($filterValue);
-//			}
+			$this->filter = null;
+			return;
 		}
+		
+		// Set button option default values.
+		$filterOptionsResolver = new OptionsResolver();
+		$filterOptionsResolver->setDefaults(array(
+			'submit' => array(),
+			'reset' => array()
+		));
+		$this->tableType->setFilterButtonOptions($filterOptionsResolver);
+		
+		// Resolve the filter button options.
+		$filter = $filterOptionsResolver->resolve(array());
+		
+		// Set submit button default values.
+		$submitOptionsResolver = new OptionsResolver();
+		$submitOptionsResolver->setDefaults(array(
+			'label' => 'submit',
+			'class' => array()
+		));
+		
+		// Resolve submit button options.
+		$submit = $submitOptionsResolver->resolve($filter['submit']);
+		
+		// Set submit button default values.
+		$resetOptionsResolver = new OptionsResolver();
+		$resetOptionsResolver->setDefaults(array(
+			'label' => 'reset',
+			'class' => array()
+		));
+		
+		// Resolve submit button options.
+		$reset = $submitOptionsResolver->resolve($filter['reset']);
+		
+		// Set up the options container.
+		$this->filter = new FilterOptionsContainer($submit['label'], $submit['class'], $reset['label'], $reset['class']);
 	}
 	
 	public function getContainer()
