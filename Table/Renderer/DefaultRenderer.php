@@ -3,6 +3,7 @@
 namespace PZAD\TableBundle\Table\Renderer;
 
 use PZAD\TableBundle\Table\Column\ColumnInterface;
+use PZAD\TableBundle\Table\Filter\FilterInterface;
 use PZAD\TableBundle\Table\Row\Row;
 use PZAD\TableBundle\Table\TableView;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -52,13 +53,13 @@ class DefaultRenderer implements RendererInterface
 	 */
 	public function render(TableView $tableView)
 	{
-		return sprintf("%s\n %s\n %s\n %s\n %s",
-			$this->renderBegin($tableView),
-			$this->renderHead($tableView),
-			$this->renderBody($tableView),
-			$this->renderEnd(),
-			$this->renderPagination($tableView)				
-		);
+//		return sprintf("%s\n %s\n %s\n %s\n %s",
+//			$this->renderBegin($tableView),
+//			$this->renderHead($tableView),
+//			$this->renderBody($tableView),
+//			$this->renderEnd(),
+//			$this->renderPagination($tableView)				
+//		);
 	}
 	
 	/**
@@ -68,7 +69,7 @@ class DefaultRenderer implements RendererInterface
 	 * 
 	 * @return string HTML Code.
 	 */
-	public function renderBegin(TableView $tableView)
+	public function renderTableBegin(TableView $tableView)
 	{
 		return sprintf(
 			"<table id=\"%s\"%s>",
@@ -84,7 +85,7 @@ class DefaultRenderer implements RendererInterface
 	 * 
 	 * @return string HTML Code.
 	 */
-	public function renderHead(TableView $tableView)
+	public function renderTableHead(TableView $tableView)
 	{		
 		$content = "<thead>";
 		$content .= sprintf("<tr%s>", $this->renderAttributesContent($tableView->getHeadAttributes()));
@@ -122,7 +123,7 @@ class DefaultRenderer implements RendererInterface
 	 * 
 	 * @return string HTML Code.
 	 */
-	public function renderBody(TableView $tableView)
+	public function renderTableBody(TableView $tableView)
 	{
 		$content = "<tbody>";
 		
@@ -166,7 +167,7 @@ class DefaultRenderer implements RendererInterface
 	 * 
 	 * @return string HTML Code.
 	 */
-	public function renderEnd(TableView $tableView = null)
+	public function renderTableEnd(TableView $tableView = null)
 	{
 		return "</table>";
 	}
@@ -178,7 +179,7 @@ class DefaultRenderer implements RendererInterface
 	 * 
 	 * @return string HTML Code.
 	 */
-	public function renderPagination(TableView $tableView)
+	public function renderTablePagination(TableView $tableView)
 	{
 		$pagination = $tableView->getPagination();
 		
@@ -365,5 +366,52 @@ class DefaultRenderer implements RendererInterface
 		}
 		
 		return $this->router->generate($routeName, $currentRouteParams);
+	}
+
+	public function renderFilter(FilterInterface $filter)
+	{
+		return $filter->render($this->container);
+	}
+
+	public function renderFilterBegin(TableView $tableView)
+	{
+		foreach($tableView->getFilters() as $filter)
+		{
+			/* @var $filter FilterInterface */
+			if($filter->needsFormEnviroment())
+			{
+				return "<form>";
+			}
+		}
+	}
+
+	public function renderFilterEnd(TableView $tableView)
+	{
+		foreach($tableView->getFilters() as $filter)
+		{
+			/* @var $filter FilterInterface */
+			if($filter->needsFormEnviroment())
+			{
+				return "</form>";
+			}
+		}
+	}
+
+	public function renderFilterResetLink(TableView $tableView)
+	{
+		return sprintf(
+			"<a href=\"#\" class=\"%s\">%s</a>",
+			implode(" ", $tableView->getFilter()->getResetClasses()),
+			$tableView->getFilter()->getResetLabel()
+		);
+	}
+
+	public function renderFilterSubmitButton(TableView $tableView)
+	{
+		return sprintf(
+			"<input type=\"submit\" class=\"%s\" value=\"%s\" />",
+			implode(" ", $tableView->getFilter()->getSubmitClasses()),
+			$tableView->getFilter()->getSubmitLabel()
+		);
 	}
 }

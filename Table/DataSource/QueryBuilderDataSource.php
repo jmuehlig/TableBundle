@@ -12,7 +12,6 @@ use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
 use PZAD\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * DataSource implementation for fetching the data
@@ -57,17 +56,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		}
 		
 		if($pagination !== null)
-		{
-			$countPages = $this->getCountPages($container, $columns, $filters, $pagination);
-			if(	$pagination->getCurrentPage() < 0
-				|| $pagination->getCurrentPage() > $countPages
-			)
-			{
-				
-				print_r($countPages);
-				throw new NotFoundHttpException(sprintf("%s < 0 || %s > %s", $pagination->getCurrentPage(), $pagination->getCurrentPage(), $countPages));
-			}
-			
+		{			
 			$queryBuilder->setFirstResult($pagination->getCurrentPage() * $pagination->getItemsPerRow());
 			$queryBuilder->setMaxResults($pagination->getItemsPerRow());
 			
@@ -77,7 +66,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		return $queryBuilder->getQuery()->getResult();
 	}
 	
-	public function getCountPages(ContainerInterface $container, array $columns, array $filters = null, PaginationOptionsContainer $pagination = null)
+	public function getCountItems(ContainerInterface $container, array $columns, array $filters = null)
 	{
 		if($this->queryBuilder === null)
 		{
@@ -92,10 +81,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		
 		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
 		
-		$countItems = $queryBuilder->getQuery()->getSingleScalarResult();
-		$countPages = ceil($countItems / $pagination->getItemsPerRow());
-		
-		return $countPages < 1 ? 1 : $countPages;
+		return $queryBuilder->getQuery()->getSingleScalarResult();
 	}
 	
 	/**
@@ -111,40 +97,49 @@ class QueryBuilderDataSource implements DataSourceInterface
 		{
 			return;
 		}
-		
+
 		$whereParts = array();
 		
 		foreach($filters as $filter)
 		{
 			/* @var $filter FilterInterface */
-			
-			$filterValue = $request->attributes->get($filter->getName());
+
+			// Only apply used filters to the query builder.
+			$filterValue = $request->query->get($filter->getName());
 			if($filterValue === null || trim($filterValue) === "")
 			{
 				continue;
 			}
 			
+			// Build part for filter with all columns like: 'column1 = x or column2 = x ..'
+			$innerWhereParts = array();
 			foreach($filter->getColumns() as $column)
 			{
 				/* @var $column ColumnInterface */
-
-				$whereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column, $filter->getName());
+				$innerWhereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column, $filter->getName());
 			}
 			
-			if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
+			if(count($innerWhereParts) > 0)
 			{
-				$queryBuilder->setParameter($filter->getName(), '%' . $filterValue . '%');
-			}
-			else
-			{
-				$queryBuilder->setParameter($filter->getName(), $filterValue);
+				$whereParts[] = sprintf('(%s)', implode(' or ', $innerWhereParts));
+				
+				// Add the filters value to the query builder parameters map.
+				if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
+				{
+					$queryBuilder->setParameter($filter->getName(), '%' . $filterValue . '%');
+				}
+				else
+				{
+					$queryBuilder->setParameter($filter->getName(), $filterValue);
+				}
 			}
 		}
-		
+
+		// If there was more than one filter used, add them all to the query builder.
 		if(count($whereParts) > 0)
 		{
 			$whereStatement = implode(' and ', $whereParts);
-
+			print($whereStatement);
 			if(strpos(strtolower($queryBuilder->getDQL()), 'where') === false)
 			{
 				$queryBuilder->where($whereStatement);

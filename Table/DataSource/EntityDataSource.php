@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace PZAD\TableBundle\Table\DataSource;
 
 use Doctrine\ORM\QueryBuilder;
@@ -48,14 +42,14 @@ class EntityDataSource extends QueryBuilderDataSource
 		return parent::getData($container, $columns, $filters, $pagination, $sortable);
 	}
 	
-	public function getCountPages(ContainerInterface $container, array $columns, array $filters = null, \PZAD\TableBundle\Table\Model\PaginationOptionsContainer $pagination = null)
+	public function getCountItems(ContainerInterface $container, array $columns, array $filters = null)
 	{
 		if($this->queryBuilder === null)
 		{
 			$this->queryBuilder = $this->createQueryBuilder($container, $columns);
 		}
 		
-		return parent::getCountPages($container, $columns, $filters, $pagination);
+		return parent::getCountItems($container, $columns, $filters);
 	}
 	
 	/**

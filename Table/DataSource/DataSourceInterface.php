@@ -35,19 +35,17 @@ interface DataSourceInterface
 	);
 	
 	/**
-	 * Returns the number of pages.
+	 * Returns the number of items.
 	 * 
 	 * @param ContainerInterace					$container	Symfonys container.
 	 * @param array								$columns	Array with all columns of the table.
 	 * @param array|null						$filters	Array with all filters of the table, null if filters are not supported.
-	 * @param PaginationOptionsContainer|null	$pagination	Container with all pagination options, null if pagination is not supported.
 	 * 
 	 * @return array							Array with data for the table.
 	 */
-	public function getCountPages(
+	public function getCountItems(
 		ContainerInterface $container,
 		array $columns,
-		array $filters = null,
-		PaginationOptionsContainer $pagination = null
+		array $filters = null
 	);
 }

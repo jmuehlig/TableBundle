@@ -113,4 +113,16 @@ class TableException extends \Exception
 		$message = 'You have to pass a QueryBuilder into the DataSource.';
 		throw new TableException($message);
 	}
+	
+	public static function filterNoView()
+	{
+		$message = "You have to use filter_begin() before you can render a single filter.";
+		throw new TableException($message);
+	}
+	
+	public static function canNotRenderFilter()
+	{
+		$message = "Please pass a TablieView, a FilterInterface or an array of FilterInterface objects to the filter()-method.";
+		throw new TableException($message);
+	}
 }
