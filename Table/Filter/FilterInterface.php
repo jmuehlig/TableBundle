@@ -59,6 +59,18 @@ interface FilterInterface
 	public function needsFormEnviroment();
 	
 	/**
+	 * Sets the value of the filter.
+	 * 
+	 * @param mixed $value
+	 */
+	public function setValue($value);
+	
+	/**
+	 * @return mixed			Value of the filter.
+	 */
+	public function getValue();
+	
+	/**
 	 * Renders the filter.
 	 * 
 	 * @param ContainerInterface $container

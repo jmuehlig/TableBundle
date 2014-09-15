@@ -2,6 +2,8 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
+use PZAD\TableBundle\Table\TableException;
+
 /**
  * Available filter operators.
  */
@@ -26,7 +28,7 @@ class FilterOperator
 		$validOperators = array(self::EQ, self::LIKE, self::LT, self::GT, self::LEQ, self::GEQ, self::NOT_EQ, self::NOT_LIKE);
 		if(!in_array($operator, $validOperators))
 		{
-			FilterException::operatorNotValid($operator, $validOperators);
+			TableException::operatorNotValid($operator, $validOperators);
 		}
 	}
 }

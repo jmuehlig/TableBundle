@@ -2,7 +2,7 @@
 
 namespace PZAD\TableBundle\Table\Type;
 
-use PZAD\TableBundle\Table\Filter\FilterBuilder;
+use PZAD\TableBundle\Table\FilterBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**

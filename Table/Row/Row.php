@@ -48,6 +48,11 @@ class Row
 		{
 			return $this->getEntity()->$property;
 		}
+		else if(is_array($this->getEntity()))
+		{
+			$entity = $this->getEntity();
+			return $entity[$property];
+		}
 		else
 		{
 			$propertyName = strtoupper($property[0]) . substr($property, 1);

@@ -43,7 +43,8 @@ class Configuration implements ConfigurationInterface
 	public function getDefaultFilters()
 	{
 		return array(
-			'text'		=> 'PZAD\TableBundle\Table\Filter\TextFilter'
+			'text'		=> 'PZAD\TableBundle\Table\Filter\TextFilter',
+			'list'		=> 'PZAD\TableBundle\Table\Filter\ListFilter'
 		);
 	}
 			

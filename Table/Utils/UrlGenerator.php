@@ -1,0 +1,64 @@
+<?php
+
+namespace PZAD\TableBundle\Table\Utils;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
+
+/**
+ * Generator for urls, used in the table bundle.
+ *
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
+ */
+class UrlGenerator
+{
+	/**
+	 * @var Request
+	 */
+	private $request;
+	
+	/**
+	 * @var Router
+	 */
+	private $router;
+	
+	public function __construct(Request $request, RouterInterface $router)
+	{
+		$this->request = $request;
+		$this->router = $router;
+	}
+	
+	/**
+	 * Generates an url.
+	 * Replaces the parameters of the given array or adds them,
+	 * if they are not used, yet.
+	 * 
+	 * @param	array|null $replacedParameters	Parameters to replace in the url.
+	 * @return	string							New generated url.
+	 */
+	public function getUrl(array $replacedParameters = array())
+	{
+		$routeName = $this->request->get('_route');
+		$currentRouteParams = array_merge(
+			$this->request->attributes->get('_route_params'),
+			$this->request->query->all()
+		);
+
+		foreach($replacedParameters as $name => $value)
+		{
+			$currentRouteParams[$name] = $value;
+		}
+		
+		// Cleaning up the parameters.
+		foreach($currentRouteParams as $key => $value)
+		{
+			if($value === null || trim($value) === '')
+			{
+				unset($currentRouteParams[$key]);
+			}
+		}
+		
+		return $this->router->generate($routeName, $currentRouteParams);
+	}
+}
