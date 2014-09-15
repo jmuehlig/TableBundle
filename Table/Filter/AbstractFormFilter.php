@@ -5,6 +5,7 @@ namespace PZAD\TableBundle\Table\Filter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 /**
  * The AbstractFormFilter gives a extending filter the possibility
@@ -48,14 +49,15 @@ abstract class AbstractFormFilter extends AbstractFilter
 
 	public function render(ContainerInterface $container)
 	{
-		$formBuilder = $container->get('form.factory')->createBuilder('form');
+		$formBuilder = $container->get('form.factory')->createNamedBuilder('', 'form');
 		/* @var $formBuilder FormBuilder */
 		
 		$options = array_merge(
 			$this->formOptions,
 			array(
 				'label' => $this->getLabel(),
-				'attr' => $this->getAttributes()
+				'attr' => $this->getAttributes(),
+				'data' => $this->getValue()
 			)
 		);
 		

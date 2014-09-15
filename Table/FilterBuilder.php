@@ -1,7 +1,9 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Filter;
+namespace PZAD\TableBundle\Table;
 
+use PZAD\TableBundle\Table\Filter\FilterInterface;
+use PZAD\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -30,13 +32,13 @@ class FilterBuilder
 	{
 		if(array_key_exists($name, $this->filters))
 		{
-			FilterException::duplicatedFilterName($name);
+			TableException::duplicatedFilterName($name);
 		}
 		
 		$type = strtolower($type);
 		if(!array_key_exists($type, $this->registeredFilters))
 		{
-			FilterException::typeNotAllowed($type, array_keys($this->registeredFilters));
+			TableException::filterTypeNotAllowed($type, array_keys($this->registeredFilters));
 		}
 		
 		$filter = new $this->registeredFilters[$type];
@@ -44,7 +46,7 @@ class FilterBuilder
 		
 		if(!$filter instanceof FilterInterface)
 		{
-			FilterException::filterClassNotImplementingInterface($filter);
+			TableException::filterClassNotImplementingInterface($filter);
 		}
 		
 		$filter->setName($name);

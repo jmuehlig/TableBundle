@@ -67,7 +67,7 @@ class TableBuilder
 		$type = strtolower($type);
 		if(!array_key_exists($type, $this->registeredColumns))
 		{
-			TableException::typeNotAllowed($type);
+			TableException::columnTypeNotAllowed($type);
 		}
 		
 		$column = new $this->registeredColumns[$type];

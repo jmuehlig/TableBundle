@@ -6,7 +6,8 @@ use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
 use Iterator;
 use PZAD\TableBundle\Table\Column\ColumnInterface;
-use PZAD\TableBundle\Table\Filter\FilterBuilder;
+use PZAD\TableBundle\Table\FilterBuilder;
+use PZAD\TableBundle\Table\Filter\FilterInterface;
 use PZAD\TableBundle\Table\Model\FilterOptionsContainer;
 use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
 use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
@@ -119,16 +120,6 @@ class Table
 	private $filter;
 	
 	/**
-	 * Used filters of this table:
-	 * name => value.
-	 * Empty array, if type of the table
-	 * does not implement the FilterInterface.
-	 * 
-	 * @var array
-	 */
-	private $filterValues;
-	
-	/**
 	 * Number of total pages.
 	 * 
 	 * @var int
@@ -154,7 +145,6 @@ class Table
 		// Set up rows, filters and optionsResolver
 		// for the table type.
 		$this->rows = array();
-		$this->filterValues = array();
 		$this->options = array();
 	}
 	
@@ -216,7 +206,7 @@ class Table
 			$this->options['renderer'],
 			$this->tableBuilder->getColumns(),
 			$this->rows,
-			$this->filterValues,
+			$this->getFilters(),
 			$this->pagination,
 			$this->sortable,
 			$this->filter,
@@ -243,7 +233,6 @@ class Table
 		if($this->tableType instanceof Type\FilterableInterface)
 		{
 			$this->tableType->buildFilter($this->filterBuilder);
-			$this->filterValues = $this->filterBuilder->getFilters();
 		}
 		
 		// Resolve all options, defined in the table type.
@@ -264,7 +253,7 @@ class Table
 		$data = $this->tableType->getDataSource($this->container)->getData(
 			$this->container,
 			$this->tableBuilder->getColumns(),
-			$this->filterBuilder->getFilters(),
+			$this->getFilters(),
 			$this->pagination, 
 			$this->sortable
 		);
@@ -321,7 +310,7 @@ class Table
 		$this->totalItems = $this->tableType->getDataSource($this->container)->getCountItems(
 			$this->container,
 			$this->tableBuilder->getColumns(),
-			$this->filterBuilder->getFilters()
+			$this->getFilters()
 		);
 		
 		// Read total pages.
@@ -524,6 +513,20 @@ class Table
 		
 		// Set up the options container.
 		$this->filter = new FilterOptionsContainer($submit['label'], $submit['class'], $reset['label'], $reset['class']);
+		
+		// Sets value of all filters.
+		foreach($this->getFilters() as $filter)
+		{
+			/* @var $filter FilterInterface */
+			
+			$filterValue = $this->request->query->get($filter->getName());
+			if(trim($filterValue) === "")
+			{
+				$filterValue = null;
+			}
+			
+			$filter->setValue($filterValue);
+		}
 	}
 	
 	public function getContainer()
@@ -539,5 +542,15 @@ class Table
 	public function getRouter()
 	{
 		return $this->router;
+	}
+	
+	private function getFilters()
+	{
+		if($this->filterBuilder === null)
+		{
+			return array();
+		}
+		
+		return $this->filterBuilder->getFilters();
 	}
 }

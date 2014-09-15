@@ -6,6 +6,7 @@ use PZAD\TableBundle\Table\Column\ColumnInterface;
 use PZAD\TableBundle\Table\Filter\FilterInterface;
 use PZAD\TableBundle\Table\Row\Row;
 use PZAD\TableBundle\Table\TableView;
+use PZAD\TableBundle\Table\Utils\UrlGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
@@ -38,28 +39,20 @@ class DefaultRenderer implements RendererInterface
 	 * @var RouterInterface
 	 */
 	protected $router;
+	
+	/**
+	 * URL Generator.
+	 * 
+	 * @var UrlGenerator
+	 */
+	protected $urlGenerator;
 
 	function __construct(ContainerInterface $container, Request $request, RouterInterface $router)
 	{
 		$this->container	= $container;
 		$this->request		= $request;
 		$this->router		= $router;
-	}
-	
-	/**
-	 * Render the complete table.
-	 * 
-	 * @return string HTML code.
-	 */
-	public function render(TableView $tableView)
-	{
-//		return sprintf("%s\n %s\n %s\n %s\n %s",
-//			$this->renderBegin($tableView),
-//			$this->renderHead($tableView),
-//			$this->renderBody($tableView),
-//			$this->renderEnd(),
-//			$this->renderPagination($tableView)				
-//		);
+		$this->urlGenerator = new UrlGenerator($request, $router);
 	}
 	
 	/**
@@ -188,83 +181,83 @@ class DefaultRenderer implements RendererInterface
 			return;
 		}
 		
-		if($pagination['count_pages'] < 2)
+		if($tableView->getTotalPages() < 2)
 		{
 			return;
 		}
 		
-		$routeName = $this->request->get('_route');
+		$classes = $pagination->getClasses();
 		
-		$ulClass = $pagination['ul_class'] === null ? "" : sprintf(" class=\"%s\"", $pagination['ul_class']);
+		$ulClass = $classes['ul'] === null ? "" : sprintf(" class=\"%s\"", $classes['ul']);
 		$content = sprintf("<ul%s>", $ulClass);
 		
 		// Left arrow.
 		if($pagination['page'] == 0)
 		{
 			$liClass = "";
-			if($pagination['li_class'] !== null || $pagination['li_class_disabled'] !== null)
+			if($classes['li'] !== null || $classes['li_disabled'] !== null)
 			{
-				$liClass = sprintf(" class=\"%s %s\"", $pagination['li_class'], $pagination['li_class_disabled']);
+				$liClass = sprintf(" class=\"%s %s\"", $classes['li'], $classes['li_disabled']);
 			}
 			$content .= sprintf("<li%s><a>&laquo;</a></li>", $liClass);
 		}
 		else
 		{
 			$liClass = "";
-			if($pagination['li_class'] !== null)
+			if($classes['li'] !== null)
 			{
-				$liClass = sprintf(" class=\"%s\"", $pagination['li_class']);
+				$liClass = sprintf(" class=\"%s\"", $classes['li']);
 			}
 			
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">&laquo;</a></li>",
 				$liClass,
-				$this->generateUrl(array(
-					$pagination['param'] => $pagination['page']
+				$this->urlGenerator->getUrl(array(
+					$pagination->getParameterName() => $pagination['page']
 				))
 			);
 		}
 		
 		// Pages
-		for($page = 0; $page < $pagination['count_pages']; $page++)
+		for($page = 0; $page < $tableView->getTotalPages(); $page++)
 		{
 			$liClass = "";
-			if($pagination['li_class'] !== null || ($page == $pagination['page'] && $pagination['li_class_active'] !== null))
+			if($classes['li'] !== null || ($page == $pagination->getCurrentPage() && $classes['li_active'] !== null))
 			{
-				$liClass = sprintf(" class=\"%s %s\"", $pagination['li_class'], $page == $pagination['page'] ? $pagination['li_class_active'] : '');
+				$liClass = sprintf(" class=\"%s %s\"", $classes['li'], $page == $pagination->getCurrentPage() ? $classes['li_active'] : '');
 			}
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">%s</a></li>",
 				$liClass,
-				$this->generateUrl(array(
-					$pagination['param'] => $page + 1
+				$this->urlGenerator->getUrl(array(
+					$pagination->getParameterName() => $page + 1
 				)),
 				$page + 1
 			);
 		}
 		
 		// Right arrow.
-		if($pagination['page'] == $pagination['count_pages'] - 1)
+		if($pagination->getCurrentPage() == $tableView->getTotalPages() - 1)
 		{
 			$liClass = "";
-			if($pagination['li_class'] !== null || $pagination['li_class_disabled'] !== null)
+			if($classes['li'] !== null || $classes['li_disabled'] !== null)
 			{
-				$liClass = sprintf(" class=\"%s %s\"", $pagination['li_class'], $pagination['li_class_disabled']);
+				$liClass = sprintf(" class=\"%s %s\"", $classes['li'], $classes['li_disabled']);
 			}
 			$content .= sprintf("<li%s><a>&raquo;</a></li>", $liClass);
 		}
 		else
 		{
 			$liClass = "";
-			if($pagination['li_class'] !== null)
+			if($classes['li'] !== null)
 			{
-				$liClass = sprintf(" class=\"%s\"", $pagination['li_class']);
+				$liClass = sprintf(" class=\"%s\"", $classes['li']);
 			}
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">&raquo;</a></li>",
 				$liClass,
-				$this->generateUrl(array(
-					$pagination['param'] => $pagination['page'] + 2
+				$this->urlGenerator->getUrl(array(
+					$pagination->getParameterName() => $pagination['page'] + 2
 				))
 			);
 		}
@@ -298,6 +291,7 @@ class DefaultRenderer implements RendererInterface
 		}
 		else
 		{
+			//TODO!
 //			$direction = $sortable['empty_direction'];
 			$direction = $sortable->getDirection() == 'asc' ? 'desc' : 'asc';
 		}
@@ -317,7 +311,7 @@ class DefaultRenderer implements RendererInterface
 		
 		return sprintf(
 			"<a href=\"%s\">%s</a> %s",
-			$this->generateUrl($routeParams),
+			$this->urlGenerator->getUrl($routeParams),
 			$column->getLabel(),
 			$isSortedColumn ? sprintf("<span class=\"%s\"></span>", $classes[$sortable->getDirection()]) : ''
 		);
@@ -344,28 +338,6 @@ class DefaultRenderer implements RendererInterface
 		}
 		
 		return $content;
-	}
-	
-	/**
-	 * Generates an url, considering the current parameters of the route.
-	 * 
-	 * @param array		$routeParams	Parameters.
-	 * @return string					HTML Code.
-	 */
-	private function generateUrl(array $routeParams)
-	{
-		$routeName = $this->request->get('_route');
-		$currentRouteParams = array_merge(
-			$this->request->attributes->get('_route_params'),
-			$this->request->query->all()
-		);
-
-		foreach($routeParams as $paramName => $paramValue)
-		{
-			$currentRouteParams[$paramName] = $paramValue;
-		}
-		
-		return $this->router->generate($routeName, $currentRouteParams);
 	}
 
 	public function renderFilter(FilterInterface $filter)
@@ -399,8 +371,15 @@ class DefaultRenderer implements RendererInterface
 
 	public function renderFilterResetLink(TableView $tableView)
 	{
+		$filterParams = array();
+		foreach($tableView->getFilters() as $filter)
+		{
+			$filterParams[$filter->getName()] = null;
+		}
+		
 		return sprintf(
-			"<a href=\"#\" class=\"%s\">%s</a>",
+			"<a href=\"%s\" class=\"%s\">%s</a>",
+			$this->urlGenerator->getUrl($filterParams),
 			implode(" ", $tableView->getFilter()->getResetClasses()),
 			$tableView->getFilter()->getResetLabel()
 		);

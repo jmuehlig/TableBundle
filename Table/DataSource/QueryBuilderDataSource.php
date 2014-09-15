@@ -105,8 +105,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 			/* @var $filter FilterInterface */
 
 			// Only apply used filters to the query builder.
-			$filterValue = $request->query->get($filter->getName());
-			if($filterValue === null || trim($filterValue) === "")
+			if($filter->getValue() === null)
 			{
 				continue;
 			}
@@ -116,6 +115,14 @@ class QueryBuilderDataSource implements DataSourceInterface
 			foreach($filter->getColumns() as $column)
 			{
 				/* @var $column ColumnInterface */
+				
+				// Add the table alias, if not used.
+				if(strpos($column, '.') === false)
+				{
+					$aliases = $queryBuilder->getRootAliases();
+					$column = sprintf("%s.%s", $aliases[0], $column);
+				}
+				
 				$innerWhereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column, $filter->getName());
 			}
 			
@@ -126,11 +133,11 @@ class QueryBuilderDataSource implements DataSourceInterface
 				// Add the filters value to the query builder parameters map.
 				if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
 				{
-					$queryBuilder->setParameter($filter->getName(), '%' . $filterValue . '%');
+					$queryBuilder->setParameter($filter->getName(), '%' . $filter->getValue() . '%');
 				}
 				else
 				{
-					$queryBuilder->setParameter($filter->getName(), $filterValue);
+					$queryBuilder->setParameter($filter->getName(), $filter->getValue());
 				}
 			}
 		}
@@ -139,7 +146,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		if(count($whereParts) > 0)
 		{
 			$whereStatement = implode(' and ', $whereParts);
-			print($whereStatement);
+
 			if(strpos(strtolower($queryBuilder->getDQL()), 'where') === false)
 			{
 				$queryBuilder->where($whereStatement);
@@ -190,7 +197,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		}
 		else
 		{
-			return "%s like %s";
+			return "%s like :%s";
 		}
 	}
 }

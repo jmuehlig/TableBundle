@@ -49,6 +49,13 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var array 
 	 */
 	protected $attributes;
+	
+	/**
+	 * Value of this filter.
+	 * 
+	 * @var mixed
+	 */
+	protected $value;
 
 	public function getAttributes()
 	{
@@ -74,10 +81,20 @@ abstract class AbstractFilter implements FilterInterface
 	{
 		return $this->operator;
 	}
+	
+	public function getValue()
+	{
+		return $this->value;
+	}
 
 	public function setName($name)
 	{
 		$this->name = $name;
+	}
+	
+	public function setValue($value)
+	{
+		$this->value = $value;
 	}
 
 	public function setOptions(array $options)
@@ -88,7 +105,7 @@ abstract class AbstractFilter implements FilterInterface
 		$optionsResolver->setDefaults(array(
 			'columns' => array(),
 			'label' => '',
-			'operator' => FilterOperator::EQ,
+			'operator' => FilterOperator::LIKE,
 			'attr' => array()
 		));
 		
