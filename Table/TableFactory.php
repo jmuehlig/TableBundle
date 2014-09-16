@@ -1,11 +1,14 @@
 <?php
+
 namespace PZAD\TableBundle\Table;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Routing\RouterInterface;
 use PZAD\TableBundle\Table\Type\AbstractTableType;
+use PZAD\TableBundle\Table\Type\AnonymousTableType;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
+
 
 /**
  * TableFactory.
@@ -48,10 +51,30 @@ class TableFactory
 		$this->router = $router;
 	}
 	
+	/**
+	 * Builds a table by a table type.
+	 * 
+	 * @param AbstractTableType $tableType	TableType.
+	 * @return	Table						Table.
+	 */
 	public function createTable(AbstractTableType $tableType)
 	{
 		$table = new Table($this->container, $this->entityManager, $this->request, $this->router);
 		
 		return $table->create($tableType);
+	}
+	
+	/**
+	 * Builds a table based on a anonymous builder function.
+	 * 
+	 * @param string		$entity	Name of the entity.
+	 * @param callable		$build	Function for building the table.
+	 * @param string|null	$name	Name of the table.
+	 * 
+	 * @return Table			Table.
+	 */
+	public function createAnonymousTable($entity, $build, $name = 'table')
+	{
+		return $this->createTable(new AnonymousTableType($entity, $build, $name));
 	}
 }

@@ -132,9 +132,8 @@ class TableView
 	protected $totalItems;
 	
 	public function __construct($name, RendererInterface $renderer, array $columns, array $rows,
-		array $filters, PaginationOptionsContainer $pagination, SortableOptionsContainer $sortable,
-		FilterOptionsContainer $filter, $emptyValue, array $attributes, array $headAttributes,
-		$totalPages, $totalItems
+		array $filters, $pagination, $sortable, $filter, $emptyValue, array $attributes,
+		array $headAttributes, $totalPages, $totalItems
 	)
 	{
 		// Set up the class vars.

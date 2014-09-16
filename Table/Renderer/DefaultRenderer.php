@@ -94,13 +94,6 @@ class DefaultRenderer implements RendererInterface
 				$this->renderAttributesContent($column->getHeadAttributes()),
 				$this->renderSortableColumnHeader($tableView, $column)
 			);
-			
-			// Set the container, if the column need one.
-			$containerSetter = array($column, 'setContainer');
-			if(is_callable($containerSetter))
-			{
-				$column->setContainer($this->container);
-			}
 		}
 		
 		$content .= "</tr>";
@@ -284,7 +277,7 @@ class DefaultRenderer implements RendererInterface
 			return $column->getLabel();
 		}
 		
-		$isSortedColumn = $sortable->getColumnName() == $column->getName() ? true : false;
+		$isSortedColumn = $sortable->getColumnName() == $column->getName();
 		if($isSortedColumn)
 		{
 			$direction = $sortable->getDirection() == 'asc' ? 'desc' : 'asc';
