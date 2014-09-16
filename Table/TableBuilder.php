@@ -57,7 +57,7 @@ class TableBuilder
 	 * 
 	 * @return TableBuilder		TableBuilder for add more columns, set options and so on.
 	 */
-	public function add($type, $name, array $options)
+	public function add($type, $name, array $options = array())
 	{
 		if(array_key_exists($name, $this->columns))
 		{

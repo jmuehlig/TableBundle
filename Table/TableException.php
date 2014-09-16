@@ -114,6 +114,12 @@ class TableException extends \Exception
 		throw new TableException($message);
 	}
 	
+	public static function isNoCallback()
+	{
+		$message = "Please pass a callback.";
+		throw new TableException($message);
+	}
+	
 	public static function filterNoView()
 	{
 		$message = "You have to use filter_begin() before you can render a single filter.";

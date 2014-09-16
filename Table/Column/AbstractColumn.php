@@ -36,12 +36,6 @@ abstract class AbstractColumn implements ColumnInterface
 	 */
 	protected $name;
 	
-	function __construct()
-	{
-		$this->optionsResolver = new OptionsResolver();
-		$this->setDefaultOptions($this->optionsResolver);
-	}
-	
 	/**
 	 * {@inheritdoc}
 	 */
@@ -95,6 +89,9 @@ abstract class AbstractColumn implements ColumnInterface
 	 */
 	public function setOptions(array $options)
 	{
+		$this->optionsResolver = new OptionsResolver();
+		$this->setDefaultOptions($this->optionsResolver);
+		
 		$this->options = $this->optionsResolver->resolve($options);
 	}
 	
@@ -104,7 +101,7 @@ abstract class AbstractColumn implements ColumnInterface
 			'attr' => array(),
 			'head_attr' => array(),
 			'sortable' => false,
-			'label' => ''
+			'label' => $this->getName()
 		));
 	}
 }
