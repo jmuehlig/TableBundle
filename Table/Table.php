@@ -519,13 +519,9 @@ class Table
 		{
 			/* @var $filter FilterInterface */
 			
-			$filterValue = $this->request->query->get($filter->getName());
-			if(trim($filterValue) === "")
-			{
-				$filterValue = null;
-			}
-			
-			$filter->setValue($filterValue);
+			$filterValue = (string) $this->request->query->get($filter->getName(), '');
+
+			$filter->setValue(trim($filterValue));
 		}
 	}
 	
