@@ -62,8 +62,9 @@ class ListFilter extends AbstractFilter
 		
 		foreach($this->values as $key => $label)
 		{
-			$class = $this->getValue() == $key ? $this->classes['li_active'] : $this->classes['li'];
-			
+			$value = (string) $key;
+			$class = $this->getValue() === $value ? $this->classes['li_active'] : $this->classes['li'];
+
 			$content .= sprintf("<li%s>", $class !== '' ? ' class="' . $class . '"' : '');
 			$content .= sprintf(
 				"<a href=\"%s\">%s</a>",
