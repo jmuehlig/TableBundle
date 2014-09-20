@@ -2,7 +2,7 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\Utils\UrlGenerator;
+use PZAD\TableBundle\Table\Utils\UrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,6 +13,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ListFilter extends AbstractFilter
 {
+	/**
+	 * Label for filter resetter.
+	 * 
+	 * @var string
+	 */
+	protected $resetLabel;
+	
 	/**
 	 * List with values.
 	 * 
@@ -31,6 +38,7 @@ class ListFilter extends AbstractFilter
 	{
 		$optionsResolver->setDefaults(array(
 			'values' => array(),
+			'reset_label' => null,
 			'ul_class' => '',
 			'li_class' => '',
 			'li_active_class' => ''
@@ -42,6 +50,7 @@ class ListFilter extends AbstractFilter
 		$options = parent::setOptions($options);
 		
 		$this->values = $options['values'];
+		$this->resetLabel = $options['reset_label'];
 		$this->classes = array(
 			'ul' => $options['ul_class'],
 			'li' => $options['li_class'],
@@ -56,26 +65,44 @@ class ListFilter extends AbstractFilter
 
 	public function render(ContainerInterface $container)
 	{
-		$urlGenerator = new UrlGenerator($container->get('request'), $container->get('router'));
+		$urlHelper = $container->get('pzad.url_helper');
 		
+		// Begin <ul>-tag.
 		$content = sprintf("<ul%s>", $this->classes['ul'] !== '' ? ' class="' . $this->classes['ul'] . '"' : '');
 		
-		foreach($this->values as $key => $label)
+		// Reset-Link.
+		if($this->resetLabel!== null)
 		{
-			$value = (string) $key;
-			$class = $this->getValue() === $value ? $this->classes['li_active'] : $this->classes['li'];
-
-			$content .= sprintf("<li%s>", $class !== '' ? ' class="' . $class . '"' : '');
-			$content .= sprintf(
-				"<a href=\"%s\">%s</a>",
-				$urlGenerator->getUrl(array($this->getName() => $key)),
-				$label
-			);
-			$content .= "</li>";
+			$this->renderValue($urlHelper, null, $this->resetLabel, $this->getLiClass(null));
 		}
 		
+		// Other values.
+		foreach($this->values as $key => $label)
+		{
+			$content .= $this->renderValue($urlHelper, (string) $key,  $label, $this->getLiClass((string) $key));
+		}
+		
+		// End <ul>-tag.
 		$content .= "</ul>";
 		
 		return $content;
+	}
+	
+	protected function renderValue(UrlHelper $urlHelper, $value, $label, $class)
+	{
+		$content = sprintf("<li%s>", $class !== '' ? ' class="' . $class . '"' : '');
+		$content .= sprintf(
+			"<a href=\"%s\">%s</a>",
+			$urlHelper->getUrlForParameters(array(
+				$this->getName() => $value
+			)),
+			$label
+		);
+		$content .= "</li>";
+	}
+	
+	protected function getLiClass($value)
+	{
+		return $this->getValue() === $value ? $this->classes['li_active'] : $this->classes['li'];
 	}
 }

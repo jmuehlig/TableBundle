@@ -6,12 +6,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Generator for urls, used in the table bundle.
+ * Helper for urls, used in the table bundle.
  *
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class UrlGenerator
+class UrlHelper
 {
 	/**
 	 * @var Request
@@ -37,7 +37,7 @@ class UrlGenerator
 	 * @param	array|null $replacedParameters	Parameters to replace in the url.
 	 * @return	string							New generated url.
 	 */
-	public function getUrl(array $replacedParameters = array())
+	public function getUrlForParameters(array $replacedParameters = array())
 	{
 		$routeName = $this->request->get('_route');
 		$currentRouteParams = array_merge(
