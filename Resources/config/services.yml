@@ -7,3 +7,7 @@ services:
         class: PZAD\TableBundle\Table\TableFactory
         scope: request
         arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router"]
+    pzad.url_helper:
+        class: PZAD\TableBundle\Table\UrlHelper
+        scope: request
+        arguments: ["@request","@router"]

@@ -6,7 +6,7 @@ use PZAD\TableBundle\Table\Column\ColumnInterface;
 use PZAD\TableBundle\Table\Filter\FilterInterface;
 use PZAD\TableBundle\Table\Row\Row;
 use PZAD\TableBundle\Table\TableView;
-use PZAD\TableBundle\Table\Utils\UrlGenerator;
+use PZAD\TableBundle\Table\Utils\UrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
@@ -43,16 +43,16 @@ class DefaultRenderer implements RendererInterface
 	/**
 	 * URL Generator.
 	 * 
-	 * @var UrlGenerator
+	 * @var UrlHelper
 	 */
-	protected $urlGenerator;
+	protected $urlHelper;
 
 	function __construct(ContainerInterface $container, Request $request, RouterInterface $router)
 	{
 		$this->container	= $container;
 		$this->request		= $request;
 		$this->router		= $router;
-		$this->urlGenerator = new UrlGenerator($request, $router);
+		$this->urlHelper	= $container->get('pzad.url_helper');
 	}
 	
 	/**
@@ -205,7 +205,7 @@ class DefaultRenderer implements RendererInterface
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">&laquo;</a></li>",
 				$liClass,
-				$this->urlGenerator->getUrl(array(
+				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $pagination['page']
 				))
 			);
@@ -222,7 +222,7 @@ class DefaultRenderer implements RendererInterface
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">%s</a></li>",
 				$liClass,
-				$this->urlGenerator->getUrl(array(
+				$this->urlHelper->getUrl(array(
 					$pagination->getParameterName() => $page + 1
 				)),
 				$page + 1
@@ -249,7 +249,7 @@ class DefaultRenderer implements RendererInterface
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">&raquo;</a></li>",
 				$liClass,
-				$this->urlGenerator->getUrl(array(
+				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $pagination['page'] + 2
 				))
 			);
@@ -304,7 +304,7 @@ class DefaultRenderer implements RendererInterface
 		
 		return sprintf(
 			"<a href=\"%s\">%s</a> %s",
-			$this->urlGenerator->getUrl($routeParams),
+			$this->urlHelper->getUrlForParameters($routeParams),
 			$column->getLabel(),
 			$isSortedColumn ? sprintf("<span class=\"%s\"></span>", $classes[$sortable->getDirection()]) : ''
 		);
@@ -372,7 +372,7 @@ class DefaultRenderer implements RendererInterface
 		
 		return sprintf(
 			"<a href=\"%s\" class=\"%s\">%s</a>",
-			$this->urlGenerator->getUrl($filterParams),
+			$this->urlHelper->getUrlForParameters($filterParams),
 			implode(" ", $tableView->getFilter()->getResetClasses()),
 			$tableView->getFilter()->getResetLabel()
 		);
