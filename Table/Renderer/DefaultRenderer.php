@@ -67,7 +67,7 @@ class DefaultRenderer implements RendererInterface
 		return sprintf(
 			"<table id=\"%s\"%s>",
 			$tableView->getName(),
-			$this->renderAttributesContent($tableView->getAttributes())
+			RenderHelper::attrToString($tableView->getAttributes())
 		);
 	}
 	
@@ -81,7 +81,7 @@ class DefaultRenderer implements RendererInterface
 	public function renderTableHead(TableView $tableView)
 	{		
 		$content = "<thead>";
-		$content .= sprintf("<tr%s>", $this->renderAttributesContent($tableView->getHeadAttributes()));
+		$content .= sprintf("<tr%s>", RenderHelper::attrToString($tableView->getHeadAttributes()));
 		
 		foreach($tableView->getColumns() as $column)
 		{
@@ -91,7 +91,7 @@ class DefaultRenderer implements RendererInterface
 			// and a link for sortable columns.
 			$content .= sprintf(
 				"<th%s>%s</th>",
-				$this->renderAttributesContent($column->getHeadAttributes()),
+				RenderHelper::attrToString($column->getHeadAttributes()),
 				$this->renderSortableColumnHeader($tableView, $column)
 			);
 		}
@@ -124,12 +124,12 @@ class DefaultRenderer implements RendererInterface
 							
 				$tr .= sprintf(
 					"<td%s>%s</td>",
-					$this->renderAttributesContent($column->getAttributes()),
+					RenderHelper::attrToString($column->getAttributes()),
 					$column->getContent($row)
 				);
 			}
 			
-			$content .= sprintf("<tr%s>%s</tr>", $this->renderAttributesContent($row->getAttributes()), $tr);
+			$content .= sprintf("<tr%s>%s</tr>", RenderHelper::attrToString($row->getAttributes()), $tr);
 		}
 		
 		if(count($tableView->getRows()) === 0)
@@ -308,29 +308,6 @@ class DefaultRenderer implements RendererInterface
 			$column->getLabel(),
 			$isSortedColumn ? sprintf("<span class=\"%s\"></span>", $classes[$sortable->getDirection()]) : ''
 		);
-	}
-	
-	/**
-	 * Renders an array of attributes.
-	 * 
-	 * @param array $attributes Array of attributes.
-	 * 
-	 * @return string HTML Code of rendered attributes array.
-	 */
-	private function renderAttributesContent($attributes)
-	{
-		if(!is_array($attributes))
-		{
-			return "";
-		}
-		
-		$content = "";
-		foreach($attributes as $attributeName => $attributeValue)
-		{
-			$content .= sprintf(" %s=\"%s\"", $attributeName, $attributeValue);
-		}
-		
-		return $content;
 	}
 
 	public function renderFilter(FilterInterface $filter)
