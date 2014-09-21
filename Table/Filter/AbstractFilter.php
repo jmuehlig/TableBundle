@@ -55,7 +55,14 @@ abstract class AbstractFilter implements FilterInterface
 	 * 
 	 * @var mixed
 	 */
-	protected $value;
+	protected $value = null;
+	
+	/**
+	 * Options of the filter.
+	 * 
+	 * @var array
+	 */
+	protected $options;
 
 	public function getAttributes()
 	{
@@ -100,42 +107,32 @@ abstract class AbstractFilter implements FilterInterface
 	public function setOptions(array $options)
 	{
 		$optionsResolver = new OptionsResolver();
-		
-		// Set defaults.
-		$optionsResolver->setDefaults(array(
-			'columns' => array(),
-			'label' => '',
-			'operator' => FilterOperator::LIKE,
-			'attr' => array()
-		));
-		
+
 		// Set this filter default options.
 		$this->setDefaultFilterOptions($optionsResolver);
 
 		// Resolve options.
-		$resolvedOptions = $optionsResolver->resolve($options);
+		$this->options = $optionsResolver->resolve($options);
 		
 		// Set intern properties from options.
-		if(!is_array($resolvedOptions['columns']))
+		if(!is_array($this->options['columns']))
 		{
-			$this->columns = array($resolvedOptions['columns']);
+			$this->columns = array($this->options['columns']);
 		}
-		else if(count($resolvedOptions['columns']) < 1)
+		else if(count($this->options['columns']) < 1)
 		{
 			$this->columns = array($this->getName());
 		}
 		else
 		{
-			$this->columns = $resolvedOptions['columns'];
+			$this->columns = $this->options['columns'];
 		}
 
-		$this->label = $resolvedOptions['label'];
-		$this->operator = $resolvedOptions['operator'];
-		$this->attributes = $resolvedOptions['attr'];
+		$this->label = $this->options['label'];
+		$this->operator = $this->options['operator'];
+		$this->attributes = $this->options['attr'];
 		
 		FilterOperator::validate($this->operator);
-		
-		return $resolvedOptions;
 	}
 	
 	/**
@@ -144,5 +141,32 @@ abstract class AbstractFilter implements FilterInterface
 	 * 
 	 * @param OptionsResolver $optionsResolver
 	 */
-	protected abstract function setDefaultFilterOptions(OptionsResolver $optionsResolver);
+	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
+	{
+		$optionsResolver->setDefaults(array(
+			'columns' => array(),
+			'label' => '',
+			'operator' => FilterOperator::LIKE,
+			'attr' => array()
+		));
+	}
+	
+	protected function __get($name)
+	{
+		// Replace CalmelCase to under_score: getMyOption => $options['my_option'].
+		$name = preg_replace_callback(
+			'/([A-Z])/',
+			function($hit) {
+				return sprintf("_%s", strtolower($hit[1]));
+			},
+			$name
+		);
+			
+		if(array_key_exists($name, $this->options))
+		{
+			return $this->options[$name];
+		}
+		
+		return null;
+	}
 }

@@ -49,6 +49,8 @@ class TableExtension extends Twig_Extension
 			
 			// Filter rendering
 			'filter' => new Twig_Function_Method($this, 'getFilterContent', array('is_safe' => array('html'))),
+			'filter_label' => new Twig_Function_Method($this, 'getFilterLabelContent', array('is_safe' => array('html'))),
+			'filter_widget' => new Twig_Function_Method($this, 'getFilterWidgetContent', array('is_safe' => array('html'))),
 			'filter_begin' => new Twig_Function_Method($this, 'getFilterBeginContent', array('is_safe' => array('html'))),
 			'filter_submit_button' => new Twig_Function_Method($this, 'getFilterSubmitButtonContent', array('is_safe' => array('html'))),
 			'filter_reset_link' => new Twig_Function_Method($this, 'getFilterResetLinkContent', array('is_safe' => array('html'))),
@@ -152,12 +154,22 @@ class TableExtension extends Twig_Extension
 			
 	private function getFilterSingleContent(FilterInterface $filter)
 	{
+		return sprintf("%s\n%s", $this->getFilterLabelContent($filter), $this->getFilterWidgetContent($filter));
+	}
+	
+	private function getFilterWidgetContent(FilterInterface $filter)
+	{
 		if($this->getRenderer() === null)
 		{
 			TableException::filterNoView();
 		}
 		
 		return $this->getRenderer()->renderFilter($filter);
+	}
+	
+	private function getFilterLabelContent(FilterInterface $filter)
+	{
+		return $filter->getLabel();
 	}
 }
 
