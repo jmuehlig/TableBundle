@@ -5,8 +5,4 @@ The TableBundle is a bundle for the symfony2 framework. It will help you to mana
 
 Documentation
 ==========
-* Install the bundle
-* Create your first table
-* Use pagination to reduce your table view
-* Use sortable tables for better usability
-* Use filter in your table
+[Here](Resources/doc/v1.0/index.md) is the documentation.
