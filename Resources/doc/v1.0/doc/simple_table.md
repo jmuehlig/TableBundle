@@ -21,28 +21,33 @@ class SimpleTableType extends AbstractType
 {
 	public function buildTable(TableBuilder $builder)
 	{
-		// ... (see chapter 'Build the table')
+		$builder
+			->add('text', 'id')
+			->add('text', 'username', array(
+				'attr' => array('width' => '90%')
+			));
 	}
 	
 	public function getName()
 	{
-		// return 'simple_table';
+		return 'simple_table';
 	}
 	
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
-		// ... (see chapter 'Table type options')
+		$resolver->setDefaultOptions(array(
+			'attr' => array('class' => 'table'),
+			'empty_value' => 'This table is empty :-('
+		));
 	}
 	
 	public function getDataSource(ContainerInterface $container)
 	{
-		// (see chapter 'Data of your table')
 		return new EntityDataSource('YourBundle:Entity');
 	}
 	
 	public function getRowAttributes(Row $row)
 	{
-		// (see chapter 'Row attributes')
 		if($row->getCount() % 2 === 0)
 		{
 			return array('class' => 'row-gray');
@@ -54,4 +59,14 @@ class SimpleTableType extends AbstractType
 	}
 }
 
-## Build the table
+## Add columns
+You can add a new columns to your table by calling the method `TableBuilder::add`, using the `buildTable` method.
+Syntax of the `add` method is specified as follows: `TableBuilder::add(string $columnType, string $columnName[, array $options])`.
+Each column brings is own options, here are the pre-defined columns:
+
+### text
+### number
+### date
+### entity
+### content
+### counter
