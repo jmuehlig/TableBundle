@@ -58,6 +58,7 @@ class SimpleTableType extends AbstractType
 		}
 	}
 }
+```
 
 ## Add columns
 You can add a new columns to your table by calling the method `TableBuilder::add`, using the `buildTable` method.
