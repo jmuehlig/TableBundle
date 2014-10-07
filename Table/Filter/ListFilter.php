@@ -15,6 +15,8 @@ class ListFilter extends AbstractFilter
 {
 	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
 	{
+		parent::setDefaultFilterOptions($optionsResolver);
+		
 		$optionsResolver->setDefaults(array(
 			'values' => array(),
 			'reset_label' => null,

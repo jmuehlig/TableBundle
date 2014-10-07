@@ -14,15 +14,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TextFilter extends AbstractFilter
 {
-	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
-	{
-		parent::setDefaultFilterOptions($optionsResolver);
-		
-		$optionsResolver->setDefaults(array(
-			'placeholder' => null
-		));
-	}
-
 	public function needsFormEnviroment()
 	{
 		return true;
@@ -30,8 +21,11 @@ class TextFilter extends AbstractFilter
 
 	public function render(ContainerInterface $container)
 	{
-		$placeholder = $this->getPlaceholder() !== null ? sprintf(" placeholder=\"%s\"", $this->getPlaceholder()) : "";
-		
-		return sprintf("<input name=\"%s\"%s%s />", $this->getName(), RenderHelper::attrToString($this->getAttributes()), $placeholder);
+		$value = "";
+		if($this->getValue() !== null)
+		{
+			$value = sprintf(" value=\"%s\"", $this->getValue());
+		}
+		return sprintf("<input name=\"%s\"%s%s />", $this->getName(), $value, RenderHelper::attrToString($this->getAttributes()));
 	}
 }
