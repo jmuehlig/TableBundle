@@ -70,15 +70,19 @@ You can specify your table with some options:
 The table bundle will not restrict you on database only as source for your data.
 With the data source feature, you can choose a source and if you have a look into the [api](../api/data_source.md),
 you can also implement your own data sources (e.g. file data source, REST data source, ...).
+Available sources are the entity data source and for more control the query builder data source.
 
 ### EntityDataSource
+If you only want all rows of an entity, the entity data source 
+`EntityDataSource(string $entity[, callable $callback])`
 
 ### QueryBuilderDataSource
 
 
 ## Row attributes
 For more control, you can specify the `<tr>`-tag attributes.
-As example, if you want to mark the rows with class *project-finished*, if the row *isFinished*:
+Therefore you can overwrite the method `getRowAttributes`, which depends on a row and returns an `array` with all attributes for this row.
+As example, if you want to mark the rows with class *success*, if the row *isFinished*:
 ```php
 <?php
 // src/YourBundle/Table/Type/SimpleTableType.php
@@ -87,13 +91,13 @@ use PZAD\TableBundle\Table\Row\Row;
 
 class SimpleTableType extends AbstractType
 {
-	// ...
+	// ... some other methods ...
 	
 	public function getRowAttributes(Row $row)
 	{
-		if($row->get('isFinished'))
+		if($row->get('isFinished') === true)
 		{
-			return array('class' => 'project-finished');
+			return array('class' => 'success');
 		}
 		
 		return array();
