@@ -58,6 +58,13 @@ abstract class AbstractFilter implements FilterInterface
 	protected $value = null;
 	
 	/**
+	 * Default Value, if filter value is null.
+	 * 
+	 * @var mixed
+	 */
+	protected $defaultValue = null;
+	
+	/**
 	 * Options of the filter.
 	 * 
 	 * @var array
@@ -91,6 +98,11 @@ abstract class AbstractFilter implements FilterInterface
 	
 	public function getValue()
 	{
+		if($this->value === null && $this->defaultValue !== null)
+		{
+			return $this->defaultValue;
+		}
+		
 		return $this->value;
 	}
 
@@ -131,6 +143,7 @@ abstract class AbstractFilter implements FilterInterface
 		$this->label = $this->options['label'];
 		$this->operator = $this->options['operator'];
 		$this->attributes = $this->options['attr'];
+		$this->defaultValue = $this->options['default_value'];
 		
 		FilterOperator::validate($this->operator);
 	}
@@ -147,11 +160,12 @@ abstract class AbstractFilter implements FilterInterface
 			'columns' => array(),
 			'label' => '',
 			'operator' => FilterOperator::LIKE,
-			'attr' => array()
+			'attr' => array(),
+			'default_value' => null
 		));
 	}
 	
-	protected function __get($name)
+	public function __get($name)
 	{
 		// Replace CalmelCase to under_score: getMyOption => $options['my_option'].
 		$name = preg_replace_callback(
