@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Utils;
+namespace PZAD\TableBundle\Table;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;

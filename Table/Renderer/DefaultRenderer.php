@@ -169,12 +169,12 @@ class DefaultRenderer implements RendererInterface
 	{
 		$pagination = $tableView->getPagination();
 		
-		if(true || $pagination === null)
+		if($pagination === null)
 		{
 			return;
 		}
 		
-		if($tableView->getTotalPages() < 2)
+		if($tableView->getTotalPages() < 2 && $pagination->getShowEmpty() === false)
 		{
 			return;
 		}
@@ -185,7 +185,7 @@ class DefaultRenderer implements RendererInterface
 		$content = sprintf("<ul%s>", $ulClass);
 		
 		// Left arrow.
-		if($pagination['page'] == 0)
+		if($pagination->getCurrentPage() == 0)
 		{
 			$liClass = "";
 			if($classes['li'] !== null || $classes['li_disabled'] !== null)
@@ -206,7 +206,7 @@ class DefaultRenderer implements RendererInterface
 				"<li%s><a href=\"%s\">&laquo;</a></li>",
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
-					$pagination->getParameterName() => $pagination['page']
+					$pagination->getParameterName() => $pagination->getCurrentPage()
 				))
 			);
 		}
@@ -222,7 +222,7 @@ class DefaultRenderer implements RendererInterface
 			$content .= sprintf(
 				"<li%s><a href=\"%s\">%s</a></li>",
 				$liClass,
-				$this->urlHelper->getUrl(array(
+				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $page + 1
 				)),
 				$page + 1
@@ -250,7 +250,7 @@ class DefaultRenderer implements RendererInterface
 				"<li%s><a href=\"%s\">&raquo;</a></li>",
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
-					$pagination->getParameterName() => $pagination['page'] + 2
+					$pagination->getParameterName() => $pagination->getCurrentPage() + 2
 				))
 			);
 		}
@@ -284,9 +284,7 @@ class DefaultRenderer implements RendererInterface
 		}
 		else
 		{
-			//TODO!
-//			$direction = $sortable['empty_direction'];
-			$direction = $sortable->getDirection() == 'asc' ? 'desc' : 'asc';
+			$direction = $sortable->getDirection();
 		}
 		
 		$routeParams = array(

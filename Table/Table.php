@@ -363,6 +363,7 @@ class Table
 		$paginationOptionsResolver->setDefaults(array(
 			'param' => 'page',
 			'rows_per_page' => 20,
+			'show_empty' => true,
 			'ul_class' => 'pagination',
 			'li_class' => null,
 			'li_class_active' => 'active',
@@ -380,6 +381,7 @@ class Table
 			$pagination['param'],
 			$pagination['rows_per_page'],
 			((int) $this->request->get( $pagination['param'] )) - 1,
+			$pagination['show_empty'],
 			array(
 				'ul' => $pagination['ul_class'],
 				'li' => $pagination['li_class'],
@@ -468,7 +470,7 @@ class Table
 			$sortable['param_column'],
 			$direction,
 			$column,
-			array('asc' => $sortable['class_asc'], 'desc' => 'class_desc')
+			array('asc' => $sortable['class_asc'], 'desc' => $sortable['class_desc'])
 		);
 	}
 	

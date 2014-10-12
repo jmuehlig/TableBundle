@@ -4,6 +4,7 @@ namespace PZAD\TableBundle\Controller;
 
 use PZAD\TableBundle\Table\Type\AbstractTableType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
+use PZAD\TableBundle\Table\Table;
 
 /**
  * Extending the Symfony Controller with methods
