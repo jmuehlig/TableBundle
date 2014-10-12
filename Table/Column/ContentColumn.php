@@ -26,8 +26,7 @@ class ContentColumn extends AbstractColumn
 		parent::setDefaultOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
-			'content_grabber' => null,
-			'content_function' => null
+			'content_grabber' => null
 		));
 	}
 
@@ -38,19 +37,21 @@ class ContentColumn extends AbstractColumn
 
 	public function getContent(Row $row)
 	{
-		if($this->options['content_function'] !== null && is_callable($this->options['content_function']))
+		if($this->options['content_grabber'] !== null)
 		{
-			return $this->options['content_function']($row, $this);
-		}
-		
-		if($this->options['content_grabber'] !== null && $this->options['content_grabber'] instanceof ContentGrabberInterface)
-		{
-			if(is_callable(array($this->options['content_grabber'], 'setContainer')))
+			if($this->options['content_grabber'] instanceof ContentGrabberInterface)
 			{
-				$this->options['content_grabber']->setContainer($this->container);
-			}
+				if(is_callable(array($this->options['content_grabber'], 'setContainer')))
+				{
+					$this->options['content_grabber']->setContainer($this->container);
+				}
 			
-			return $this->options['content_grabber']->getContent($row, $this);
+				return $this->options['content_grabber']->getContent($row, $this);
+			}
+			else if(is_callable($this->options['content_grabber']))
+			{
+				return $this->options['content_grabber']($row, $this);
+			}
 		}
 		
 		TableException::noContentDefined($this->getName());

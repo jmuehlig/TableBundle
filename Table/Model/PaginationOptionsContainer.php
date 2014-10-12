@@ -26,16 +26,22 @@ class PaginationOptionsContainer
 	protected $currentPage;
 	
 	/**
+	 * @var boolean
+	 */
+	protected $showEmpty;
+	
+	/**
 	 * @var array
 	 */
 	protected $classes;
 
 
-	public function __construct($parameterName, $itemPerRow, $currentPage, array $classes)
+	public function __construct($parameterName, $itemPerRow, $currentPage, $showEmpty, array $classes)
 	{
 		$this->parameterName = $parameterName;
 		$this->itemsPerRow = $itemPerRow;
 		$this->currentPage = $currentPage;
+		$this->showEmpty = $showEmpty;
 		$this->classes = $classes;
 	}
 	
@@ -52,6 +58,11 @@ class PaginationOptionsContainer
 	public function getCurrentPage()
 	{
 		return $this->currentPage;
+	}
+	
+	public function getShowEmpty()
+	{
+		return $this->showEmpty;
 	}
 	
 	public function getClasses()
