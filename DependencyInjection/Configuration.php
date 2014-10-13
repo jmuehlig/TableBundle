@@ -36,7 +36,8 @@ class Configuration implements ConfigurationInterface
 			'date'		=> 'PZAD\TableBundle\Table\Column\DateColumn',
 			'text'		=> 'PZAD\TableBundle\Table\Column\TextColumn',
 			'number'	=> 'PZAD\TableBundle\Table\Column\NumberColumn',
-			'counter'	=> 'PZAD\TableBundle\Table\Column\CounterColumn'
+			'counter'	=> 'PZAD\TableBundle\Table\Column\CounterColumn',
+			'boolean'	=> 'PZAD\TableBundle\Table\Column\BooleanColumn'
 		);
 	}
 	
