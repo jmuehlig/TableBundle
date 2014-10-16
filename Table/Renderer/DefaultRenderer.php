@@ -65,7 +65,9 @@ class DefaultRenderer implements RendererInterface
 	public function renderTableBegin(TableView $tableView)
 	{
 		return sprintf(
-			"<table id=\"%s\"%s>",
+			"<a name=\"%s\"></a>\n
+			<table id=\"%s\"%s>",
+			$tableView->getName(),
 			$tableView->getName(),
 			RenderHelper::attrToString($tableView->getAttributes())
 		);
@@ -207,7 +209,7 @@ class DefaultRenderer implements RendererInterface
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $pagination->getCurrentPage()
-				))
+				), $tableView->getName())
 			);
 		}
 		
@@ -224,7 +226,7 @@ class DefaultRenderer implements RendererInterface
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $page + 1
-				)),
+				), $tableView->getName()),
 				$page + 1
 			);
 		}
@@ -251,7 +253,7 @@ class DefaultRenderer implements RendererInterface
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $pagination->getCurrentPage() + 2
-				))
+				), $tableView->getName())
 			);
 		}
 		
@@ -302,7 +304,7 @@ class DefaultRenderer implements RendererInterface
 		
 		return sprintf(
 			"<a href=\"%s\">%s</a> %s",
-			$this->urlHelper->getUrlForParameters($routeParams),
+			$this->urlHelper->getUrlForParameters($routeParams, $tableView->getName()),
 			$column->getLabel(),
 			$isSortedColumn ? sprintf("<span class=\"%s\"></span>", $classes[$sortable->getDirection()]) : ''
 		);
@@ -347,7 +349,7 @@ class DefaultRenderer implements RendererInterface
 		
 		return sprintf(
 			"<a href=\"%s\" class=\"%s\">%s</a>",
-			$this->urlHelper->getUrlForParameters($filterParams),
+			$this->urlHelper->getUrlForParameters($filterParams, $tableView->getName()),
 			implode(" ", $tableView->getFilter()->getResetClasses()),
 			$tableView->getFilter()->getResetLabel()
 		);
