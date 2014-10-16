@@ -37,7 +37,7 @@ class UrlHelper
 	 * @param	array|null $replacedParameters	Parameters to replace in the url.
 	 * @return	string							New generated url.
 	 */
-	public function getUrlForParameters(array $replacedParameters = array())
+	public function getUrlForParameters(array $replacedParameters = array(), $anchor = null)
 	{
 		$routeName = $this->request->get('_route');
 		$currentRouteParams = array_merge(
@@ -59,6 +59,14 @@ class UrlHelper
 			}
 		}
 		
-		return $this->router->generate($routeName, $currentRouteParams);
+		$url = $this->router->generate($routeName, $currentRouteParams);
+		
+		// Add the anchor, if given.
+		if($anchor != null)
+		{
+			$url .= sprintf("#%s", $anchor);
+		}
+		
+		return $url;
 	}
 }
