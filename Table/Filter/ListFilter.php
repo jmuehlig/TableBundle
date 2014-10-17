@@ -37,17 +37,18 @@ class ListFilter extends AbstractFilter
 		$urlHelper = $container->get('pzad.url_helper');
 		
 		// Begin <ul>-tag.
-		$content = sprintf("<ul%s>", $this->getUlClass() !== '' ? ' class="' . $this->getUlClass() . '"' : '');
+		$content = sprintf("<ul%s>", $this->ulClass !== '' ? ' class="' . $this->ulClass . '"' : '');
 
 		// Render values as items and reset item.
 		$count = 0;
-		$resetItemRendered = $this->getResetLabel() === null;
-		foreach($this->getValues() as $key => $label)
+		$resetItemRendered = $this->resetLabel === null;
+
+		foreach($this->values as $key => $label)
 		{
 			// Render reset label, if not done.
-			if($resetItemRendered === false && $this->getResetPos() <= $count)
+			if($resetItemRendered === false && $this->resetPos <= $count)
 			{
-				$content .= $this->renderValue($urlHelper, null, $this->getResetLabel(), $this->getLiClass(null));
+				$content .= $this->renderValue($urlHelper, null, $this->resetLabel, $this->getLiClass(null));
 			}
 			
 			// Value item.
@@ -57,7 +58,7 @@ class ListFilter extends AbstractFilter
 		// Render reset label, if not done.
 		if($resetItemRendered === false)
 		{
-			$content .= $this->renderValue($urlHelper, null, $this->getResetLabel(), $this->getLiClass(null));
+			$content .= $this->renderValue($urlHelper, null, $this->resetLabel, $this->getLiClass(null));
 		}
 		
 		// End <ul>-tag.
@@ -101,6 +102,6 @@ class ListFilter extends AbstractFilter
 	 */
 	protected function getLiClass($value)
 	{
-		return $this->getValue() === $value ? $this->getLiActiveClass() : $this->getLiClass();
+		return $this->getValue() === $value ? $this->liActiveClass : $this->getLiClass(null);
 	}
 }
