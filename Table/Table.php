@@ -497,7 +497,7 @@ class Table
 		$submitOptionsResolver = new OptionsResolver();
 		$submitOptionsResolver->setDefaults(array(
 			'label' => 'submit',
-			'class' => array()
+			'attr' => array()
 		));
 		
 		// Resolve submit button options.
@@ -507,14 +507,14 @@ class Table
 		$resetOptionsResolver = new OptionsResolver();
 		$resetOptionsResolver->setDefaults(array(
 			'label' => 'reset',
-			'class' => array()
+			'attr' => array()
 		));
 		
 		// Resolve submit button options.
 		$reset = $submitOptionsResolver->resolve($filter['reset']);
 		
 		// Set up the options container.
-		$this->filter = new FilterOptionsContainer($submit['label'], $submit['class'], $reset['label'], $reset['class']);
+		$this->filter = new FilterOptionsContainer($submit['label'], $submit['attr'], $reset['label'], $reset['attr']);
 		
 		// Sets value of all filters.
 		foreach($this->getFilters() as $filter)

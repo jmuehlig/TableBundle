@@ -18,7 +18,7 @@ class FilterOptionsContainer
 	/**
 	 * @var array
 	 */
-	protected $submitClasses;
+	protected $submitAttributes;
 	
 	/**
 	 * @var string
@@ -28,14 +28,14 @@ class FilterOptionsContainer
 	/**
 	 * @var array
 	 */
-	protected $resetClasses;
+	protected $resetAttributes;
 	
-	public function __construct($submitLabel, array $submitClasses, $resetLabel, array $resetClasses)
+	public function __construct($submitLabel, array $submitAttributes, $resetLabel, array $resetAttributes)
 	{
 		$this->submitLabel = $submitLabel;
-		$this->submitClasses = $submitClasses;
+		$this->submitAttributes = $submitAttributes;
 		$this->resetLabel = $resetLabel;
-		$this->resetClasses = $resetClasses;
+		$this->resetAttributes = $resetAttributes;
 	}
 	
 	public function getSubmitLabel()
@@ -43,9 +43,9 @@ class FilterOptionsContainer
 		return $this->submitLabel;
 	}
 
-	public function getSubmitClasses()
+	public function getSubmitAttributes()
 	{
-		return $this->submitClasses;
+		return $this->submitAttributes;
 	}
 
 	public function getResetLabel()
@@ -53,8 +53,8 @@ class FilterOptionsContainer
 		return $this->resetLabel;
 	}
 
-	public function getResetClasses()
+	public function getResetAttributes()
 	{
-		return $this->resetClasses;
+		return $this->resetAttributes;
 	}
 }

@@ -348,9 +348,9 @@ class DefaultRenderer implements RendererInterface
 		}
 		
 		return sprintf(
-			"<a href=\"%s\" class=\"%s\">%s</a>",
+			"<a href=\"%s\"%s>%s</a>",
 			$this->urlHelper->getUrlForParameters($filterParams, $tableView->getName()),
-			implode(" ", $tableView->getFilter()->getResetClasses()),
+			RenderHelper::attrToString($tableView->getFilter()->getResetAttributes()),
 			$tableView->getFilter()->getResetLabel()
 		);
 	}
@@ -358,9 +358,9 @@ class DefaultRenderer implements RendererInterface
 	public function renderFilterSubmitButton(TableView $tableView)
 	{
 		return sprintf(
-			"<input type=\"submit\" class=\"%s\" value=\"%s\" />",
-			implode(" ", $tableView->getFilter()->getSubmitClasses()),
-			$tableView->getFilter()->getSubmitLabel()
+			"<input type=\"submit\" value=\"%s\" %s />",
+			$tableView->getFilter()->getSubmitLabel(),
+			RenderHelper::attrToString($tableView->getFilter()->getSubmitAttributes())
 		);
 	}
 }
