@@ -168,7 +168,6 @@ abstract class AbstractFilter implements FilterInterface
 	public function __get($name)
 	{
 		// Replace CalmelCase to under_score: getMyOption => $options['my_option'].
-//		$name = strtolower($name{0}) . substr($name, 1);
 		$name = preg_replace_callback(
 			'/([A-Z])/',
 			function($hit) {
@@ -184,12 +183,4 @@ abstract class AbstractFilter implements FilterInterface
 		
 		return null;
 	}
-//	
-//	public function __call($method, $arguments)
-//	{
-//		if(substr($method, 0, 3) === 'get')
-//		{
-//			return $this->get(str_replace('get', '', $method));
-//		}
-//	}
 }
