@@ -134,7 +134,7 @@ class TableException extends \Exception
 	
 	public static function filterTypeNotAllowed($filterType, array $legalFilterTypes)
 	{
-		$message = sprintf("The filter type '%s' is not valid. Valid types are '%s'", $filterType, implode(",", $legalFilterTypes));
+		$message = sprintf("The filter type '%s' is not valid. Valid types are: '%s'.", $filterType, implode("','", $legalFilterTypes));
 		throw new TableException($message);
 	}
 	

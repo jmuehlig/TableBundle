@@ -2,7 +2,7 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\Utils\UrlHelper;
+use PZAD\TableBundle\Table\UrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -42,13 +42,13 @@ class ListFilter extends AbstractFilter
 		// Render values as items and reset item.
 		$count = 0;
 		$resetItemRendered = $this->resetLabel === null;
-
 		foreach($this->values as $key => $label)
 		{
 			// Render reset label, if not done.
 			if($resetItemRendered === false && $this->resetPos <= $count)
 			{
-				$content .= $this->renderValue($urlHelper, null, $this->resetLabel, $this->getLiClass(null));
+				$content .= $this->renderValue($urlHelper, '', $this->resetLabel, $this->getLiClass(''));
+				$resetItemRendered = true;
 			}
 			
 			// Value item.
@@ -102,6 +102,6 @@ class ListFilter extends AbstractFilter
 	 */
 	protected function getLiClass($value)
 	{
-		return $this->getValue() === $value ? $this->liActiveClass : $this->getLiClass(null);
+		return $this->getValue() === $value ? $this->liActiveClass : $this->liClass;
 	}
 }

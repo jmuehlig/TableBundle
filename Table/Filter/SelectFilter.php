@@ -36,8 +36,8 @@ class SelectFilter extends AbstractFilter
 		
 		// Merge reset option with all other values.
 		$allOptions = array_merge(
-			array($this->defaultValue => $this->getResetLabel()), 
-			$this->getValues()
+			array($this->defaultValue => $this->resetLabel), 
+			$this->values
 		);
 		
 		// Render all options.

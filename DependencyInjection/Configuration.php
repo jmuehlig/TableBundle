@@ -45,7 +45,8 @@ class Configuration implements ConfigurationInterface
 	{
 		return array(
 			'text'		=> 'PZAD\TableBundle\Table\Filter\TextFilter',
-			'list'		=> 'PZAD\TableBundle\Table\Filter\ListFilter'
+			'list'		=> 'PZAD\TableBundle\Table\Filter\ListFilter',
+			'select'	=> 'PZAD\TableBundle\Table\Filter\SelectFilter'
 		);
 	}
 			
