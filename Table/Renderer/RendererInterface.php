@@ -82,6 +82,15 @@ interface RendererInterface
 	public function renderFilter(FilterInterface $filter);
 	
 	/**
+	 * Renders the label of a single filter.
+	 * 
+	 * @param FilterInterface $filter	Single filter.
+	 * 
+	 * @return string					HTML output of this filter label.
+	 */
+	public function renderFilterLabel(FilterInterface $filter);
+	
+	/**
 	 * Renders the submit button for filters, using the form-enviroment.
 	 * 
 	 * @param TableView $tableView	View of the table.
