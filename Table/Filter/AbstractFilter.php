@@ -2,6 +2,7 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
+use PZAD\TableBundle\Table\Renderer\RenderHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -49,6 +50,13 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var array 
 	 */
 	protected $attributes;
+	
+	/**
+	 * Attributes for rendering the label.
+	 * 
+	 * @var array
+	 */
+	protected $labelAttributes;
 	
 	/**
 	 * Value of this filter.
@@ -143,6 +151,7 @@ abstract class AbstractFilter implements FilterInterface
 		$this->label = $this->options['label'];
 		$this->operator = $this->options['operator'];
 		$this->attributes = $this->options['attr'];
+		$this->labelAttributes = $this->options['label_attr'];
 		$this->defaultValue = $this->options['default_value'];
 		
 		FilterOperator::validate($this->operator);
@@ -161,6 +170,7 @@ abstract class AbstractFilter implements FilterInterface
 			'label' => '',
 			'operator' => FilterOperator::LIKE,
 			'attr' => array(),
+			'label_attr' => array('styles' => 'font-weight: bold'),
 			'default_value' => null
 		));
 	}
@@ -182,5 +192,15 @@ abstract class AbstractFilter implements FilterInterface
 		}
 		
 		return null;
+	}
+	
+	public function renderLabel()
+	{
+		return sprintf(
+			"<label for=\"%s\"%s>%s</label>",
+			$this->getName(),
+			RenderHelper::attrToString($this->labelAttributes),
+			$this->label
+		);
 	}
 }
