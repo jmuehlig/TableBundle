@@ -316,6 +316,11 @@ class DefaultRenderer implements RendererInterface
 	{
 		return $filter->render($this->container);
 	}
+	
+	public function renderFilterLabel(FilterInterface $filter)
+	{
+		return $filter->renderLabel();
+	}
 
 	public function renderFilterBegin(TableView $tableView)
 	{
