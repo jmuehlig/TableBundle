@@ -76,4 +76,9 @@ interface FilterInterface
 	 * @param ContainerInterface $container
 	 */
 	public function render(ContainerInterface $container);
+	
+	/**
+	 * Renders the label of the filter.
+	 */
+	public function renderLabel();
 }

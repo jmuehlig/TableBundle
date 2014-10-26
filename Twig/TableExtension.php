@@ -157,7 +157,7 @@ class TableExtension extends Twig_Extension
 		return sprintf("%s\n%s", $this->getFilterLabelContent($filter), $this->getFilterWidgetContent($filter));
 	}
 	
-	private function getFilterWidgetContent(FilterInterface $filter)
+	public function getFilterWidgetContent(FilterInterface $filter)
 	{
 		if($this->getRenderer() === null)
 		{
@@ -167,9 +167,9 @@ class TableExtension extends Twig_Extension
 		return $this->getRenderer()->renderFilter($filter);
 	}
 	
-	private function getFilterLabelContent(FilterInterface $filter)
+	public function getFilterLabelContent(FilterInterface $filter)
 	{
-		return $filter->getLabel();
+		return $this->getRenderer()->renderFilterLabel($filter);
 	}
 }
 
