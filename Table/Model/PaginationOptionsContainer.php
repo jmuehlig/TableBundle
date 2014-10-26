@@ -34,15 +34,27 @@ class PaginationOptionsContainer
 	 * @var array
 	 */
 	protected $classes;
+	
+	/**
+	 * @var string
+	 */
+	protected $previousLabel;
+	
+	/**
+	 * @var string
+	 */
+	protected $nextLabel;
 
 
-	public function __construct($parameterName, $itemPerRow, $currentPage, $showEmpty, array $classes)
+	public function __construct($parameterName, $itemPerRow, $currentPage, $showEmpty, array $classes, $previousLabel, $nextLabel)
 	{
 		$this->parameterName = $parameterName;
 		$this->itemsPerRow = $itemPerRow;
 		$this->currentPage = $currentPage;
 		$this->showEmpty = $showEmpty;
 		$this->classes = $classes;
+		$this->previousLabel = $previousLabel;
+		$this->nextLabel = $nextLabel;
 	}
 	
 	public function getParameterName()
@@ -68,5 +80,15 @@ class PaginationOptionsContainer
 	public function getClasses()
 	{
 		return $this->classes;
+	}
+	
+	public function getPreviousLabel()
+	{
+		return $this->previousLabel;
+	}
+
+	public function getNextLabel()
+	{
+		return $this->nextLabel;
 	}
 }

@@ -367,8 +367,10 @@ class Table
 			'ul_class' => 'pagination',
 			'li_class' => null,
 			'li_class_active' => 'active',
-			'li_class_disabled' => 'disabled'
-		));
+			'li_class_disabled' => 'disabled',
+			'prev_label' => '&laquo;',
+			'next_label' => '&raquo;'
+		)); 
 		
 		// Set the defaults by the table type.
 		$this->tableType->setPaginatableDefaultOptions($paginationOptionsResolver);
@@ -387,7 +389,9 @@ class Table
 				'li' => $pagination['li_class'],
 				'li_active' => $pagination['li_class_active'],
 				'li_disabled' => $pagination['li_class_disabled']
-			)
+			),
+			$pagination['prev_label'],
+			$pagination['next_label']
 		);
 		
 		
