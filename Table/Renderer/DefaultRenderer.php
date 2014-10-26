@@ -194,7 +194,7 @@ class DefaultRenderer implements RendererInterface
 			{
 				$liClass = sprintf(" class=\"%s %s\"", $classes['li'], $classes['li_disabled']);
 			}
-			$content .= sprintf("<li%s><a>&laquo;</a></li>", $liClass);
+			$content .= sprintf("<li%s><a>%s</a></li>", $liClass, $pagination->getPreviousLabel());
 		}
 		else
 		{
@@ -205,11 +205,12 @@ class DefaultRenderer implements RendererInterface
 			}
 			
 			$content .= sprintf(
-				"<li%s><a href=\"%s\">&laquo;</a></li>",
+				"<li%s><a href=\"%s\">%s</a></li>",
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $pagination->getCurrentPage()
-				), $tableView->getName())
+				), $tableView->getName()),
+				$pagination->getPreviousLabel()
 			);
 		}
 		
@@ -239,7 +240,7 @@ class DefaultRenderer implements RendererInterface
 			{
 				$liClass = sprintf(" class=\"%s %s\"", $classes['li'], $classes['li_disabled']);
 			}
-			$content .= sprintf("<li%s><a>&raquo;</a></li>", $liClass);
+			$content .= sprintf("<li%s><a>%s</a></li>", $liClass, $pagination->getNextLabel());
 		}
 		else
 		{
@@ -249,11 +250,12 @@ class DefaultRenderer implements RendererInterface
 				$liClass = sprintf(" class=\"%s\"", $classes['li']);
 			}
 			$content .= sprintf(
-				"<li%s><a href=\"%s\">&raquo;</a></li>",
+				"<li%s><a href=\"%s\">%s</a></li>",
 				$liClass,
 				$this->urlHelper->getUrlForParameters(array(
 					$pagination->getParameterName() => $pagination->getCurrentPage() + 2
-				), $tableView->getName())
+				), $tableView->getName()),
+				$pagination->getNextLabel()
 			);
 		}
 		
