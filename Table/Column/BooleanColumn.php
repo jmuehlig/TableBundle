@@ -17,8 +17,8 @@ class BooleanColumn extends AbstractColumn
 		parent::setDefaultOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
-			'true' => '<input type="checkbox" checked="checked" readonly="readonly" />',
-			'false' => '<input type="checkbox" readonly="readonly" />'
+			'true' => '<input type="checkbox" checked="checked" disabled="disabled" />',
+			'false' => '<input type="checkbox" disabled="disabled" />'
 		));
 	}
 	

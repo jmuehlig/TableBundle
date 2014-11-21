@@ -35,7 +35,7 @@ class NumberColumn extends AbstractColumn
 		
 		return number_format(
 			$value,
-			$this->options['decmals'],
+			$this->options['decimals'],
 			$this->options['decimal_point'],
 			$this->options['thousands_sep']
 		);

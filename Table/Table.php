@@ -378,11 +378,14 @@ class Table
 		// Resolve the options.
 		$pagination = $paginationOptionsResolver->resolve(array());
 		
+		// Read current page.
+		$currentPage = max(0, ((int) $this->request->get( $pagination['param'] )) - 1);
+		
 		// Setup options container.
 		$this->pagination = new PaginationOptionsContainer(
 			$pagination['param'],
 			$pagination['rows_per_page'],
-			((int) $this->request->get( $pagination['param'] )) - 1,
+			$currentPage,
 			$pagination['show_empty'],
 			array(
 				'ul' => $pagination['ul_class'],
