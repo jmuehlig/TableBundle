@@ -21,24 +21,25 @@ abstract class AbstractValuedFilter extends AbstractFilter
 	 */
 	protected abstract function getValues();
 	
-	protected function needsFormEnviroment()
+	public function needsFormEnviroment()
 	{
 		return in_array($this->widget, array('select', 'choice'));
 	}
 	
 	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
 	{
-		$optionsResolver->setAllowedValues(array(
-			'widget' => $this->getAvailableWidgets(),
-		));
-		
 		parent::setDefaultFilterOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
+			'widget' => 'list',
 			'reset_label' => '',
 			'reset_pos' => 0,
 			'li_class' => '',
 			'li_active_class' => ''
+		));
+		
+		$optionsResolver->setAllowedValues(array(
+			'widget' => $this->getAvailableWidgets(),
 		));
 	}
 	
@@ -58,12 +59,12 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		$methods = get_class_methods($this);
 		foreach($methods as $method)
 		{
-			if(strrpos($prefix, $methods, -$prefixLength) !== false)
+			if(substr($method, 0, $prefixLength) === $prefix)
 			{
 				$widgets[] = strtolower(substr($method, $prefixLength, 1)) . substr($method, $prefixLength+1);
 			}
 		}
-		
+
 		return $widgets;
 	}
 
@@ -79,7 +80,7 @@ abstract class AbstractValuedFilter extends AbstractFilter
 	 */
 	public function render()
 	{
-		return call_user_func($this, $this->getWidgetFuntionName($this->RENDER_PREFIX));
+		return call_user_func(array($this, $this->getWidgetFuntionName($this->RENDER_PREFIX)));
 	}
 	
 	/**
@@ -95,7 +96,7 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		// Render values as items and reset item.
 		$count = 0;
 		$resetItemRendered = $this->resetLabel === null;
-		foreach($this->values as $key => $label)
+		foreach($this->getValues() as $key => $label)
 		{
 			// Render reset label, if not done.
 			if($resetItemRendered === false && $this->resetPos <= $count)
@@ -161,7 +162,9 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		// Render all options.
 		foreach($allOptions as $value => $label)
 		{
+			$value = (string) $value;
 			$attr = $this->getAttributes();
+
 			if($value === $this->getValue())
 			{
 				$attr['checked'] = "checked";
@@ -169,8 +172,9 @@ abstract class AbstractValuedFilter extends AbstractFilter
 			
 			$id = $this->getName() . "_" . str_replace(' ', '_', $value);
 			$content .= sprintf(
-				"<input id=\"%s\" type=\"radio\" value=\"%s\"%s> <label for=\"%s\">%s</label>",
+				"<input id=\"%s\" name=\"%s\" type=\"radio\" value=\"%s\"%s /> <label for=\"%s\">%s</label>",
 				$id,
+				$this->getName(),
 				$value,
 				RenderHelper::attrToString($attr),
 				$id,

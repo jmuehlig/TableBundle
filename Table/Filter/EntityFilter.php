@@ -42,6 +42,12 @@ class EntityFilter extends AbstractValuedFilter
 		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
 		/* @var $repository EntityRepository */
 		
-		return $repository->findBy($this->findBy, $this->orderBy);
+		$values = array();
+		foreach($repository->findBy($this->findBy, $this->orderBy) as $item)
+		{
+			$values[$item->getId()] = $item->__toString();
+		}
+		
+		return $values;
 	}
 }

@@ -45,8 +45,9 @@ class Configuration implements ConfigurationInterface
 	{
 		return array(
 			'text'		=> 'PZAD\TableBundle\Table\Filter\TextFilter',
-			'list'		=> 'PZAD\TableBundle\Table\Filter\ListFilter',
-			'select'	=> 'PZAD\TableBundle\Table\Filter\SelectFilter',
+			'entity'	=> 'PZAD\TableBundle\Table\Filter\EntityFilter',
+			'boolean'	=> 'PZAD\TableBundle\Table\Filter\BooleanFilter',
+			'valued'	=> 'PZAD\TableBundle\Table\Filter\ValuedFilter',
 			'date'		=> 'PZAD\TableBundle\Table\Filter\DateFilter'
 		);
 	}
