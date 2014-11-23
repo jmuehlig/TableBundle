@@ -4,6 +4,7 @@
 namespace PZAD\TableBundle\Table\Filter;
 
 use PZAD\TableBundle\Table\Renderer\RenderHelper;
+use PZAD\TableBundle\Table\UrlHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
 
@@ -101,24 +102,62 @@ abstract class AbstractValuedFilter extends AbstractFilter
 			// Render reset label, if not done.
 			if($resetItemRendered === false && $this->resetPos <= $count)
 			{
-				$content .= $this->renderValue($urlHelper, '', $this->resetLabel, $this->getLiClass(''));
+				$content .= $this->createListNodeValue($urlHelper, '', $this->resetLabel, $this->getListItemClass(''));
 				$resetItemRendered = true;
 			}
 			
 			// Value item.
-			$content .= $this->renderValue($urlHelper, (string) $key,  $label, $this->getLiClass((string) $key));
+			$content .= $this->createListNodeValue($urlHelper, (string) $key,  $label, $this->getListItemClass((string) $key));
 		}
 		
 		// Render reset label, if not done.
 		if($resetItemRendered === false)
 		{
-			$content .= $this->renderValue($urlHelper, null, $this->resetLabel, $this->getLiClass(null));
+			$content .= $this->createListNodeValue($urlHelper, null, $this->resetLabel, $this->getListItemClass(null));
 		}
 		
 		// End <ul>-tag.
 		$content .= "</ul>";
 		
 		return $content;
+	}
+	
+	/**
+	 * Renders a value item as a list item.
+	 * 
+	 * @param UrlHelper $urlHelper	UrlHelper for creating urls with filter values.
+	 * @param string $value			Value to render.
+	 * @param string $label			Label of the value.
+	 * @param string $class			Class of the list item.
+	 * 
+	 * @return string				HTML code of the list item.
+	 */
+	protected function createListNodeValue(UrlHelper $urlHelper, $value, $label, $class)
+	{
+		$content = sprintf("<li%s>", $class !== '' ? ' class="' . $class . '"' : '');
+		$content .= sprintf(
+			"<a href=\"%s\">%s</a>",
+			$urlHelper->getUrlForParameters(array(
+				$this->getName() => $value
+			)),
+			$label
+		);
+		$content .= "</li>";
+		
+		return $content;
+	}
+	
+	/**
+	 * Returns the class of a list item,
+	 * depending on the filters value and the
+	 * class options, defined by the filter builder.
+	 * 
+	 * @param string $value	Value, the class is used for.
+	 * @return string		Class.
+	 */
+	protected function getListItemClass($value)
+	{
+		return $this->getValue() === $value ? $this->liActiveClass : $this->liClass;
 	}
 	
 	/**
@@ -129,15 +168,12 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		$content = sprintf("<select name=\"%s\"%s>", $this->getName(), RenderHelper::attrToString($this->getAttributes()));
 		
 		// Merge reset option with all other values.
-		$allOptions = array_merge(
-			array($this->defaultValue => $this->resetLabel), 
-			$this->getValues()
-		);
+		$allOptions = array($this->defaultValue => $this->resetLabel) + $this->getValues();
 		
 		// Render all options.
 		foreach($allOptions as $value => $label)
 		{
-			$selected = $value === $this->getValue() ? " selected=\"selected\"" : "";
+			$selected = (string) $value === $this->getValue() ? " selected=\"selected\"" : "";
 			$content .= sprintf("<option value=\"%s\"%s>%s</option>", $value, $selected, $label);
 		}
 		
@@ -154,10 +190,7 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		$content = "";
 		
 		// Merge reset option with all other values.
-		$allOptions = array_merge(
-			array($this->defaultValue => $this->resetLabel), 
-			$this->getValues()
-		);
+		$allOptions = array($this->defaultValue => $this->resetLabel) + $this->getValues();
 		
 		// Render all options.
 		foreach($allOptions as $value => $label)

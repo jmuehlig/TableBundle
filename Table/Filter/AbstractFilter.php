@@ -207,11 +207,14 @@ abstract class AbstractFilter implements FilterInterface
 	
 	public function renderLabel()
 	{
-		return sprintf(
-			"<label for=\"%s\"%s>%s</label>",
-			$this->getName(),
-			RenderHelper::attrToString($this->labelAttributes),
-			$this->label
-		);
+		if($this->label != '')
+		{
+			return sprintf(
+				"<label for=\"%s\"%s>%s</label>",
+				$this->getName(),
+				RenderHelper::attrToString($this->labelAttributes),
+				$this->label
+			);
+		}
 	}
 }

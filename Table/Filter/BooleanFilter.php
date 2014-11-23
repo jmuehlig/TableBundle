@@ -2,7 +2,6 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\Renderer\RenderHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
