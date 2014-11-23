@@ -3,8 +3,6 @@
 namespace PZAD\TableBundle\Table\Filter;
 
 use PZAD\TableBundle\Table\Renderer\RenderHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Simple filter for filtering text.
@@ -19,7 +17,7 @@ class TextFilter extends AbstractFilter
 		return true;
 	}
 
-	public function render(ContainerInterface $container)
+	public function render()
 	{
 		$value = "";
 		if($this->getValue() !== null)

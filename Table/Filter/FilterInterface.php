@@ -11,8 +11,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @since 1.0.0
  */
 interface FilterInterface
-{	
-	/**
+{
+	public function __construct(ContainerInterface $container);
+
+		/**
 	 * Here are your options. 
 	 * Do whatever you want with these.
 	 * 
@@ -72,10 +74,8 @@ interface FilterInterface
 	
 	/**
 	 * Renders the filter.
-	 * 
-	 * @param ContainerInterface $container
 	 */
-	public function render(ContainerInterface $container);
+	public function render();
 	
 	/**
 	 * Renders the label of the filter.

@@ -21,11 +21,18 @@ class FilterBuilder
 	 */
 	private $registeredFilters;
 	
+	/**
+	 * @var ContainerInterface
+	 */
+	private $container;
+	
 	public function __construct(ContainerInterface $container)
 	{
 		$this->filters = array();
 		
 		$this->registeredFilters = $container->getParameter('pzad_table.filters');
+		
+		$this->container = $container;
 	}
 	
 	public function add($type, $name, $options)
@@ -41,7 +48,7 @@ class FilterBuilder
 			TableException::filterTypeNotAllowed($type, array_keys($this->registeredFilters));
 		}
 		
-		$filter = new $this->registeredFilters[$type];
+		$filter = new $this->registeredFilters[$type]($this->container);
 		/* @var $filter FilterInterface */
 		
 		if(!$filter instanceof FilterInterface)
