@@ -3,6 +3,7 @@
 namespace PZAD\TableBundle\Table\Filter;
 
 use PZAD\TableBundle\Table\Renderer\RenderHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -78,6 +79,16 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var array
 	 */
 	protected $options;
+	
+	/**
+	 * @var ContainerInterface
+	 */
+	protected $containeInterface;
+	
+	public function __construct(ContainerInterface $container)
+	{
+		$this->containeInterface = $container;
+	}
 
 	public function getAttributes()
 	{

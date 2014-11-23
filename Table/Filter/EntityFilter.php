@@ -8,7 +8,7 @@
 
 namespace PZAD\TableBundle\Table\Filter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -16,31 +16,32 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Jan
  */
-class EntityFilter extends AbstractFilter
+class EntityFilter extends AbstractValuedFilter
 {
 	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
 	{
-		$optionsResolver->setAllowedValues(array(
-			'type' => array('select', 'list')
+		$optionsResolver->setRequired(array(
+			'entity'
+		));
+		
+		$optionsResolver->setAllowedTypes(array(
+			'order_by' => 'array'
 		));
 		
 		parent::setDefaultFilterOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
-			'type' => 'select'
+			'widget' => 'select',
+			'order_by' => array('id', 'asc'),
+			'find_by' => array()
 		));
 	}
 
-
-	public function needsFormEnviroment()
+	protected function getValues()
 	{
+		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
+		/* @var $repository EntityRepository */
 		
+		return $repository->findBy($this->findBy, $this->orderBy);
 	}
-
-	public function render(ContainerInterface $container)
-	{
-		
-	}
-
-//put your code here
 }
