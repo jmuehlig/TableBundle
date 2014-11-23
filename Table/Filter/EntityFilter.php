@@ -20,20 +20,22 @@ class EntityFilter extends AbstractValuedFilter
 {
 	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
 	{
+		parent::setDefaultFilterOptions($optionsResolver);
+		
+		$optionsResolver->setDefaults(array(
+			'operator' => FilterOperator::EQ,
+			'widget' => 'select',
+			'order_by' => array('id', 'asc'),
+			'find_by' => array()
+		));
+		
 		$optionsResolver->setRequired(array(
 			'entity'
 		));
 		
 		$optionsResolver->setAllowedTypes(array(
-			'order_by' => 'array'
-		));
-		
-		parent::setDefaultFilterOptions($optionsResolver);
-		
-		$optionsResolver->setDefaults(array(
-			'widget' => 'select',
-			'order_by' => array('id', 'asc'),
-			'find_by' => array()
+			'order_by' => 'array',
+			'find_by' => 'array'
 		));
 	}
 
@@ -43,7 +45,8 @@ class EntityFilter extends AbstractValuedFilter
 		/* @var $repository EntityRepository */
 		
 		$values = array();
-		foreach($repository->findBy($this->findBy, $this->orderBy) as $item)
+		//$repository->findBy($this->findBy, $this->orderBy)
+		foreach($repository->findAll() as $item)
 		{
 			$values[$item->getId()] = $item->__toString();
 		}

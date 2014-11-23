@@ -314,7 +314,7 @@ class DefaultRenderer implements RendererInterface
 
 	public function renderFilter(FilterInterface $filter)
 	{
-		return $filter->render($this->container);
+		return $filter->render();
 	}
 	
 	public function renderFilterLabel(FilterInterface $filter)
@@ -327,7 +327,7 @@ class DefaultRenderer implements RendererInterface
 		foreach($tableView->getFilters() as $filter)
 		{
 			/* @var $filter FilterInterface */
-			if($filter->needsFormEnviroment())
+			if($filter->needsFormEnviroment() === true)
 			{
 				return "<form>";
 			}
@@ -348,26 +348,40 @@ class DefaultRenderer implements RendererInterface
 
 	public function renderFilterResetLink(TableView $tableView)
 	{
-		$filterParams = array();
 		foreach($tableView->getFilters() as $filter)
 		{
-			$filterParams[$filter->getName()] = null;
+			/* @var $filter FilterInterface */
+			if($filter->needsFormEnviroment() === true)
+			{
+				$filterParams = array();
+				foreach($tableView->getFilters() as $filter)
+				{
+					$filterParams[$filter->getName()] = null;
+				}
+
+				return sprintf(
+					"<a href=\"%s\"%s>%s</a>",
+					$this->urlHelper->getUrlForParameters($filterParams, $tableView->getName()),
+					RenderHelper::attrToString($tableView->getFilter()->getResetAttributes()),
+					$tableView->getFilter()->getResetLabel()
+				);
+			}
 		}
-		
-		return sprintf(
-			"<a href=\"%s\"%s>%s</a>",
-			$this->urlHelper->getUrlForParameters($filterParams, $tableView->getName()),
-			RenderHelper::attrToString($tableView->getFilter()->getResetAttributes()),
-			$tableView->getFilter()->getResetLabel()
-		);
 	}
 
 	public function renderFilterSubmitButton(TableView $tableView)
 	{
-		return sprintf(
-			"<input type=\"submit\" value=\"%s\" %s />",
-			$tableView->getFilter()->getSubmitLabel(),
-			RenderHelper::attrToString($tableView->getFilter()->getSubmitAttributes())
-		);
+		foreach($tableView->getFilters() as $filter)
+		{
+			/* @var $filter FilterInterface */
+			if($filter->needsFormEnviroment() === true)
+			{
+				return sprintf(
+					"<input type=\"submit\" value=\"%s\" %s />",
+					$tableView->getFilter()->getSubmitLabel(),
+					RenderHelper::attrToString($tableView->getFilter()->getSubmitAttributes())
+				);
+			}
+		}
 	}
 }
