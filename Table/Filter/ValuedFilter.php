@@ -12,15 +12,16 @@ class ValuedFilter extends AbstractValuedFilter
 {
 	public function setDefaultFilterOptions(OptionsResolver $optionsResolver)
 	{
-		$optionsResolver->setAllowedTypes(array(
-			'values' => 'array'
-		));
-		
 		parent::setDefaultFilterOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
 			'values' => array()
 		));
+		
+		$optionsResolver->setAllowedTypes(array(
+			'values' => 'array'
+		));
+		
 	}
 	
 	public function getValues()

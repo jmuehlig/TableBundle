@@ -35,12 +35,20 @@ abstract class AbstractValuedFilter extends AbstractFilter
 			'widget' => 'list',
 			'reset_label' => '',
 			'reset_pos' => 0,
-			'li_class' => '',
-			'li_active_class' => ''
+			'li_attr' => array(),
+			'li_active_attr' => array()
 		));
 		
 		$optionsResolver->setAllowedValues(array(
 			'widget' => $this->getAvailableWidgets(),
+		));
+		
+		$optionsResolver->setAllowedValues(array(
+			'li_attr' => 'array',
+			'li_active_attr' => 'array',
+			'widget' => 'string',
+			'reset_pos' => 'integer',
+			'reset_label' => 'string'
 		));
 	}
 	
@@ -102,18 +110,18 @@ abstract class AbstractValuedFilter extends AbstractFilter
 			// Render reset label, if not done.
 			if($resetItemRendered === false && $this->resetPos <= $count)
 			{
-				$content .= $this->createListNodeValue($urlHelper, '', $this->resetLabel, $this->getListItemClass(''));
+				$content .= $this->createListNodeValue($urlHelper, '', $this->resetLabel, $this->getListItemAttributes(''));
 				$resetItemRendered = true;
 			}
 			
 			// Value item.
-			$content .= $this->createListNodeValue($urlHelper, (string) $key,  $label, $this->getListItemClass((string) $key));
+			$content .= $this->createListNodeValue($urlHelper, (string) $key,  $label, $this->getListItemAttributes((string) $key));
 		}
 		
 		// Render reset label, if not done.
 		if($resetItemRendered === false)
 		{
-			$content .= $this->createListNodeValue($urlHelper, null, $this->resetLabel, $this->getListItemClass(null));
+			$content .= $this->createListNodeValue($urlHelper, null, $this->resetLabel, $this->getListItemAttributes(null));
 		}
 		
 		// End <ul>-tag.
@@ -128,13 +136,13 @@ abstract class AbstractValuedFilter extends AbstractFilter
 	 * @param UrlHelper $urlHelper	UrlHelper for creating urls with filter values.
 	 * @param string $value			Value to render.
 	 * @param string $label			Label of the value.
-	 * @param string $class			Class of the list item.
+	 * @param string $attr			Attributes of the list item.
 	 * 
 	 * @return string				HTML code of the list item.
 	 */
-	protected function createListNodeValue(UrlHelper $urlHelper, $value, $label, $class)
+	protected function createListNodeValue(UrlHelper $urlHelper, $value, $label, $attr)
 	{
-		$content = sprintf("<li%s>", $class !== '' ? ' class="' . $class . '"' : '');
+		$content = sprintf("<li%s>", RenderHelper::attrToString($attr));
 		$content .= sprintf(
 			"<a href=\"%s\">%s</a>",
 			$urlHelper->getUrlForParameters(array(
@@ -148,16 +156,16 @@ abstract class AbstractValuedFilter extends AbstractFilter
 	}
 	
 	/**
-	 * Returns the class of a list item,
+	 * Returns the attributes of a list item,
 	 * depending on the filters value and the
 	 * class options, defined by the filter builder.
 	 * 
-	 * @param string $value	Value, the class is used for.
-	 * @return string		Class.
+	 * @param	string	$value	Value, the class is used for.
+	 * @return	array			Attributes.
 	 */
-	protected function getListItemClass($value)
+	protected function getListItemAttributes($value)
 	{
-		return $this->getValue() === $value ? $this->liActiveClass : $this->liClass;
+		return $this->getValue() === $value ? $this->liActiveAttr : $this->liAttr;
 	}
 	
 	/**
@@ -165,7 +173,12 @@ abstract class AbstractValuedFilter extends AbstractFilter
 	 */
 	protected function renderSelect()
 	{
-		$content = sprintf("<select name=\"%s\"%s>", $this->getName(), RenderHelper::attrToString($this->getAttributes()));
+		$content = sprintf(
+			"<select name=\"%s\" id=\"%s\"%s>",
+			$this->getName(),
+			$this->getName(),
+			RenderHelper::attrToString($this->getAttributes())
+		);
 		
 		// Merge reset option with all other values.
 		$allOptions = array($this->defaultValue => $this->resetLabel) + $this->getValues();
