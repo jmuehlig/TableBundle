@@ -518,8 +518,8 @@ class Table
 		));
 		
 		// Resolve submit button options.
-		$reset = $submitOptionsResolver->resolve($filter['reset']);
-		
+		$reset = $resetOptionsResolver->resolve($filter['reset']);
+
 		// Set up the options container.
 		$this->filter = new FilterOptionsContainer($submit['label'], $submit['attr'], $reset['label'], $reset['attr']);
 		

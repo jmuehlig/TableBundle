@@ -98,7 +98,7 @@ class TableExtension extends Twig_Extension
 	{
 		if($viewOrFilterOrArray instanceof TableView)
 		{
-			return sprintf("%s\n %s\n %s %s\n %s",
+			return sprintf("%s\n %s <br /> %s %s\n %s",
 				$this->getFilterBeginContent($viewOrFilterOrArray),
 				$this->getFilterArrayContent($viewOrFilterOrArray->getFilters()),
 				$this->getFilterSubmitButtonContent($viewOrFilterOrArray),
@@ -149,7 +149,7 @@ class TableExtension extends Twig_Extension
 			$filterContent[] = $this->getFilterSingleContent($filter);
 		}
 		
-		return implode("\n", $filterContent);
+		return implode("<br />", $filterContent);
 	}
 			
 	private function getFilterSingleContent(FilterInterface $filter)
