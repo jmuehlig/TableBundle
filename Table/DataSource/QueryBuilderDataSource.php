@@ -105,7 +105,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 			/* @var $filter FilterInterface */
 
 			// Only apply used filters to the query builder.
-			if($filter->getValue() === null)
+			if($filter->getValue() === "" || $filter->getValue() === null)
 			{
 				continue;
 			}
