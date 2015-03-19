@@ -39,7 +39,7 @@ Add the bundle to your `require` section of your `composer.json`.
 ```
 "require" :  {
     // ...
-    "pzad/table-bundle": "~1.0"
+    "jgm/table-bundle": "~1.0"
 }
 ```
 #### Method 2) Download from github
@@ -53,7 +53,7 @@ public function registerBundles()
 {
     $bundles = array(
         // ... other bundles ...
-        new PZAD\TableBundle\TableBundle(),
+        new JGM\TableBundle\TableBundle(),
     );
     // ...
 }

@@ -1,5 +1,5 @@
 <?php
-namespace PZAD\TableBundle\Table\Filter;
+namespace JGM\TableBundle\Table\Filter;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

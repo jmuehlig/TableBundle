@@ -1,8 +1,8 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace JGM\TableBundle\Table;
 
-use PZAD\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\Column\ColumnInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\SecurityContextInterface;

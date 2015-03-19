@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Column\AccessValidation;
+namespace JGM\TableBundle\Table\Column\AccessValidation;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 

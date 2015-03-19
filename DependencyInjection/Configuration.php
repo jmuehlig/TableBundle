@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\DependencyInjection;
+namespace JGM\TableBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -31,24 +31,24 @@ class Configuration implements ConfigurationInterface
 	public function getDefaultColumns() 
 	{
 		return array(
-			'content'	=> 'PZAD\TableBundle\Table\Column\ContentColumn',
-			'entity'	=> 'PZAD\TableBundle\Table\Column\EntityColumn',
-			'date'		=> 'PZAD\TableBundle\Table\Column\DateColumn',
-			'text'		=> 'PZAD\TableBundle\Table\Column\TextColumn',
-			'number'	=> 'PZAD\TableBundle\Table\Column\NumberColumn',
-			'counter'	=> 'PZAD\TableBundle\Table\Column\CounterColumn',
-			'boolean'	=> 'PZAD\TableBundle\Table\Column\BooleanColumn'
+			'content'	=> 'JGM\TableBundle\Table\Column\ContentColumn',
+			'entity'	=> 'JGM\TableBundle\Table\Column\EntityColumn',
+			'date'		=> 'JGM\TableBundle\Table\Column\DateColumn',
+			'text'		=> 'JGM\TableBundle\Table\Column\TextColumn',
+			'number'	=> 'JGM\TableBundle\Table\Column\NumberColumn',
+			'counter'	=> 'JGM\TableBundle\Table\Column\CounterColumn',
+			'boolean'	=> 'JGM\TableBundle\Table\Column\BooleanColumn'
 		);
 	}
 	
 	public function getDefaultFilters()
 	{
 		return array(
-			'text'		=> 'PZAD\TableBundle\Table\Filter\TextFilter',
-			'entity'	=> 'PZAD\TableBundle\Table\Filter\EntityFilter',
-			'boolean'	=> 'PZAD\TableBundle\Table\Filter\BooleanFilter',
-			'valued'	=> 'PZAD\TableBundle\Table\Filter\ValuedFilter',
-			'date'		=> 'PZAD\TableBundle\Table\Filter\DateFilter'
+			'text'		=> 'JGM\TableBundle\Table\Filter\TextFilter',
+			'entity'	=> 'JGM\TableBundle\Table\Filter\EntityFilter',
+			'boolean'	=> 'JGM\TableBundle\Table\Filter\BooleanFilter',
+			'valued'	=> 'JGM\TableBundle\Table\Filter\ValuedFilter',
+			'date'		=> 'JGM\TableBundle\Table\Filter\DateFilter'
 		);
 	}
 			

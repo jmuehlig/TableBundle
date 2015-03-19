@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace PZAD\TableBundle\Table\Type;
+namespace JGM\TableBundle\Table\Type;
 
 /**
  *

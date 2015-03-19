@@ -1,8 +1,8 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Column;
+namespace JGM\TableBundle\Table\Column;
 
-use PZAD\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Row\Row;
 
 /**
  * Interface for all columns of the table tool.

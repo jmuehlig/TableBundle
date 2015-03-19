@@ -1,8 +1,8 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Filter;
+namespace JGM\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\TableException;
 
 /**
  * Available filter operators.

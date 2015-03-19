@@ -1,10 +1,10 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace JGM\TableBundle\Table;
 
 use Doctrine\ORM\EntityManager;
-use PZAD\TableBundle\Table\Type\AbstractTableType;
-use PZAD\TableBundle\Table\Type\AnonymousTableType;
+use JGM\TableBundle\Table\Type\AbstractTableType;
+use JGM\TableBundle\Table\Type\AnonymousTableType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;

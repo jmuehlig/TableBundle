@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace PZAD\TableBundle\Table\Filter;
+namespace JGM\TableBundle\Table\Filter;
 
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\OptionsResolver\OptionsResolver;

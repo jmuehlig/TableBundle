@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Type;
+namespace JGM\TableBundle\Table\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

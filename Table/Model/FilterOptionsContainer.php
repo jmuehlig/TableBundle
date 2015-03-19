@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Model;
+namespace JGM\TableBundle\Table\Model;
 
 /**
  * Container for options of the filter component.

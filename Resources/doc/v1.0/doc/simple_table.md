@@ -11,8 +11,8 @@ Here is a simple table type:
 <?php
 // src/YourBundle/Table/Type/SimpleTableType.php
 
-use PZAD\TableBundle\Table\DataSource\DataSourceInterface;
-use PZAD\TableBundle\Table\TableBuilder;
+use JGM\TableBundle\Table\DataSource\DataSourceInterface;
+use JGM\TableBundle\Table\TableBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -87,7 +87,7 @@ As example, if you want to mark the rows with class *success*, if the row *isFin
 <?php
 // src/YourBundle/Table/Type/SimpleTableType.php
 
-use PZAD\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Row\Row;
 
 class SimpleTableType extends AbstractType
 {

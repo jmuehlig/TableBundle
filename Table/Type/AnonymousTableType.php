@@ -6,11 +6,11 @@
  * and open the template in the editor.
  */
 
-namespace PZAD\TableBundle\Table\Type;
+namespace JGM\TableBundle\Table\Type;
 
-use PZAD\TableBundle\Table\DataSource\EntityDataSource;
-use PZAD\TableBundle\Table\TableBuilder;
-use PZAD\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\DataSource\EntityDataSource;
+use JGM\TableBundle\Table\TableBuilder;
+use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

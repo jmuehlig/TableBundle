@@ -1,10 +1,10 @@
 <?php
 
-namespace PZAD\TableBundle\Controller;
+namespace JGM\TableBundle\Controller;
 
-use PZAD\TableBundle\Table\Type\AbstractTableType;
+use JGM\TableBundle\Table\Type\AbstractTableType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
-use PZAD\TableBundle\Table\Table;
+use JGM\TableBundle\Table\Table;
 
 /**
  * Extending the Symfony Controller with methods
@@ -23,7 +23,7 @@ class Controller extends SymfonyController
 	 */
 	public function createTable(AbstractTableType $tableType)
 	{
-		return $this->get('pzad.table')->createTable($tableType);
+		return $this->get('jgm.table')->createTable($tableType);
 	}
 	
 	/**
@@ -37,6 +37,6 @@ class Controller extends SymfonyController
 	 */
 	public function createAnonymousTable($entity, $build, $name = 'table')
 	{
-		return $this->get('pzad.table')->createAnonymousTable($entity, $build, $name);
+		return $this->get('jgm.table')->createAnonymousTable($entity, $build, $name);
 	}
 }

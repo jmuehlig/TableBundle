@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Column;
+namespace JGM\TableBundle\Table\Column;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;

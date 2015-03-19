@@ -1,10 +1,10 @@
 <?php
 
-namespace PZAD\TableBundle\Table\DataSource;
+namespace JGM\TableBundle\Table\DataSource;
 
 use Doctrine\ORM\QueryBuilder;
-use PZAD\TableBundle\Table\Column\ColumnInterface;
-use PZAD\TableBundle\Table\Column\EntityColumn;
+use JGM\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\Column\EntityColumn;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -32,7 +32,7 @@ class EntityDataSource extends QueryBuilderDataSource
 		$this->callback = $callback;
 	}
 	
-	public function getData(ContainerInterface $container, array $columns, array $filters = null, \PZAD\TableBundle\Table\Model\PaginationOptionsContainer $pagination = null, \PZAD\TableBundle\Table\Model\SortableOptionsContainer $sortable = null)
+	public function getData(ContainerInterface $container, array $columns, array $filters = null, \JGM\TableBundle\Table\Model\PaginationOptionsContainer $pagination = null, \JGM\TableBundle\Table\Model\SortableOptionsContainer $sortable = null)
 	{
 		if($this->queryBuilder === null)
 		{

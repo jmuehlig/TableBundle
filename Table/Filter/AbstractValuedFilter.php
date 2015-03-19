@@ -1,10 +1,10 @@
 <?php
 
 
-namespace PZAD\TableBundle\Table\Filter;
+namespace JGM\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\Renderer\RenderHelper;
-use PZAD\TableBundle\Table\UrlHelper;
+use JGM\TableBundle\Table\Renderer\RenderHelper;
+use JGM\TableBundle\Table\UrlHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
 
@@ -97,7 +97,7 @@ abstract class AbstractValuedFilter extends AbstractFilter
 	 */
 	protected function renderList()
 	{
-		$urlHelper = $this->containeInterface->get('pzad.url_helper');
+		$urlHelper = $this->containeInterface->get('jgm.url_helper');
 		
 		// Begin <ul>-tag.
 		$content = sprintf("<ul%s>", RenderHelper::attrToString($this->getAttributes()));

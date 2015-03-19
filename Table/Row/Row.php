@@ -1,8 +1,8 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Row;
+namespace JGM\TableBundle\Table\Row;
 
-use PZAD\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\TableException;
 
 /**
  * Represents a row of tabla data.

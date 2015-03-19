@@ -1,13 +1,13 @@
 services:
-    pzad.table.twig:
-        class: PZAD\TableBundle\Twig\TableExtension
+    jgm.table.twig:
+        class: JGM\TableBundle\Twig\TableExtension
         tags:
             - { name: twig.extension }
-    pzad.table:
-        class: PZAD\TableBundle\Table\TableFactory
+    jgm.table:
+        class: JGM\TableBundle\Table\TableFactory
         scope: request
         arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router"]
-    pzad.url_helper:
-        class: PZAD\TableBundle\Table\UrlHelper
+    jgm.url_helper:
+        class: JGM\TableBundle\Table\UrlHelper
         scope: request
         arguments: ["@request","@router"]

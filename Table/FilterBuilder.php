@@ -1,9 +1,9 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace JGM\TableBundle\Table;
 
-use PZAD\TableBundle\Table\Filter\FilterInterface;
-use PZAD\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
