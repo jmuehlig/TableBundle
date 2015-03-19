@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Renderer;
+namespace JGM\TableBundle\Table\Renderer;
 
 /**
  * Description of RenderHelper

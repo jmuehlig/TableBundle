@@ -1,9 +1,9 @@
 <?php
 
-namespace PZAD\TableBundle\Table\DataSource;
+namespace JGM\TableBundle\Table\DataSource;
 
-use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
-use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

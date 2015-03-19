@@ -1,9 +1,9 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Column;
+namespace JGM\TableBundle\Table\Column;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use PZAD\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Row\Row;
 
 /**
  * This column will call the __toString method of an entity.

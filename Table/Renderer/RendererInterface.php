@@ -1,9 +1,9 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Renderer;
+namespace JGM\TableBundle\Table\Renderer;
 
-use PZAD\TableBundle\Table\Filter\FilterInterface;
-use PZAD\TableBundle\Table\TableView;
+use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\TableView;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;

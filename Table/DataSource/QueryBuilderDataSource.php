@@ -1,15 +1,15 @@
 <?php
 
-namespace PZAD\TableBundle\Table\DataSource;
+namespace JGM\TableBundle\Table\DataSource;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use PZAD\TableBundle\Table\Column\ColumnInterface;
-use PZAD\TableBundle\Table\Filter\FilterInterface;
-use PZAD\TableBundle\Table\Filter\FilterOperator;
-use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
-use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
-use PZAD\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\Filter\FilterOperator;
+use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 

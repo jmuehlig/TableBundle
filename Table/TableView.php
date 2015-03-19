@@ -1,11 +1,11 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace JGM\TableBundle\Table;
 
-use PZAD\TableBundle\Table\Model\FilterOptionsContainer;
-use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
-use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
-use PZAD\TableBundle\Table\Renderer\RendererInterface;
+use JGM\TableBundle\Table\Model\FilterOptionsContainer;
+use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Renderer\RendererInterface;
 
 /**
  * TablieView

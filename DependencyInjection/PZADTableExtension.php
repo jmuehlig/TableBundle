@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\DependencyInjection;
+namespace JGM\TableBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;

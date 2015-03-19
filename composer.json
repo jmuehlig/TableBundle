@@ -1,5 +1,5 @@
 {
-    "name" : "pzad/tablebundle",
+    "name" : "jgm/tablebundle",
     "description" : "Bundle for creating tables.",
     "type" : "symfony-bundle",
     "authors" : [{
@@ -16,10 +16,10 @@
     },
     "autoload" : {
         "psr-0" : {
-            "PZAD\\TableBundle" : ""
+            "JGM\\TableBundle" : ""
         }
     },
-    "target-dir" : "PZAD/TableBundle",
+    "target-dir" : "JGM/TableBundle",
     "repositories" : [{
 	}],
     "extra" : {

@@ -1,12 +1,12 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Column;
+namespace JGM\TableBundle\Table\Column;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use PZAD\TableBundle\Table\Row\Row;
-use PZAD\TableBundle\Table\ContentGrabber\ContentGrabberInterface;
-use PZAD\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Content\ContentGrabber\ContentGrabberInterface;
+use JGM\TableBundle\Table\TableException;
 
 /**
  * Uses a ContentGrabber or a ContentFunction to generate

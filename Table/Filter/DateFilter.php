@@ -1,8 +1,8 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Filter;
+namespace JGM\TableBundle\Table\Filter;
 
-use PZAD\TableBundle\Table\Renderer\RenderHelper;
+use JGM\TableBundle\Table\Renderer\RenderHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

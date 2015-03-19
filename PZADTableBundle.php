@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle;
+namespace JGM\TableBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

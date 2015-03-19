@@ -1,6 +1,6 @@
 <?php
 
-namespace PZAD\TableBundle\Table\Model;
+namespace JGM\TableBundle\Table\Model;
 
 /**
  * Container for options of the pagination component.
@@ -10,6 +10,11 @@ namespace PZAD\TableBundle\Table\Model;
  */
 class PaginationOptionsContainer
 {
+	const BEGIN = 0;
+	const BEFORE_CURRENT = 2;
+	const AFTER_CURRENT = 3;
+	const END = 1;
+	
 	/**
 	 * @var string
 	 */
@@ -44,9 +49,15 @@ class PaginationOptionsContainer
 	 * @var string
 	 */
 	protected $nextLabel;
+	
+	/**
+	 * @var int
+	 */
+	protected $maxPages;
 
 
-	public function __construct($parameterName, $itemPerRow, $currentPage, $showEmpty, array $classes, $previousLabel, $nextLabel)
+	public function __construct($parameterName, $itemPerRow, $currentPage, $showEmpty, array $classes, 
+								$previousLabel, $nextLabel, $maxPages)
 	{
 		$this->parameterName = $parameterName;
 		$this->itemsPerRow = $itemPerRow;
@@ -55,6 +66,7 @@ class PaginationOptionsContainer
 		$this->classes = $classes;
 		$this->previousLabel = $previousLabel;
 		$this->nextLabel = $nextLabel;
+		$this->maxPages = $maxPages;
 	}
 	
 	public function getParameterName()
@@ -90,5 +102,10 @@ class PaginationOptionsContainer
 	public function getNextLabel()
 	{
 		return $this->nextLabel;
+	}
+	
+	public function getMaxPages()
+	{
+		return $this->maxPages;
 	}
 }

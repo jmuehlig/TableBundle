@@ -1,11 +1,11 @@
 <?php
 
-namespace PZAD\TableBundle\Twig;
+namespace JGM\TableBundle\Twig;
 
-use PZAD\TableBundle\Table\Filter\FilterInterface;
-use PZAD\TableBundle\Table\Renderer\RendererInterface;
-use PZAD\TableBundle\Table\TableException;
-use PZAD\TableBundle\Table\TableView;
+use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\Renderer\RendererInterface;
+use JGM\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\TableView;
 use Twig_Extension;
 use Twig_Function_Method;
 

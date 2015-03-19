@@ -1,21 +1,21 @@
 <?php
 
-namespace PZAD\TableBundle\Table;
+namespace JGM\TableBundle\Table;
 
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
 use Iterator;
-use PZAD\TableBundle\Table\Column\ColumnInterface;
-use PZAD\TableBundle\Table\FilterBuilder;
-use PZAD\TableBundle\Table\Filter\FilterInterface;
-use PZAD\TableBundle\Table\Model\FilterOptionsContainer;
-use PZAD\TableBundle\Table\Model\PaginationOptionsContainer;
-use PZAD\TableBundle\Table\Model\SortableOptionsContainer;
-use PZAD\TableBundle\Table\Renderer\DefaultRenderer;
-use PZAD\TableBundle\Table\Row\Row;
-use PZAD\TableBundle\Table\Type\AbstractTableType;
-use PZAD\TableBundle\Table\Type\PaginatableInterface;
-use PZAD\TableBundle\Table\Type\SortableInterface;
+use JGM\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\FilterBuilder;
+use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\Model\FilterOptionsContainer;
+use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Renderer\DefaultRenderer;
+use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Type\AbstractTableType;
+use JGM\TableBundle\Table\Type\PaginatableInterface;
+use JGM\TableBundle\Table\Type\SortableInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -369,7 +369,8 @@ class Table
 			'li_class_active' => 'active',
 			'li_class_disabled' => 'disabled',
 			'prev_label' => '&laquo;',
-			'next_label' => '&raquo;'
+			'next_label' => '&raquo;',
+			'max_pages' => null
 		)); 
 		
 		// Set the defaults by the table type.
@@ -394,7 +395,8 @@ class Table
 				'li_disabled' => $pagination['li_class_disabled']
 			),
 			$pagination['prev_label'],
-			$pagination['next_label']
+			$pagination['next_label'],
+			$pagination['max_pages']
 		);
 		
 		

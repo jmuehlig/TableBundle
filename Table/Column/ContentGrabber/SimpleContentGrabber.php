@@ -1,9 +1,9 @@
 <?php
 
-namespace PZAD\TableBundle\Table\ContentGrabber;
+namespace JGM\TableBundle\Table\Column\ContentGrabber;
 
-use PZAD\TableBundle\Table\Row\Row;
-use PZAD\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Column\ColumnInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
