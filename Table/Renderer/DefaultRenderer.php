@@ -203,11 +203,11 @@ class DefaultRenderer implements RendererInterface
 					$pages[] = $point;
 				}
 				
-				if($pointerIndex == PaginationOptionsContainer::BEGIN || $pointerIndex == PaginationOptionsContainer::AFTER_CURRENT)
+				if($pointerIndex === PaginationOptionsContainer::BEGIN || $pointerIndex === PaginationOptionsContainer::AFTER_CURRENT)
 				{
 					$pointer[$pointerIndex] += 1;
 				}
-				else if($pointerIndex == PaginationOptionsContainer::BEFORE_CURRENT || $pointerIndex == PaginationOptionsContainer::END)
+				else if($pointerIndex === PaginationOptionsContainer::BEFORE_CURRENT || $pointerIndex === PaginationOptionsContainer::END)
 				{
 					$pointer[$pointerIndex] -= 1;
 				}
