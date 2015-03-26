@@ -5,6 +5,8 @@ namespace JGM\TableBundle\Table\DataSource;
 use Doctrine\ORM\QueryBuilder;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Column\EntityColumn;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -32,7 +34,8 @@ class EntityDataSource extends QueryBuilderDataSource
 		$this->callback = $callback;
 	}
 	
-	public function getData(ContainerInterface $container, array $columns, array $filters = null, \JGM\TableBundle\Table\Model\PaginationOptionsContainer $pagination = null, \JGM\TableBundle\Table\Model\SortableOptionsContainer $sortable = null)
+	public function getData(ContainerInterface $container, array $columns, array $filters = null,
+							Pagination $pagination = null, SortableOptionsContainer $sortable = null)
 	{
 		if($this->queryBuilder === null)
 		{

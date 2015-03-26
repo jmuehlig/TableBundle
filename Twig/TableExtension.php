@@ -3,11 +3,17 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Renderer\RendererInterface;
 use JGM\TableBundle\Table\TableException;
 use JGM\TableBundle\Table\TableView;
+use JGM\TableBundle\Table\UrlHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig_Environment;
 use Twig_Extension;
 use Twig_Function_Method;
+use Twig_Template;
 
 class TableExtension extends Twig_Extension
 {
@@ -16,9 +22,29 @@ class TableExtension extends Twig_Extension
 	 */
 	protected $tableRenderer;
 	
+	/**
+	 * @var Twig_Template
+	 */
+	protected $template;
+	
+	/**
+	 * @var UrlHelper
+	 */
+	protected $urlHelper;
+	
+	public function __construct(ContainerInterface $container)
+	{
+		$this->urlHelper = $container->get('jgm.url_helper');
+	}
+	
 	public function getName()
 	{
 		return 'table';
+	}
+	
+	public function initRuntime(Twig_Environment $environment) 
+	{
+		$this->template = $environment->loadTemplate('JGMTableBundle::blocks.html.twig');
 	}
 	
 	private function getRenderer(TableView $view = null)
@@ -55,6 +81,8 @@ class TableExtension extends Twig_Extension
 			'filter_submit_button' => new Twig_Function_Method($this, 'getFilterSubmitButtonContent', array('is_safe' => array('html'))),
 			'filter_reset_link' => new Twig_Function_Method($this, 'getFilterResetLinkContent', array('is_safe' => array('html'))),
 			'filter_end' => new Twig_Function_Method($this, 'getFilterEndContent', array('is_safe' => array('html'))),
+			
+			'get_table_url' => new Twig_Function_Method($this, 'getTableUrl'),
 		);
 	}
 	
@@ -71,12 +99,39 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableBeginContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderTableBegin($tableView);
+		return $this->template->renderBlock('table_begin', array(
+			'name' => $tableView->getName(),
+			'attributes' => $tableView->getAttributes()
+		));
 	}
 	
 	public function getTableHeadContent(TableView $tableView)
-	{
-		return $this->getRenderer($tableView)->renderTableHead($tableView);
+	{			
+		// Create the route parameter names for each sortable column.
+		$paramterNames = array();
+		
+		// Fill it with sortable parameter names.
+		$sortable = $tableView->getSortable();
+		if($sortable != null)
+		{
+			$paramterNames['column'] = $sortable->getParamColumnName();
+			$paramterNames['direction'] = $sortable->getDirection();
+		}
+		
+		// Fill it with the pagination parameter name.
+		$pagination = $tableView->getPagination();
+		if($pagination != null)
+		{
+			$paramterNames['page'] = $pagination->getParameterName();
+		}
+		
+		return $this->template->renderBlock('table_head', array(
+			'columns' => $tableView->getColumns(),
+			'is_sortable' => $tableView->getSortable() != null,
+			'parameterNames' => $paramterNames,
+			'sort' => $sortable,
+			'pagination' => $pagination
+		));
 	}
 	
 	public function getTableBodyContent(TableView $tableView)
@@ -170,6 +225,11 @@ class TableExtension extends Twig_Extension
 	public function getFilterLabelContent(FilterInterface $filter)
 	{
 		return $this->getRenderer()->renderFilterLabel($filter);
+	}
+	
+	public function getTableUrl($pagination, $sort, $page, $columnName, $direction = null)
+	{
+		return $this->urlHelper->getUrl($pagination, $sort, $page, $columnName, $direction);
 	}
 }
 

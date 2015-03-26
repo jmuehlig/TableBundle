@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
-use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,7 +37,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		$this->queryBuilder = $queryBuilder;
 	}
 	
-	public function getData(ContainerInterface $container, array $columns, array $filters = null, PaginationOptionsContainer $pagination = null, SortableOptionsContainer $sortable = null)
+	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, SortableOptionsContainer $sortable = null)
 	{
 		if($this->queryBuilder === null)
 		{

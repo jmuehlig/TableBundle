@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder(); 
-		$rootNode = $treeBuilder->root('pzad_table');
+		$rootNode = $treeBuilder->root('jgm_table');
 
 		$rootNode
 			->children()

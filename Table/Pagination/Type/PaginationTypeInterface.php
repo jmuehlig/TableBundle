@@ -1,6 +1,6 @@
 <?php
 
-namespace JGM\TableBundle\Table\Type;
+namespace JGM\TableBundle\Table\Pagination\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -13,12 +13,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * @author Jan Mühlig <mail@janmuehlig.de>
  * @since 1.0.0 
  */
-interface PaginatableInterface
+interface PaginationTypeInterface
 {
 	/**
 	 * Sets the default options for the pagination of the table type.
 	 * 
 	 * @param OptionsResolverInterface $resolver
 	 */
-	public function setPaginatableDefaultOptions(OptionsResolverInterface $resolver);
+	public function setPaginationDefaultOptions(OptionsResolverInterface $resolver);
 }

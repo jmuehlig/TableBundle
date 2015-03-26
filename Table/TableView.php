@@ -3,7 +3,7 @@
 namespace JGM\TableBundle\Table;
 
 use JGM\TableBundle\Table\Model\FilterOptionsContainer;
-use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use JGM\TableBundle\Table\Renderer\RendererInterface;
 
@@ -63,7 +63,7 @@ class TableView
 	 * Only, if pagination is defined by
 	 * the table type.
 	 * 
-	 * @var PaginationOptionsContainer
+	 * @var Pagination
 	 */
 	protected $pagination;
 	

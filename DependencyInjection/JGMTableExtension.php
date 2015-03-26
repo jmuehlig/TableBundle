@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Loader;
  * 
  * @author Jan Mühlig <mail@janmuehlig.de>
  */
-class PZADTableExtension extends Extension
+class JGMTableExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -34,13 +34,13 @@ class PZADTableExtension extends Extension
 		$configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-		$container->setParameter('pzad_table.columns', array_merge($config['columns'], $configuration->getDefaultColumns()));
-		$container->setParameter('pzad_table.filters', array_merge($config['filters'], $configuration->getDefaultFilters()));
+		$container->setParameter('jgm_table.columns', array_merge($config['columns'], $configuration->getDefaultColumns()));
+		$container->setParameter('jgm_table.filters', array_merge($config['filters'], $configuration->getDefaultFilters()));
 		
 	}
 	
 	public function getAlias()
 	{
-		return 'pzad_table';
+		return 'jgm_table';
 	}
 }
