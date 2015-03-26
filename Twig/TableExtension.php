@@ -136,7 +136,11 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableBodyContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderTableBody($tableView);
+		return $this->template->renderBlock('table_body', array(
+			'columns' => $tableView->getColumns(),
+			'rows' => $tableView->getRows(),
+			'emptyValue' => $tableView->getEmptyValue()
+		));
 	}
 	
 	public function getTableEndContent(TableView $tableView)

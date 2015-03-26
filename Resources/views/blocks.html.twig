@@ -27,6 +27,21 @@
 {% endblock %}
 
 {% block table_body %}
+<tbody>
+{% for row in rows %}
+{% set attributes = row.attributes %}
+<tr{{ block('attributes') }}>
+	{% for column in columns %}
+	{% set attributes = column.attributes %}
+	<td{{ block('attributes') }}>{{ column.content(row)|raw }}</td>
+	{% endfor %}
+</tr>
+{% else %}
+<tr>
+	<td colspan="{{ columns|length }}">{{ emptyValue }}</td>
+</tr>
+{% endfor %}
+</tbody>
 {% endblock %}
 
 {% block table_pagination %}
