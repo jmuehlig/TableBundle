@@ -47,7 +47,7 @@ class TableBuilder
 		$this->columns = array();
 		
 		// Register standard columns.
-		$this->registeredColumns = $this->container->getParameter('pzad_table.columns');
+		$this->registeredColumns = $this->container->getParameter('jgm_table.columns');
 	}
 	
 	/**

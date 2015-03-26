@@ -30,7 +30,7 @@ class FilterBuilder
 	{
 		$this->filters = array();
 		
-		$this->registeredFilters = $container->getParameter('pzad_table.filters');
+		$this->registeredFilters = $container->getParameter('jgm_table.filters');
 		
 		$this->container = $container;
 	}

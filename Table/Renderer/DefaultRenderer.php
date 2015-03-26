@@ -4,7 +4,8 @@ namespace JGM\TableBundle\Table\Renderer;
 
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
-use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
+use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\TableView;
 use JGM\TableBundle\Table\Utils\UrlHelper;
@@ -182,46 +183,10 @@ class DefaultRenderer implements RendererInterface
 			return;
 		}
 		
-		if($tableView->getTotalPages() > $pagination->getMaxPages() && $pagination->getMaxPages() > 0)
-		{
-			$pointer = array( 
-				PaginationOptionsContainer::BEGIN => 0, 
-				PaginationOptionsContainer::BEFORE_CURRENT => $pagination->getCurrentPage()-1,
-				PaginationOptionsContainer::AFTER_CURRENT => $pagination->getCurrentPage()+1,
-				PaginationOptionsContainer::END => $tableView->getTotalPages()-1
-			);
-			$pages = array();
-			
-			$pages[] = $pagination->getCurrentPage();
-			$i = 0;
-			while(count($pages) < $pagination->getMaxPages())
-			{
-				$pointerIndex = $i++ % count($pointer);
-				$point = $pointer[$pointerIndex];
-				if(!in_array($point, $pages) && $point >= 0 && $point < $tableView->getTotalPages())
-				{
-					$pages[] = $point;
-				}
-				
-				if($pointerIndex === PaginationOptionsContainer::BEGIN || $pointerIndex === PaginationOptionsContainer::AFTER_CURRENT)
-				{
-					$pointer[$pointerIndex] += 1;
-				}
-				else if($pointerIndex === PaginationOptionsContainer::BEFORE_CURRENT || $pointerIndex === PaginationOptionsContainer::END)
-				{
-					$pointer[$pointerIndex] -= 1;
-				}
-			}
-			sort($pages);
-		}
-		else
-		{
-			$pages = array();
-			for($page = 0; $page < $tableView->getTotalPages(); $page++)
-			{
-				$pages[] = $page;
-			}
-		}
+		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $pagination->getMaxPages());
+		/* @var $strategy StrategyInterface */ 
+		$pages = $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages());
+		sort($pages);
 		
 		$classes = $pagination->getClasses();
 		
@@ -257,8 +222,6 @@ class DefaultRenderer implements RendererInterface
 		}
 		
 		// Pages
-		//for($page = 0; $page < $tableView->getTotalPages(); $page++)
-		//foreach($pages as $page)
 		for($pageIndex = 0; $pageIndex < count($pages); $pageIndex++)
 		{
 			$page = $pages[$pageIndex];

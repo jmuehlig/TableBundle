@@ -1,0 +1,37 @@
+{% block table_begin %}
+<table id="{{ name }}"{{ block('attributes') }}>
+{% endblock %}
+
+{% block table_end %}
+</table>
+{% endblock %}
+
+{% block table_head %}
+<thead>
+	<tr>
+		{% for column in columns %}
+		{% set attributes = column.headAttributes %}
+		<th{{ block('attributes') }}>{{ block('table_head_column_label') }}</th>
+		{% endfor %}
+	</tr>
+</thead>
+{% endblock %}
+	
+{% block table_head_column_label %}
+{% if  is_sortable and column.isSortable %}
+	<a href="{{ get_table_url(pagination, sort, 1, column.name) }}">{{ column.label }}</a>
+	{% if sort.columnName == column.name %}<span class="{{ sort.classes[sort.direction] }}"></span>{% endif %}
+{% else %}
+	{{ column.label }}
+{% endif %}
+{% endblock %}
+
+{% block table_body %}
+{% endblock %}
+
+{% block table_pagination %}
+{% endblock %}
+
+{% block attributes %}
+	{% for attr,value in attributes %} {{ attr }}="{{ value }}"{% endfor %}
+{% endblock %}

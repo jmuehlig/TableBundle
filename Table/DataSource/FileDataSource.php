@@ -2,7 +2,7 @@
 
 namespace JGM\TableBundle\Table\DataSource;
 
-use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,11 +23,11 @@ class FileDataSource implements DataSourceInterface
 	
 	public function getCountItems(ContainerInterface $container, array $columns, $filters = null)
 	{
-		
+		// TODO
 	}
 	
-	public function getData(ContainerInterface $container, array $columns, $filters = null, PaginationOptionsContainer $pagination = null, SortableOptionsContainer $sortable = null)
+	public function getData(ContainerInterface $container, array $columns, $filters = null, Pagination $pagination = null, SortableOptionsContainer $sortable = null)
 	{
-		
+		// TODO
 	}
 }

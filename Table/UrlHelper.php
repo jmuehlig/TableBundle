@@ -2,7 +2,10 @@
 
 namespace JGM\TableBundle\Table;
 
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -27,6 +30,44 @@ class UrlHelper
 	{
 		$this->request = $request;
 		$this->router = $router;
+	}
+	
+	public function getUrl($pagination, $sort, $page, $columnName, $direction = null)
+	{
+		$parameters = array();
+		if($pagination != null)
+		{
+			$parameters[$pagination->getParameterName] = $page;
+		}
+		
+		if($sort != null)
+		{
+			$parameters[$sort->getParamColumnName()] = $columnName;
+			$parameters[$sort->getParamDirectionName()] = $this->getDirection($sort, $columnName, $direction);
+		}
+		
+		return $this->getUrlForParameters($parameters);
+	}
+	
+	protected function getDirection(SortableOptionsContainer $sort, $columnName, $direction = null)
+	{
+		if($direction == null)
+		{
+			if($columnName == $sort->getColumnName() && $sort->getDirection() === SortableOptionsContainer::ORDER_ASC)
+			{
+				return SortableOptionsContainer::ORDER_DESC;
+			}
+			else
+			{
+				return SortableOptionsContainer::ORDER_ASC;
+			}
+		}
+		else if(!in_array($direction, array(SortableOptionsContainer::ORDER_ASC, SortableOptionsContainer::ORDER_DESC)))
+		{
+			return SortableOptionsContainer::ORDER_ASC;
+		}
+		
+		return $direction;
 	}
 	
 	/**

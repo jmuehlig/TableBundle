@@ -1,20 +1,15 @@
 <?php
 
-namespace JGM\TableBundle\Table\Model;
+namespace JGM\TableBundle\Table\Pagination\Model;
 
 /**
- * Container for options of the pagination component.
+ * Model for pagination information.
  *
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0.0
+ * @since	1.0
  */
-class PaginationOptionsContainer
+class Pagination 
 {
-	const BEGIN = 0;
-	const BEFORE_CURRENT = 2;
-	const AFTER_CURRENT = 3;
-	const END = 1;
-	
 	/**
 	 * @var string
 	 */
@@ -56,12 +51,11 @@ class PaginationOptionsContainer
 	protected $maxPages;
 
 
-	public function __construct($parameterName, $itemPerRow, $currentPage, $showEmpty, array $classes, 
+	public function __construct($parameterName, $itemPerRow, $showEmpty, array $classes, 
 								$previousLabel, $nextLabel, $maxPages)
 	{
 		$this->parameterName = $parameterName;
 		$this->itemsPerRow = $itemPerRow;
-		$this->currentPage = $currentPage;
 		$this->showEmpty = $showEmpty;
 		$this->classes = $classes;
 		$this->previousLabel = $previousLabel;
@@ -107,5 +101,10 @@ class PaginationOptionsContainer
 	public function getMaxPages()
 	{
 		return $this->maxPages;
+	}
+	
+	public function setCurrentPage($currentPage)
+	{
+		$this->currentPage = $currentPage;
 	}
 }

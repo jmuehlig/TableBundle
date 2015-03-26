@@ -10,6 +10,9 @@ namespace JGM\TableBundle\Table\Model;
  */
 class SortableOptionsContainer
 {
+	const ORDER_ASC = 'asc';
+	const ORDER_DESC = 'desc';
+	
 	/**
 	 * @var string
 	 */

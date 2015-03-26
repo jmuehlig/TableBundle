@@ -1,6 +1,7 @@
 services:
     jgm.table.twig:
         class: JGM\TableBundle\Twig\TableExtension
+        arguments: ["@service_container"]
         tags:
             - { name: twig.extension }
     jgm.table:

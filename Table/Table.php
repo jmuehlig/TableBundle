@@ -6,15 +6,15 @@ use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
 use Iterator;
 use JGM\TableBundle\Table\Column\ColumnInterface;
-use JGM\TableBundle\Table\FilterBuilder;
 use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\FilterBuilder;
 use JGM\TableBundle\Table\Model\FilterOptionsContainer;
-use JGM\TableBundle\Table\Model\PaginationOptionsContainer;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
+use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptionsResolver;
 use JGM\TableBundle\Table\Renderer\DefaultRenderer;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Type\AbstractTableType;
-use JGM\TableBundle\Table\Type\PaginatableInterface;
 use JGM\TableBundle\Table\Type\SortableInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -99,7 +99,7 @@ class Table
 	 * Rehashed pagination information.
 	 * NULL, if pagination is disabled.
 	 * 
-	 * @var PaginationOptionsContainer 
+	 * @var Pagination 
 	 */
 	private $pagination;
 	
@@ -298,7 +298,10 @@ class Table
 		$this->options = $optionsResolver->resolve(array());
 		
 		// Resolve options of pagination.
-		$this->resolvePaginationOptions();
+		if($this->isPaginationProvider())
+		{
+			$this->pagination = $this->resolvePaginationOptions();
+		}
 		
 		// Resolve sortable options.
 		$this->resolveSortableOptions();
@@ -349,57 +352,21 @@ class Table
 	 *	classes:			Classes for rendering, containing classnames for "ul", "li", "li-active" and "li-disabled".
 	 */
 	private function resolvePaginationOptions()
-	{
-		// Only rehash the pagination options,
-		// if pagination is used in the table type.
-		if($this->tableType instanceof PaginatableInterface === false)
-		{
-			$this->pagination = null;
-			return;
-		}
-		
+	{	
 		// Configure the options resolver for the pagination.
-		$paginationOptionsResolver = new OptionsResolver();
-		$paginationOptionsResolver->setDefaults(array(
-			'param' => 'page',
-			'rows_per_page' => 20,
-			'show_empty' => true,
-			'ul_class' => 'pagination',
-			'li_class' => null,
-			'li_class_active' => 'active',
-			'li_class_disabled' => 'disabled',
-			'prev_label' => '&laquo;',
-			'next_label' => '&raquo;',
-			'max_pages' => null
-		)); 
+		$paginationOptionsResolver = new PaginationOptionsResolver();
 		
 		// Set the defaults by the table type.
-		$this->tableType->setPaginatableDefaultOptions($paginationOptionsResolver);
-		
-		// Resolve the options.
-		$pagination = $paginationOptionsResolver->resolve(array());
-		
-		// Read current page.
-		$currentPage = max(0, ((int) $this->request->get( $pagination['param'] )) - 1);
+		$this->tableType->setPaginationDefaultOptions($paginationOptionsResolver);
 		
 		// Setup options container.
-		$this->pagination = new PaginationOptionsContainer(
-			$pagination['param'],
-			$pagination['rows_per_page'],
-			$currentPage,
-			$pagination['show_empty'],
-			array(
-				'ul' => $pagination['ul_class'],
-				'li' => $pagination['li_class'],
-				'li_active' => $pagination['li_class_active'],
-				'li_disabled' => $pagination['li_class_disabled']
-			),
-			$pagination['prev_label'],
-			$pagination['next_label'],
-			$pagination['max_pages']
-		);
+		$pagination = $paginationOptionsResolver->toPagination();
 		
+		// Read current page.
+		$currentPage = max(0, ((int) $this->request->get( $pagination->getParameterName() )) - 1);
+		$pagination->setCurrentPage($currentPage);
 		
+		return $pagination;		
 	}
 	
 	private function resolveSortableOptions()
@@ -559,5 +526,10 @@ class Table
 		}
 		
 		return $this->filterBuilder->getFilters();
+	}
+	
+	private function isPaginationProvider()
+	{
+		return $this->tableType instanceof Pagination\Type\PaginationTypeInterface;
 	}
 }
