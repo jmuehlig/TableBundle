@@ -11,7 +11,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 
 /**
- * TableFactory.
+ * TableFactory for creating tables from controller.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class TableFactory
 {	

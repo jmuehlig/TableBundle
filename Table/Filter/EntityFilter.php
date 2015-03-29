@@ -1,20 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace JGM\TableBundle\Table\Filter;
 
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Description of EntityFilter
- *
- * @author Jan
+ * This valued filter will contain a set of
+ * objects of an entity.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class EntityFilter extends AbstractValuedFilter
 {
@@ -39,6 +35,9 @@ class EntityFilter extends AbstractValuedFilter
 		));
 	}
 
+	/**
+	 * @return array	All objects of the specified entity.
+	 */
 	public function getValues()
 	{
 		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);

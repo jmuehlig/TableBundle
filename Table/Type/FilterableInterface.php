@@ -11,8 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * The interface provides a method for building the filters, used
  * by the table.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 interface FilterableInterface
 {

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  * from a database by executing a query builder.
  *
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0.0
+ * @since	1.0
  */
 class QueryBuilderDataSource implements DataSourceInterface
 {

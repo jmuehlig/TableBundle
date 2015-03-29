@@ -5,7 +5,11 @@ namespace JGM\TableBundle\Table\Filter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * A boolean filter, which will contain two valid values:
+ * true or false.
  * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class BooleanFilter extends AbstractValuedFilter
 {

@@ -12,7 +12,8 @@ use JGM\TableBundle\Table\TableException;
  * Uses a ContentGrabber or a ContentFunction to generate
  * the output for this column.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class ContentColumn extends AbstractColumn
 {

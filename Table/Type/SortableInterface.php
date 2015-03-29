@@ -9,8 +9,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * The interface provides a method for setting the default options
  * for beeing sortable.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 interface SortableInterface
 {

@@ -144,13 +144,42 @@
 {% endblock %}
 
 {% block list_widget %}
+{% set attributes = filter.attributes %}
+<ul{{ block('attributes') }}>
+{% set isResetItemRendered = (filter.resetLabel is null) %}
+
+{% for value,label in filter.values %}
+{% if isResetItemRendered and filter.resetPos <= loop.index0 %}
+{% set itemValue = null %}
+{% set itemLabel = filter.resetLabel %}
+{{ block('list_widget_item') }}
+{% endif %}
+{% set itemValue = value %}
+{% set itemLabel = label %}
+{{ block('list_widget_item') }}
+{% endfor %}
+{% if not isResetItemRendered %}
+{% set itemValue = null %}
+{% set itemLabel = filter.resetLabel %}
+{{ block('list_widget_item') }}
+{% endif %}
+</ul>
+{% endblock %}
+	
+{% block list_widget_item %}
+{% if is_identical(itemValue|trans, filter.value) %}
+{% set attributes = filter.liActiveAttr %}
+{% else %}
+{% set attributes = filter.liAttr %}
+{% endif %}
+<li{{ block('attributes') }}><a href="{{ get_url({ (filter.name) : itemValue }) }}">{{ itemLabel }}</a></li>
 {% endblock %}
 
 {% block select_widget %}
 {% set attributes = filter.attributes %}
 {% set values = filter.values|merge({ (filter.defaultValue) : (filter.resetLabel) }) %}
 <select name="{{ filter.name }}" id="{{ filter.name }}"{{ block('attributes') }}>
-{% for value,label in filter.values %}
+{% for value,label in values %}
 	<option value="{{ value }}"{% if value == filter.value %} selected="selected"{% endif %}>{{ label }}</option>
 {% endfor %}
 </select>
@@ -159,7 +188,7 @@
 {% block choice_widget %}
 {% set attributes = filter.attributes %}
 {% set values = filter.values|merge({ (filter.defaultValue) : (filter.resetLabel) }) %}
-{% for value,label in filter.values %}
+{% for value,label in values %}
 {% set id = filter.name~(value|replace({' ':'_'})) %}
 <input type="radio" id="{{ id }}" name="{{ filter.name }}" value="{{ value }}"{% if value == filter.value %} checked="checked"{% endif %}{{ block('attributes') }}><label for="{{ id }}">{{ label }}</label></option>
 {% endfor %}

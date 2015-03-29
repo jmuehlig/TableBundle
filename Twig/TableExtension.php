@@ -3,6 +3,7 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
 use JGM\TableBundle\Table\Renderer\RendererInterface;
@@ -73,7 +74,7 @@ class TableExtension extends Twig_Extension
 	public function getFunctions()
 	{
 		return array(
-			// Table rendering
+			// Table rendering.
 			'table' => new Twig_Function_Method($this, 'getTableContent', array('is_safe' => array('html'))),
 			'table_begin' => new Twig_Function_Method($this, 'getTableBeginContent', array('is_safe' => array('html'))),
 			'table_head' => new Twig_Function_Method($this, 'getTableHeadContent', array('is_safe' => array('html'))),
@@ -81,7 +82,7 @@ class TableExtension extends Twig_Extension
 			'table_end' => new Twig_Function_Method($this, 'getTableEndContent', array('is_safe' => array('html'))),
 			'table_pagination' => new Twig_Function_Method($this, 'getTablePaginationContent', array('is_safe' => array('html'))),
 			
-			// Filter rendering
+			// Filter rendering.
 			'filter' => new Twig_Function_Method($this, 'getFilterContent', array('is_safe' => array('html'))),
 			'filter_label' => new Twig_Function_Method($this, 'getFilterLabelContent', array('is_safe' => array('html'))),
 			'filter_widget' => new Twig_Function_Method($this, 'getFilterWidgetContent', array('is_safe' => array('html'))),
@@ -92,8 +93,12 @@ class TableExtension extends Twig_Extension
 			'filter_reset_link' => new Twig_Function_Method($this, 'getFilterResetLinkContent', array('is_safe' => array('html'))),
 			'filter_end' => new Twig_Function_Method($this, 'getFilterEndContent', array('is_safe' => array('html'))),
 			
+			// Some helper methods.
 			'get_url_for_order' => new Twig_Function_Method($this, 'getUrlForOrder'),
-			'get_url_for_page' => new Twig_Function_Method($this, 'getTableForPage'),
+			'get_url_for_page' => new Twig_Function_Method($this, 'getUrlForPage'),
+			'get_url' => new Twig_Function_Method($this, 'getUrl'),
+			
+			'is_identical' => new Twig_Function_Method($this, 'isIdentical'),
 		);
 	}
 	
@@ -180,7 +185,7 @@ class TableExtension extends Twig_Extension
 		// Get the page strategy.
 		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $pagination->getMaxPages());
 		/* @var $strategy StrategyInterface */ 
-		
+
 		return $this->template->renderBlock('table_pagination', array(
 			'currentPage' => $pagination->getCurrentPage(),
 			'prevLabel' => $pagination->getPreviousLabel(),
@@ -292,16 +297,21 @@ class TableExtension extends Twig_Extension
 		));
 	}
 	
-	public function getTableForPage($page)
+	public function getUrl(array $params)
+	{		
+		return $this->urlHelper->getUrlForParameters($params);
+	}
+	
+	public function getUrlForPage($page)
 	{
 		if($this->tableView === null)
 		{
-			// TODO: throw exception
+			TableException::tableViewNotSet();
 		}
 		
 		if($this->tableView->getPagination() === null)
 		{
-			// TODO: throw exception
+			TableException::paginationNotProvided();
 		}
 		
 		return $this->urlHelper->getUrlForParameters(array(
@@ -313,15 +323,25 @@ class TableExtension extends Twig_Extension
 	{
 		if($this->tableView === null)
 		{
-			// TODO: throw exception
+			TableException::tableViewNotSet();
 		}
 		
 		if($this->tableView->getSortable() === null)
 		{
-			// TODO: throw exception
+			TableException::orderNotProvided();
 		}
 		
-		$parameters = array($this->tableView->getSortable()->getParamColumnName() => $columnName);
+		$order = $this->tableView->getSortable();
+		
+		$parameters = array($order->getParamColumnName() => $columnName);
+		if($order->getColumnName() == $columnName && $order->getDirection() == SortableOptionsContainer::ORDER_ASC)
+		{
+			$parameters[$order->getParamDirectionName()] = SortableOptionsContainer::ORDER_DESC;
+		}
+		else
+		{
+			$parameters[$order->getParamDirectionName()] = SortableOptionsContainer::ORDER_ASC;
+		}
 		
 		// Start at first page.
 		if($this->tableView->getPagination() !== null)
@@ -346,6 +366,11 @@ class TableExtension extends Twig_Extension
 		}
 		
 		return $needsFormEnviroment;
+	}
+	
+	public function isIdentical($obj1, $obj2)
+	{
+		return $obj1 === $obj2;
 	}
 }
 

@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Simple ContentGrabber: Grabs the columns value for the row.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class SimpleContentGrabber implements ContentGrabberInterface
 {

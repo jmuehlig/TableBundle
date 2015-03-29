@@ -8,7 +8,8 @@ use JGM\TableBundle\Table\Row\Row;
 /**
  * Rendering a boolean value.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class BooleanColumn extends AbstractColumn
 {

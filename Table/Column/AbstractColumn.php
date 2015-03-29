@@ -12,8 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * you can - but don't have to - extend these
  * abstract column.
  *
- * @author Jan Mühlig
- * @since 1.0.0
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 abstract class AbstractColumn implements ColumnInterface
 {

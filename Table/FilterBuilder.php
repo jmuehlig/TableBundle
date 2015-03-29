@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builder for building table filters.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class FilterBuilder
 {

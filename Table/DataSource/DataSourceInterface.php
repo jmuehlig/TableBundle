@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * for filling it with data.
  *
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0.0
+ * @since	1.0
  */
 interface DataSourceInterface
 {

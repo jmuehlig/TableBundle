@@ -10,7 +10,8 @@ use JGM\TableBundle\Table\Row\Row;
  * If you want to implement your own column,
  * you have to implement this interface.
  * 
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 interface ColumnInterface
 {
