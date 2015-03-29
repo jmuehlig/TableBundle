@@ -92,6 +92,11 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		return call_user_func(array($this, $this->getWidgetFuntionName($this->RENDER_PREFIX)));
 	}
 	
+	public function getWidgetBlockName()
+	{
+		return $this->widget . '_widget';
+	}
+	
 	/**
 	 * Renders filer as a ul-list.
 	 */

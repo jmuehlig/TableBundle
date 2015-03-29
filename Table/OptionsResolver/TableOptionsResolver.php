@@ -23,7 +23,6 @@ class TableOptionsResolver extends OptionsResolver
 			'empty_value' => 'No data found.',
 			'attr' => array(),
 			'head_attr' => array(),
-			'renderer' => $defaultRenderer
 		));
 	}
 }

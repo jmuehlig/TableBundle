@@ -17,13 +17,8 @@ class TextFilter extends AbstractFilter
 		return true;
 	}
 
-	public function render()
+	public function getWidgetBlockName()
 	{
-		$value = "";
-		if($this->getValue() !== null)
-		{
-			$value = sprintf(" value=\"%s\"", $this->getValue());
-		}
-		return sprintf("<input name=\"%s\"%s%s />", $this->getName(), $value, RenderHelper::attrToString($this->getAttributes()));
+		return 'text_widget';
 	}
 }

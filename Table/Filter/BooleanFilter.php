@@ -19,7 +19,7 @@ class BooleanFilter extends AbstractValuedFilter
 		));
 	}
 
-	protected function getValues()
+	public function getValues()
 	{
 		return array(
 			"1" => $this->true,

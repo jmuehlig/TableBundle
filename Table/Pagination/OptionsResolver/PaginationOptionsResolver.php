@@ -41,16 +41,36 @@ class PaginationOptionsResolver extends OptionsResolver
 	public function toPagination()
 	{
 		$pagination = $this->resolve(array());
+		
+		$classes = array();
+		$classes['ul'] = $pagination['ul_class'];
+		$classes['li'] = array();
+		$classes['li']['default'] = array();
+		$classes['li']['active'] = array();
+		$classes['li']['disabled'] = array();
+		
+		if($pagination['li_class'] !== null && !empty($pagination['li_class']))
+		{
+			$classes['li']['default'][] = $pagination['li_class'];
+			$classes['li']['active'][] = $pagination['li_class'];
+			$classes['li']['disabled'][] = $pagination['li_class'];
+		}
+		
+		if($pagination['li_class_active'] !== null && !empty($pagination['li_class_active']))
+		{
+			$classes['li']['active'][] = $pagination['li_class_active'];
+		}
+		
+		if($pagination['li_class_disabled'] !== null && !empty($pagination['li_class_disabled']))
+		{
+			$classes['li']['disabled'][] = $pagination['li_class_disabled'];
+		}
+		
 		return new Pagination(
 			$pagination['param'],
 			$pagination['rows_per_page'],
 			$pagination['show_empty'],
-			array(
-				'ul' => $pagination['ul_class'],
-				'li' => $pagination['li_class'],
-				'li_active' => $pagination['li_class_active'],
-				'li_disabled' => $pagination['li_class_disabled']
-			),
+			$classes,
 			$pagination['prev_label'],
 			$pagination['next_label'],
 			$pagination['max_pages']

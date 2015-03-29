@@ -40,7 +40,7 @@ class UrlHelper
 			$parameters[$pagination->getParameterName] = $page;
 		}
 		
-		if($sort != null)
+		if($sort != null && $columnName != null)
 		{
 			$parameters[$sort->getParamColumnName()] = $columnName;
 			$parameters[$sort->getParamDirectionName()] = $this->getDirection($sort, $columnName, $direction);
