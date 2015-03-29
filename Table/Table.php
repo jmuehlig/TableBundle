@@ -11,6 +11,7 @@ use JGM\TableBundle\Table\FilterBuilder;
 use JGM\TableBundle\Table\Model\FilterOptionsContainer;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
+use JGM\TableBundle\Table\Pagination\Type\PaginationTypeInterface;
 use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptionsResolver;
 use JGM\TableBundle\Table\Renderer\DefaultRenderer;
 use JGM\TableBundle\Table\Row\Row;
@@ -530,6 +531,6 @@ class Table
 	
 	private function isPaginationProvider()
 	{
-		return $this->tableType instanceof Pagination\Type\PaginationTypeInterface;
+		return $this->tableType instanceof PaginationTypeInterface;
 	}
 }

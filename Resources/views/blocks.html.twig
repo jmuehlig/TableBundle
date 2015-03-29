@@ -1,3 +1,15 @@
+{% block attributes %}
+{% for attr,value in attributes if value is not null and value is not empty %} {{ attr }}="{{ value }}"{% endfor %}
+{% endblock %}
+
+{% block table %}
+{{ table_begin(view) }}
+{{ table_head(view) }}
+{{ table_body(view) }}
+{{ table_end(view) }}
+{{ table_pagination(view) }}
+{% endblock %}
+
 {% block table_begin %}
 <table id="{{ name }}"{{ block('attributes') }}>
 {% endblock %}
@@ -19,10 +31,12 @@
 	
 {% block table_head_column_label %}
 {% if  is_sortable and column.isSortable %}
-	<a href="{{ get_table_url(pagination, sort, 1, column.name) }}">{{ column.label }}</a>
-	{% if sort.columnName == column.name %}<span class="{{ sort.classes[sort.direction] }}"></span>{% endif %}
+<a href="{{ get_url_for_order(column.name) }}">{{ column.label }}</a>
+{% if sort.columnName == column.name %}
+<span class="{{ sort.classes[sort.direction] }}"></span>
+{% endif %}
 {% else %}
-	{{ column.label }}
+{{ column.label }}
 {% endif %}
 {% endblock %}
 
@@ -45,8 +59,111 @@
 {% endblock %}
 
 {% block table_pagination %}
+{% set attributes = {'class': classes['ul']|join(' ')} %}
+<ul{{ block('attributes') }}>
+{# Left arrow #}
+{% if currentPage == 0 %}
+{% set attributes = {'class': classes['li']['disabled']|join(' ')} %}
+<li{{ block('attributes') }}><a>{{ prevLabel|raw }}</a></li>
+{% else %}
+{% set attributes = {'class': classes['li']['default']|join(' ')} %}
+<li{{ block('attributes') }}><a href="{{ get_url_for_page(currentPage) }}">{{ prevLabel|raw }}</a></li>
+{% endif %}
+
+{# Pages #}
+{% for index,page in pages %}
+{% if page == currentPage %}
+{% set attributes = {'class': classes['li']['active']|join(' ')} %}
+{% else %}
+{% set attributes = {'class': classes['li']['default']|join(' ')} %}
+{% endif %}
+<li{{ block('attributes') }}><a href="{{ get_url_for_page(page+1) }}">{{ page+1 }}</a></li>
+{% if index+1 < pages|length and pages[index+1]-page > 1 %}
+{% set attributes = {'class': classes['li']['disabled']|join(' ')} %}
+<li{{ block('attributes') }}><a>...</a></li>
+{% endif %}
+{% endfor %}
+
+{# Right arrow #}
+{% if currentPage == totalPages-1 %}
+{% set attributes = {'class': classes['li']['disabled']|join(' ')} %}
+<li{{ block('attributes') }}><a>{{ nextLabel|raw }}</a></li>
+{% else %}
+{% set attributes = {'class': classes['li']['default']|join(' ')} %}
+<li{{ block('attributes') }}><a href="{{ get_url_for_page(currentPage+2) }}">{{ nextLabel|raw }}</a></li>
+{% endif %}
+</ul>
+{% endblock %}
+	
+{% block filter %}
+{{ filter_begin(view) }}
+{{ filter_rows(view) }}
+{{ filter_submit_button(view) }}
+{{ filter_reset_link(view) }}
+{{ filter_end(view) }}
+{% endblock %}
+	
+{% block filter_begin %}
+{% if needsFormEnviroment %}<form id="filter_{{ tableName }}">{% endif %}
 {% endblock %}
 
-{% block attributes %}
-	{% for attr,value in attributes %} {{ attr }}="{{ value }}"{% endfor %}
+{% block filter_end %}
+{% if needsFormEnviroment %}</form>{% endif %}
+{% endblock %}
+
+{% block filter_label %}
+{% set attributes = filter.attributes  %}
+<label for="{{ filter.name }}"{{ block('attributes') }}>{{ filter.label }}</label>{% endblock %}
+
+{% block filter_widget %}
+{{ block(filter.widgetBlockName) }}
+{% endblock %}
+
+{% block filter_row %}
+{{ filter_label(filter) }}: {{ filter_widget(filter) }}
+{% endblock %}
+
+{% block filter_rows %}
+{% for filter in filters %}
+{{ filter_row(filter) }}
+{% if not loop.last %}<br />{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block filter_submit_button %}
+{% if needsFormEnviroment %}<input type="submit" value="{{ submitLabel }}"{{ block('attributes') }} />{% endif %}
+{% endblock %}
+
+{% block filter_reset_link %}
+<a href="{{ resetUrl }}"{{ block('attributes') }}>{{ resetLabel }}</a>
+{% endblock %}
+
+{% block text_widget %}
+{% set attributes = filter.attributes %}
+<input type="text" id="{{ filter.name }}" name="{{ filter.name }}"{{ block('attributes') }}{% if filter.value is not null %} value="{{ filter.value }}"{% endif %} />
+{% endblock %}
+
+{% block list_widget %}
+{% endblock %}
+
+{% block select_widget %}
+{% set attributes = filter.attributes %}
+{% set values = filter.values|merge({ (filter.defaultValue) : (filter.resetLabel) }) %}
+<select name="{{ filter.name }}" id="{{ filter.name }}"{{ block('attributes') }}>
+{% for value,label in filter.values %}
+	<option value="{{ value }}"{% if value == filter.value %} selected="selected"{% endif %}>{{ label }}</option>
+{% endfor %}
+</select>
+{% endblock %}
+
+{% block choice_widget %}
+{% set attributes = filter.attributes %}
+{% set values = filter.values|merge({ (filter.defaultValue) : (filter.resetLabel) }) %}
+{% for value,label in filter.values %}
+{% set id = filter.name~(value|replace({' ':'_'})) %}
+<input type="radio" id="{{ id }}" name="{{ filter.name }}" value="{{ value }}"{% if value == filter.value %} checked="checked"{% endif %}{{ block('attributes') }}><label for="{{ id }}">{{ label }}</label></option>
+{% endfor %}
+{% endblock %}
+
+{% block date_widget %}
 {% endblock %}

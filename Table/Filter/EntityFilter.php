@@ -39,7 +39,7 @@ class EntityFilter extends AbstractValuedFilter
 		));
 	}
 
-	protected function getValues()
+	public function getValues()
 	{
 		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
 		/* @var $repository EntityRepository */

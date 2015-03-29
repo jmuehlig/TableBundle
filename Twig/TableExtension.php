@@ -3,8 +3,8 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
-use JGM\TableBundle\Table\Model\SortableOptionsContainer;
-use JGM\TableBundle\Table\Pagination\Model\Pagination;
+use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
+use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
 use JGM\TableBundle\Table\Renderer\RendererInterface;
 use JGM\TableBundle\Table\TableException;
 use JGM\TableBundle\Table\TableView;
@@ -32,6 +32,14 @@ class TableExtension extends Twig_Extension
 	 */
 	protected $urlHelper;
 	
+	/**
+	 * Current rendererd table view.
+	 * 
+	 * @var TableView 
+	 */
+	protected $tableView;
+
+
 	public function __construct(ContainerInterface $container)
 	{
 		$this->urlHelper = $container->get('jgm.url_helper');
@@ -61,7 +69,7 @@ class TableExtension extends Twig_Extension
 		
 		return $this->tableRenderer;
 	}
-
+	
 	public function getFunctions()
 	{
 		return array(
@@ -77,28 +85,31 @@ class TableExtension extends Twig_Extension
 			'filter' => new Twig_Function_Method($this, 'getFilterContent', array('is_safe' => array('html'))),
 			'filter_label' => new Twig_Function_Method($this, 'getFilterLabelContent', array('is_safe' => array('html'))),
 			'filter_widget' => new Twig_Function_Method($this, 'getFilterWidgetContent', array('is_safe' => array('html'))),
+			'filter_row' => new Twig_Function_Method($this, 'getFilterRowContent', array('is_safe' => array('html'))),
+			'filter_rows' => new Twig_Function_Method($this, 'getFilterRowsContent', array('is_safe' => array('html'))),
 			'filter_begin' => new Twig_Function_Method($this, 'getFilterBeginContent', array('is_safe' => array('html'))),
 			'filter_submit_button' => new Twig_Function_Method($this, 'getFilterSubmitButtonContent', array('is_safe' => array('html'))),
 			'filter_reset_link' => new Twig_Function_Method($this, 'getFilterResetLinkContent', array('is_safe' => array('html'))),
 			'filter_end' => new Twig_Function_Method($this, 'getFilterEndContent', array('is_safe' => array('html'))),
 			
-			'get_table_url' => new Twig_Function_Method($this, 'getTableUrl'),
+			'get_url_for_order' => new Twig_Function_Method($this, 'getUrlForOrder'),
+			'get_url_for_page' => new Twig_Function_Method($this, 'getTableForPage'),
 		);
 	}
 	
 	public function getTableContent(TableView $tableView)
 	{
-		return sprintf("%s\n %s\n %s\n %s\n %s",
-			$this->getTableBeginContent($tableView),
-			$this->getTableHeadContent($tableView),
-			$this->getTableBodyContent($tableView),
-			$this->getTableEndContent($tableView),
-			$this->getTablePaginationContent($tableView)				
-		);
+		$this->tableView = $tableView;
+		
+		return $this->template->renderBlock('table', array(
+			'view' => $tableView,
+		));
 	}
 	
 	public function getTableBeginContent(TableView $tableView)
 	{
+		$this->tableView = $tableView;
+		
 		return $this->template->renderBlock('table_begin', array(
 			'name' => $tableView->getName(),
 			'attributes' => $tableView->getAttributes()
@@ -106,7 +117,9 @@ class TableExtension extends Twig_Extension
 	}
 	
 	public function getTableHeadContent(TableView $tableView)
-	{			
+	{
+		$this->tableView = $tableView;
+		
 		// Create the route parameter names for each sortable column.
 		$paramterNames = array();
 		
@@ -136,6 +149,8 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableBodyContent(TableView $tableView)
 	{
+		$this->tableView = $tableView;
+		
 		return $this->template->renderBlock('table_body', array(
 			'columns' => $tableView->getColumns(),
 			'rows' => $tableView->getRows(),
@@ -145,95 +160,192 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableEndContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderTableEnd($tableView);
+		$this->tableView = $tableView;
+		
+		return $this->template->renderBlock('table_end', array());
 	}
 	
 	public function getTablePaginationContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderTablePagination($tableView);
+		$this->tableView = $tableView;
+		
+		$pagination = $tableView->getPagination();
+		
+		if($pagination === null ||
+			($tableView->getTotalPages() < 2 && $pagination->getShowEmpty() === false))
+		{
+			return;
+		}
+		
+		// Get the page strategy.
+		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $pagination->getMaxPages());
+		/* @var $strategy StrategyInterface */ 
+		
+		return $this->template->renderBlock('table_pagination', array(
+			'currentPage' => $pagination->getCurrentPage(),
+			'prevLabel' => $pagination->getPreviousLabel(),
+			'nextLabel' => $pagination->getNextLabel(),
+			'totalPages' => $tableView->getTotalPages(),
+			'classes' => $pagination->getClasses(),
+			'pages' => $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages())
+		));
 	}
 	
-	public function getFilterContent($viewOrFilterOrArray)
+	public function getFilterContent(TableView $tableView)
 	{
-		if($viewOrFilterOrArray instanceof TableView)
+		return $this->template->renderBlock('filter', array(
+				'view' => $tableView
+		));
+	}
+	
+	public function getFilterBeginContent(TableView $tableView)
+	{
+		return $this->template->renderBlock('filter_begin', array(
+			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
+			'tableName' => $tableView->getName()
+		));
+	}
+	
+	public function getFilterWidgetContent(FilterInterface $filter)
+	{
+		return $this->template->renderBlock('filter_widget', array(
+			'filter' => $filter
+		));
+	}
+	
+	public function getFilterLabelContent(FilterInterface $filter)
+	{
+		return $this->template->renderBlock('filter_label', array(
+			'filter' => $filter
+		));
+	}
+	
+	public function getFilterRowContent(FilterInterface $filter)
+	{
+		return $this->template->renderBlock('filter_row', array(
+			'filter' => $filter
+		));
+	}
+	
+	public function getFilterRowsContent($tableViewOrFilterArray)
+	{
+		$filters = array();
+		if($tableViewOrFilterArray instanceof TableView)
 		{
-			return sprintf("%s\n %s <br /> %s %s\n %s",
-				$this->getFilterBeginContent($viewOrFilterOrArray),
-				$this->getFilterArrayContent($viewOrFilterOrArray->getFilters()),
-				$this->getFilterSubmitButtonContent($viewOrFilterOrArray),
-				$this->getFilterResetLinkContent($viewOrFilterOrArray),
-				$this->getFilterEndContent($viewOrFilterOrArray)				
-			);
+			$filters = $tableViewOrFilterArray->getFilters();
 		}
-		else if($viewOrFilterOrArray instanceof FilterInterface)
+		else if(is_array($tableViewOrFilterArray))
 		{
-			return $this->getFilterSingleContent($viewOrFilterOrArray);
-		}
-		else if(is_array($viewOrFilterOrArray))
-		{
-			return $this->getFilterArrayContent($viewOrFilterOrArray);
+			$filters = $tableViewOrFilterArray;
 		}
 		else
 		{
 			TableException::canNotRenderFilter();
 		}
-	}
-	
-	public function getFilterBeginContent(TableView $tableView)
-	{
-		return $this->getRenderer($tableView)->renderFilterBegin($tableView);
+		
+		return $this->template->renderBlock('filter_rows', array(
+			'filters' => $filters
+		));
 	}
 	
 	public function getFilterSubmitButtonContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderFilterSubmitButton($tableView);
+		$filterOptions = $tableView->getFilter();
+		if($filterOptions === null)
+		{
+			return;
+		}
+		
+		return $this->template->renderBlock('filter_submit_button', array(
+			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
+			'submitLabel' => $filterOptions->getSubmitLabel(),
+			'attributes' => $filterOptions->getSubmitAttributes()
+		));
 	}
 	
 	public function getFilterResetLinkContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderFilterResetLink($tableView);
+		$filterOptions = $tableView->getFilter();
+		if($filterOptions === null)
+		{
+			return;
+		}
+		
+		$filterParams = array();
+		foreach($tableView->getFilters() as $filter)
+		{
+			$filterParams[$filter->getName()] = null;
+		}
+		
+		return $this->template->renderBlock('filter_reset_link', array(
+			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
+			'resetLabel' => $filterOptions->getResetLabel(),
+			'attributes' => $filterOptions->getResetAttributes(),
+			'resetUrl' => $this->urlHelper->getUrlForParameters($filterParams)
+		));
 	}
 	
 	public function getFilterEndContent(TableView $tableView)
 	{
-		return $this->getRenderer($tableView)->renderFilterEnd($tableView);
+		return $this->template->renderBlock('filter_end', array(
+			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView)
+		));
 	}
 	
-	private function getFilterArrayContent(array $filters)
+	public function getTableForPage($page)
 	{
-		$filterContent = array();
-		foreach($filters as $filter)
+		if($this->tableView === null)
+		{
+			// TODO: throw exception
+		}
+		
+		if($this->tableView->getPagination() === null)
+		{
+			// TODO: throw exception
+		}
+		
+		return $this->urlHelper->getUrlForParameters(array(
+			$this->tableView->getPagination()->getParameterName() => $page
+		));
+	}
+	
+	public function getUrlForOrder($columnName)
+	{
+		if($this->tableView === null)
+		{
+			// TODO: throw exception
+		}
+		
+		if($this->tableView->getSortable() === null)
+		{
+			// TODO: throw exception
+		}
+		
+		$parameters = array($this->tableView->getSortable()->getParamColumnName() => $columnName);
+		
+		// Start at first page.
+		if($this->tableView->getPagination() !== null)
+		{
+			$parameters[$this->tableView->getPagination()->getParameterName()] = 1;
+		}
+		
+		return $this->urlHelper->getUrlForParameters($parameters);
+	}
+	
+	protected function getFilterNeedsFormEnviroment(TableView $tableView)
+	{
+		$needsFormEnviroment = false;
+		foreach($tableView->getFilters() as $filter)
 		{
 			/* @var $filter FilterInterface */
-			$filterContent[] = $this->getFilterSingleContent($filter);
+			if($filter->needsFormEnviroment())
+			{
+				$needsFormEnviroment = true;
+				break;
+			}
 		}
 		
-		return implode("<br />", $filterContent);
-	}
-			
-	private function getFilterSingleContent(FilterInterface $filter)
-	{
-		return sprintf("%s\n%s", $this->getFilterLabelContent($filter), $this->getFilterWidgetContent($filter));
-	}
-	
-	public function getFilterWidgetContent(FilterInterface $filter)
-	{
-		if($this->getRenderer() === null)
-		{
-			TableException::filterNoView();
-		}
-		
-		return $this->getRenderer()->renderFilter($filter);
-	}
-	
-	public function getFilterLabelContent(FilterInterface $filter)
-	{
-		return $this->getRenderer()->renderFilterLabel($filter);
-	}
-	
-	public function getTableUrl($pagination, $sort, $page, $columnName, $direction = null)
-	{
-		return $this->urlHelper->getUrl($pagination, $sort, $page, $columnName, $direction);
+		return $needsFormEnviroment;
 	}
 }
 

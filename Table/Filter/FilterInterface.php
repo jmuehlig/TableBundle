@@ -73,12 +73,7 @@ interface FilterInterface
 	public function getValue();
 	
 	/**
-	 * Renders the filter.
+	 * @return string			Name of the filter widgets block name.
 	 */
-	public function render();
-	
-	/**
-	 * Renders the label of the filter.
-	 */
-	public function renderLabel();
+	public function getWidgetBlockName();
 }

@@ -85,6 +85,14 @@ abstract class AbstractFilter implements FilterInterface
 	 */
 	protected $containeInterface;
 	
+	/**
+	 * Map of property names and option
+	 * indexes.
+	 * 
+	 * @var array
+	 */
+	protected $optionPropertyMap = array();
+	
 	public function __construct(ContainerInterface $container)
 	{
 		$this->containeInterface = $container;
@@ -186,16 +194,21 @@ abstract class AbstractFilter implements FilterInterface
 		));
 	}
 	
+	public function __isset($name) 
+	{
+		$name = $this->getOptionIndexOfPropertyName($name);
+
+		if(array_key_exists($name, $this->options))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public function __get($name)
 	{
-		// Replace CalmelCase to under_score: getMyOption => $options['my_option'].
-		$name = preg_replace_callback(
-			'/([A-Z])/',
-			function($hit) {
-				return sprintf("_%s", strtolower($hit[1]));
-			},
-			$name
-		);
+		$name = $this->getOptionIndexOfPropertyName($name);
 
 		if(array_key_exists($name, $this->options))
 		{
@@ -216,5 +229,22 @@ abstract class AbstractFilter implements FilterInterface
 				$this->label
 			);
 		}
+	}
+	
+	protected function getOptionIndexOfPropertyName($propertyName)
+	{
+		if(!array_key_exists($propertyName, $this->optionPropertyMap))
+		{
+			// Replace CalmelCase to under_score: getMyOption => $options['my_option'].
+			$this->optionPropertyMap[$propertyName] = preg_replace_callback(
+				'/([A-Z])/',
+				function($hit) {
+					return sprintf("_%s", strtolower($hit[1]));
+				},
+				$propertyName
+			);
+		}
+		
+		return $this->optionPropertyMap[$propertyName];
 	}
 }

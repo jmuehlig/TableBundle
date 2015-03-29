@@ -50,6 +50,8 @@ class SimpleLimitStrategy implements StrategyInterface
 			}
 		}
 		
+		sort($pages);
+		
 		return $pages;
 	}
 }

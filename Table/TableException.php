@@ -128,7 +128,7 @@ class TableException extends \Exception
 	
 	public static function canNotRenderFilter()
 	{
-		$message = "Please pass a TablieView, a 'FilterInterface' or an array of 'FilterInterface' implementing objects to the filter()-method.";
+		$message = "Please pass a TableView or an array of 'FilterInterface' implementing objects to the filter_rows()-method.";
 		throw new TableException($message);
 	}
 	
