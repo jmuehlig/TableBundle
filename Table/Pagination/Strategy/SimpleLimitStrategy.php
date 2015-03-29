@@ -25,7 +25,7 @@ class SimpleLimitStrategy implements StrategyInterface
 			self::BEFORE_CURRENT => $currentPage-1,
 			self::AFTER_CURRENT => $currentPage+1
 		);
-		
+
 		// Array with pages which will be assigned to the pagination.
 		$pages = array($currentPage);
 		

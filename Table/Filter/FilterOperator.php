@@ -6,6 +6,9 @@ use JGM\TableBundle\Table\TableException;
 
 /**
  * Available filter operators.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class FilterOperator
 {

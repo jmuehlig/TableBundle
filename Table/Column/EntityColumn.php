@@ -8,7 +8,8 @@ use JGM\TableBundle\Table\Row\Row;
 /**
  * This column will call the __toString method of an entity.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class EntityColumn extends AbstractColumn
 {

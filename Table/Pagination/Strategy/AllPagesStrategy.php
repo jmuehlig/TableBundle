@@ -12,6 +12,12 @@ class AllPagesStrategy implements StrategyInterface
 {
 	public function getPages($currentPage, $totalPages, $maxPages) 
 	{
+		$pages = array();
+		for($i = 0; $i < $totalPages; $i++)
+		{
+			$pages[] = $i;
+		}
 		
+		return $pages;
 	}
 }

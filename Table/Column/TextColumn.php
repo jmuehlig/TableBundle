@@ -9,7 +9,8 @@ use JGM\TableBundle\Table\Row\Row;
  * This column will only fetch the value of the property,
  * which has the same name like this column.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class TextColumn extends AbstractColumn
 {

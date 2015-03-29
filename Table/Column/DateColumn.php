@@ -8,7 +8,8 @@ use JGM\TableBundle\Table\Row\Row;
 /**
  * Column for rendering date in format you like.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class DateColumn extends AbstractColumn
 {

@@ -6,6 +6,9 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Interface for objects which will check the access of a column.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 interface ColumnAccessInterface
 {

@@ -4,9 +4,11 @@ namespace JGM\TableBundle\Table\Filter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Description of ValuedFilter
+ * Simple filter for holding a set of values, defined
+ * by the user.
  *
- * @author Jan
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class ValuedFilter extends AbstractValuedFilter
 {
@@ -21,7 +23,6 @@ class ValuedFilter extends AbstractValuedFilter
 		$optionsResolver->setAllowedTypes(array(
 			'values' => 'array'
 		));
-		
 	}
 	
 	public function getValues()

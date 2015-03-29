@@ -2,18 +2,15 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
-use JGM\TableBundle\Table\Renderer\RenderHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * The AbstractFilter implements the base methods like setOptions
  * and getter of each option, given by the FilterInterface.
- * The method for rendering must be implemented by each specific
- * filter itself.
  *
  * @author 	Jan Mühlig <mail@janmuehlig.de>
- * @since 	1.0.0
+ * @since 	1.0
  */
 abstract class AbstractFilter implements FilterInterface
 {
@@ -123,6 +120,11 @@ abstract class AbstractFilter implements FilterInterface
 		return $this->operator;
 	}
 	
+	/**
+	 * 
+	 * @return mixed	Value of this filter or default value,
+	 *					if value is null and default value is not.
+	 */
 	public function getValue()
 	{
 		if($this->value === null && $this->defaultValue !== null)
@@ -218,19 +220,18 @@ abstract class AbstractFilter implements FilterInterface
 		return null;
 	}
 	
-	public function renderLabel()
-	{
-		if($this->label != '')
-		{
-			return sprintf(
-				"<label for=\"%s\"%s>%s</label>",
-				$this->getName(),
-				RenderHelper::attrToString($this->labelAttributes),
-				$this->label
-			);
-		}
-	}
-	
+	/**
+	 * For each getter, which is not implemented,
+	 * there can be an option at the options array.
+	 * This method will create an option name
+	 * for a wanted getter method.
+	 * 
+	 * Example: Method 'getMyOption' will create
+	 * index 'my_option'.
+	 * 
+	 * @param string $propertyName	Name of the wanted property.
+	 * @return string				Index of the options array.
+	 */
 	protected function getOptionIndexOfPropertyName($propertyName)
 	{
 		if(!array_key_exists($propertyName, $this->optionPropertyMap))

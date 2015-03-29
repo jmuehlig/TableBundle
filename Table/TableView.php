@@ -11,11 +11,11 @@ use JGM\TableBundle\Table\Renderer\RendererInterface;
  * TablieView
  * 
  * Represents a table in the view layer.
- * Used by the TableRenderer to create
+ * Used by twig to create
  * the HTML based output for the table.
  *
- * @author Jan Mühlig
- * @since 1.0
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class TableView
 {

@@ -4,6 +4,13 @@ namespace JGM\TableBundle\Table\Column\AccessValidation;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+/**
+ * Access validation, which get the accessibility of 
+ * the user by his role(s).
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
+ */
 class RoleAccess implements ColumnAccessInterface
 {
 	/**

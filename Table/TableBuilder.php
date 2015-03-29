@@ -11,8 +11,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  * The TableBuilder is concerned for the visualised columns.
  * Columns will added by the table type to the table builder.
  *
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class TableBuilder
 {

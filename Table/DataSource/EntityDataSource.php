@@ -10,9 +10,11 @@ use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Description of EntityDataSource
+ * Data source for filling the table with objects
+ * of an entity.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class EntityDataSource extends QueryBuilderDataSource
 {

@@ -6,6 +6,9 @@ use JGM\TableBundle\Table\TableException;
 
 /**
  * Represents a row of tabla data.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class Row
 {	

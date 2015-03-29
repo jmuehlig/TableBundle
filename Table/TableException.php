@@ -185,4 +185,19 @@ class TableException extends \Exception
 		$message = sprintf("The operator '%s' is not a valid filter oprator. Use one of the following: '%s'", $operator, implode(',', $validOperators));
 		throw new TableException($message);
 	}
+	
+	public static function tableViewNotSet()
+	{
+		throw new TableException("You can not use the url helper without setting the table view.");
+	}
+	
+	public static function paginationNotProvided()
+	{
+		throw new TableException("Pagination is not provided. Please use the PaginationTypeInterface to add these feature");
+	}
+	
+	public static function orderNotProvided()
+	{
+		throw new TableException("Order is not provided. Please use the OrderTypeInterface to add these feature");
+	}
 }

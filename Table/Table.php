@@ -28,8 +28,8 @@ use Symfony\Component\Routing\RouterInterface;
  * It will be build by the table builder and represented
  * by the table view.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class Table
 {

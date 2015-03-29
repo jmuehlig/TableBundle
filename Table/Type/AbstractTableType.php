@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * The table type injects the container and the entity manager.
  * 
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0.0
+ * @since	1.0
  */
 abstract class AbstractTableType
 {

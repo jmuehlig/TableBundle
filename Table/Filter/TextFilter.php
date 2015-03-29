@@ -2,13 +2,11 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
-use JGM\TableBundle\Table\Renderer\RenderHelper;
-
 /**
  * Simple filter for filtering text.
  *
  * @author	Jan Mühlig <mail@jamuehlig.de>
- * @since	1.0.0
+ * @since	1.0
  */
 class TextFilter extends AbstractFilter
 {

@@ -3,9 +3,11 @@
 namespace JGM\TableBundle\Table\Pagination\Strategy;
 
 /**
- * Description of StrategyFactory
+ * The StrategyFactory will choose the right pagination
+ * strategy in dependency of total pages and maximal pages.
  *
- * @author Jan
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class StrategyFactory 
 {
