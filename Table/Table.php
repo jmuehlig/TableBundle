@@ -10,13 +10,14 @@ use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\FilterBuilder;
 use JGM\TableBundle\Table\Model\FilterOptionsContainer;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\OptionsResolver\TableOptionsResolver;
+use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptionsResolver;
+use JGM\TableBundle\Table\Order\Type\OrderTypeInterface;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
-use JGM\TableBundle\Table\Pagination\Type\PaginationTypeInterface;
 use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptionsResolver;
-use JGM\TableBundle\Table\Renderer\DefaultRenderer;
+use JGM\TableBundle\Table\Pagination\Type\PaginationTypeInterface;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Type\AbstractTableType;
-use JGM\TableBundle\Table\Type\SortableInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -204,7 +205,6 @@ class Table
 		
 		return new TableView(
 			$this->tableType->getName(),
-			$this->options['renderer'],
 			$this->tableBuilder->getColumns(),
 			$this->rows,
 			$this->getFilters(),
@@ -277,25 +277,9 @@ class Table
 	 */
 	protected function resolveOptions()
 	{
-		$optionsResolver = new OptionsResolver();
-		
-		// Set the defailt options for the table type.
-		$optionsResolver->setDefaults(array(
-			'empty_value' => 'No data found.',
-			'attr' => array(),
-			'head_attr' => array(),
-			'renderer' => new DefaultRenderer($this->container, $this->request, $this->router)
-		));
-		
-		// Pass table type options.
+		// Resolve Options of the table.
+		$optionsResolver = new TableOptionsResolver();
 		$this->tableType->setDefaultOptions($optionsResolver);
-		
-		// Allowed values.
-		$optionsResolver->setAllowedTypes(array(
-			'attr' => 'array',
-			'head_attr' => 'array'
-		));
-		
 		$this->options = $optionsResolver->resolve(array());
 		
 		// Resolve options of pagination.
@@ -305,7 +289,10 @@ class Table
 		}
 		
 		// Resolve sortable options.
-		$this->resolveSortableOptions();
+		if($this->isOrderProvider())
+		{
+			$this->sortable = $this->resolveSortableOptions();
+		}
 		
 		// Resole filter options.
 		$this->resolveFilterOptions();
@@ -371,40 +358,24 @@ class Table
 	}
 	
 	private function resolveSortableOptions()
-	{
-		// Only rehash the sortable options,
-		// if sort is used in the table type.
-		if($this->tableType instanceof SortableInterface === false)
-		{
-			$this->sortable = null;
-			return;
-		}
-		
-		// Configure the options resolver for the sortable options.
-		$sortableOptionsResolver = new OptionsResolver();
-		$sortableOptionsResolver->setDefaults(array(
-			'param_direction' => 'direction',
-			'param_column' => 'column',
-			'empty_direction' => 'desc',
-			'empty_column' => null,
-			'class_asc' => '',
-			'class_desc' => ''
-		));
-		
-		// Set the defaults by the table type.
-		$this->tableType->setSortableDefaultOptions($sortableOptionsResolver);
-		
-		// Resolve the options.
-		$sortable = $sortableOptionsResolver->resolve(array());
+	{		
+		// Configure the options resolver for the order options.
+		$sortableOptionsResolver = new OrderOptionsResolver();
+		$this->tableType->setOrderDefaultOptions($sortableOptionsResolver);
+		$order = $sortableOptionsResolver->toOrder();
 		
 		// Read the column and direction from $request-object.
-		$column = $this->request->get( $sortable['param_column'] );
-		$direction = $this->request->get( $sortable['param_direction'] );
+		$column = $this->request->get( $order->getParamColumnName() );
+		$direction = $this->request->get( $order->getParamDirectionName() );
 		
 		// Find column and direction if the are empty.
 		if($column === null)
 		{
-			if($sortable['empty_column'] === null)
+			if($order->getEmptyColumnName() !== null)
+			{
+				$column = $order->getEmptyColumnName();
+			}
+			else
 			{
 				// If no default column is defined, look for the first sortable.
 				foreach($this->tableBuilder->getColumns() as $tmpColumn)
@@ -423,16 +394,14 @@ class Table
 					TableException::noSortableColumn();
 				}
 			}
-			else
-			{
-				$column = $sortable['empty_column'];
-			}
 		}
+		$order->setCurrentColumnName($column);
 		
 		if($direction === null)
 		{
-			$direction = $sortable['empty_direction'];
+			$direction = $order->getEmptyDirection();
 		}
+		$order->setCurrentDirection($direction);
 		
 		// Require a sortable column, otherwise redirect to 404.
 		$sortedColumn = $this->getColumn($column);
@@ -441,14 +410,7 @@ class Table
 			throw new NotFoundHttpException();
 		}
 		
-		// Set up options container.
-		$this->sortable = new SortableOptionsContainer(
-			$sortable['param_direction'],
-			$sortable['param_column'],
-			$direction,
-			$column,
-			array('asc' => $sortable['class_asc'], 'desc' => $sortable['class_desc'])
-		);
+		return $order;
 	}
 	
 	private function resolveFilterOptions()
@@ -532,5 +494,10 @@ class Table
 	private function isPaginationProvider()
 	{
 		return $this->tableType instanceof PaginationTypeInterface;
+	}
+	
+	private function isOrderProvider()
+	{
+		return $this->tableType instanceof OrderTypeInterface;
 	}
 }

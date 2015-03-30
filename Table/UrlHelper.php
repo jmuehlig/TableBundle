@@ -1,11 +1,10 @@
 <?php
 
-use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+namespace JGM\TableBundle\Table;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
-
-namespace JGM\TableBundle\Table;
 
 /**
  * Helper for urls, used in the table bundle.

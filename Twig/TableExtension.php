@@ -4,6 +4,7 @@ namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
 use JGM\TableBundle\Table\Renderer\RendererInterface;
@@ -133,7 +134,7 @@ class TableExtension extends Twig_Extension
 		if($sortable != null)
 		{
 			$paramterNames['column'] = $sortable->getParamColumnName();
-			$paramterNames['direction'] = $sortable->getDirection();
+			$paramterNames['direction'] = $sortable->getParamDirectionName();
 		}
 		
 		// Fill it with the pagination parameter name.
@@ -334,13 +335,13 @@ class TableExtension extends Twig_Extension
 		$order = $this->tableView->getSortable();
 		
 		$parameters = array($order->getParamColumnName() => $columnName);
-		if($order->getColumnName() == $columnName && $order->getDirection() == SortableOptionsContainer::ORDER_ASC)
+		if($order->getCurrentColumnName() == $columnName && $order->getCurrentDirection() == Order::DIRECTION_ASC)
 		{
-			$parameters[$order->getParamDirectionName()] = SortableOptionsContainer::ORDER_DESC;
+			$parameters[$order->getParamDirectionName()] = Order::DIRECTION_DESC;
 		}
 		else
 		{
-			$parameters[$order->getParamDirectionName()] = SortableOptionsContainer::ORDER_ASC;
+			$parameters[$order->getParamDirectionName()] = Order::DIRECTION_ASC;
 		}
 		
 		// Start at first page.

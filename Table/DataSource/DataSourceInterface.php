@@ -2,8 +2,9 @@
 
 namespace JGM\TableBundle\Table\DataSource;
 
-use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Order\Model\Order;
+use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,7 +32,7 @@ interface DataSourceInterface
 		array $columns,
 		array $filters = null,
 		Pagination $pagination = null,
-		SortableOptionsContainer $sortable = null
+		Order $sortable = null
 	);
 	
 	/**
