@@ -7,8 +7,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
+use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
-use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +37,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		$this->queryBuilder = $queryBuilder;
 	}
 	
-	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, SortableOptionsContainer $sortable = null)
+	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, Order $sortable = null)
 	{
 		if($this->queryBuilder === null)
 		{
@@ -52,7 +52,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		
 		if($sortable !== null)
 		{
-			$queryBuilder->orderBy(sprintf('%s.%s', $aliases[0], $sortable->getColumnName()), $sortable->getDirection());
+			$queryBuilder->orderBy(sprintf('%s.%s', $aliases[0], $sortable->getCurrentColumnName()), $sortable->getCurrentDirection());
 		}
 		
 		if($pagination !== null)

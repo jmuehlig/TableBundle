@@ -32,8 +32,8 @@
 {% block table_head_column_label %}
 {% if  is_sortable and column.isSortable %}
 <a href="{{ get_url_for_order(column.name) }}">{{ column.label }}</a>
-{% if sort.columnName == column.name %}
-<span class="{{ sort.classes[sort.direction] }}"></span>
+{% if sort.currentColumnName == column.name %}
+<span class="{{ sort.classes[sort.currentDirection] }}"></span>
 {% endif %}
 {% else %}
 {{ column.label }}

@@ -2,8 +2,6 @@
 
 namespace JGM\TableBundle\Table\OptionsResolver;
 
-use JGM\TableBundle\Table\Renderer\DefaultRenderer;
-use JGM\TableBundle\Table\Renderer\RendererInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -15,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TableOptionsResolver extends OptionsResolver
 {
-	function __construct(RendererInterface $defaultRenderer) 
+	function __construct() 
 	{
 		parent::__construct();
 		
@@ -23,6 +21,11 @@ class TableOptionsResolver extends OptionsResolver
 			'empty_value' => 'No data found.',
 			'attr' => array(),
 			'head_attr' => array(),
+		));
+		
+		$this->setAllowedTypes(array(
+			'attr' => 'array',
+			'head_attr' => 'array'
 		));
 	}
 }

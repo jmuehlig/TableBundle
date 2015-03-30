@@ -3,9 +3,8 @@
 namespace JGM\TableBundle\Table;
 
 use JGM\TableBundle\Table\Model\FilterOptionsContainer;
+use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
-use JGM\TableBundle\Table\Model\SortableOptionsContainer;
-use JGM\TableBundle\Table\Renderer\RendererInterface;
 
 /**
  * TablieView
@@ -25,12 +24,6 @@ class TableView
 	 * @var string 
 	 */
 	protected $name;
-	
-	/**
-	 * Renderer of the table.
-	 * @var RendererInterface
-	 */
-	protected $tableRenderer;
 	
 	/**
 	 * Rows of the table, represented as array
@@ -81,7 +74,7 @@ class TableView
 	 * Only, if sortable is defined by
 	 * the table type.
 	 * 
-	 * @var SortableOptionsContainer 
+	 * @var Order 
 	 */
 	protected $sortable;
 	
@@ -131,14 +124,13 @@ class TableView
 	 */
 	protected $totalItems;
 	
-	public function __construct($name, RendererInterface $renderer, array $columns, array $rows,
+	public function __construct($name, array $columns, array $rows,
 		array $filters, $pagination, $sortable, $filter, $emptyValue, array $attributes,
 		array $headAttributes, $totalPages, $totalItems
 	)
 	{
 		// Set up the class vars.
 		$this->name				= $name;
-		$this->tableRenderer	= $renderer;
 		$this->columns			= $columns;
 		$this->rows				= $rows;
 		$this->filters			= $filters;
@@ -156,11 +148,6 @@ class TableView
 	public function getName()
 	{
 		return $this->name;
-	}
-	
-	public function getTableRenderer()
-	{
-		return $this->tableRenderer;
 	}
 	
 	public function getRows()
