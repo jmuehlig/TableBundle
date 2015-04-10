@@ -3,22 +3,29 @@
 {% endblock %}
 
 {% block table %}
+{% spaceless %}
 {{ table_begin(view) }}
 {{ table_head(view) }}
 {{ table_body(view) }}
 {{ table_end(view) }}
 {{ table_pagination(view) }}
+{% endspaceless %}
 {% endblock %}
 
 {% block table_begin %}
+{% spaceless %}
 <table id="{{ name }}"{{ block('attributes') }}>
+{% endspaceless %}
 {% endblock %}
 
 {% block table_end %}
+{% spaceless %}
 </table>
+{% endspaceless %}
 {% endblock %}
 
 {% block table_head %}
+{% spaceless %}
 <thead>
 	<tr>
 		{% for column in columns %}
@@ -27,9 +34,11 @@
 		{% endfor %}
 	</tr>
 </thead>
+{% endspaceless %}
 {% endblock %}
 	
 {% block table_head_column_label %}
+{% spaceless %}
 {% if  is_sortable and column.isSortable %}
 <a href="{{ get_url_for_order(column.name) }}">{{ column.label }}</a>
 {% if sort.currentColumnName == column.name %}
@@ -38,9 +47,11 @@
 {% else %}
 {{ column.label }}
 {% endif %}
+{% endspaceless %}
 {% endblock %}
 
 {% block table_body %}
+{% spaceless %}
 <tbody>
 {% for row in rows %}
 {% set attributes = row.attributes %}
@@ -56,9 +67,11 @@
 </tr>
 {% endfor %}
 </tbody>
+{% endspaceless %}
 {% endblock %}
 
 {% block table_pagination %}
+{% spaceless %}
 {% set attributes = {'class': classes['ul']|join(' ')} %}
 <ul{{ block('attributes') }}>
 {# Left arrow #}
@@ -93,57 +106,80 @@
 <li{{ block('attributes') }}><a href="{{ get_url_for_page(currentPage+2) }}">{{ nextLabel|raw }}</a></li>
 {% endif %}
 </ul>
+{% endspaceless %}
 {% endblock %}
 	
 {% block filter %}
+{% spaceless %}
 {{ filter_begin(view) }}
 {{ filter_rows(view) }}
 {{ filter_submit_button(view) }}
 {{ filter_reset_link(view) }}
 {{ filter_end(view) }}
+{% endspaceless %}
 {% endblock %}
 	
 {% block filter_begin %}
+{% spaceless %}
 {% if needsFormEnviroment %}<form id="filter_{{ tableName }}">{% endif %}
+{% endspaceless %}
 {% endblock %}
 
 {% block filter_end %}
+{% spaceless %}
 {% if needsFormEnviroment %}</form>{% endif %}
+{% endspaceless %}
 {% endblock %}
 
 {% block filter_label %}
+{% spaceless %}
 {% set attributes = filter.attributes  %}
-<label for="{{ filter.name }}"{{ block('attributes') }}>{{ filter.label }}</label>{% endblock %}
+<label for="{{ filter.name }}"{{ block('attributes') }}>{{ filter.label }}</label>
+{% endspaceless %}
+{% endblock %}
 
 {% block filter_widget %}
+{% spaceless %}
 {{ block(filter.widgetBlockName) }}
+{% endspaceless %}
 {% endblock %}
 
 {% block filter_row %}
+{% spaceless %}
 {{ filter_label(filter) }}: {{ filter_widget(filter) }}
+{% endspaceless %}
 {% endblock %}
 
 {% block filter_rows %}
+{% spaceless %}
 {% for filter in filters %}
 {{ filter_row(filter) }}
 {% if not loop.last %}<br />{% endif %}
 {% endfor %}
+{% endspaceless %}
 {% endblock %}
 
 {% block filter_submit_button %}
+{% spaceless %}
 {% if needsFormEnviroment %}<input type="submit" value="{{ submitLabel }}"{{ block('attributes') }} />{% endif %}
+{% endspaceless %}
 {% endblock %}
 
 {% block filter_reset_link %}
+{% spaceless %}
 <a href="{{ resetUrl }}"{{ block('attributes') }}>{{ resetLabel }}</a>
+{% endspaceless %}
 {% endblock %}
 
 {% block text_widget %}
+{% spaceless %}
 {% set attributes = filter.attributes %}
 <input type="text" id="{{ filter.name }}" name="{{ filter.name }}"{{ block('attributes') }}{% if filter.value is not null %} value="{{ filter.value }}"{% endif %} />
+{% endspaceless %}
 {% endblock %}
 
 {% block list_widget %}
+{% spaceless %}
 {% set attributes = filter.attributes %}
 <ul{{ block('attributes') }}>
 {% set isResetItemRendered = (filter.resetLabel is null) %}
@@ -156,7 +192,7 @@
 {% endif %}
 {% set itemValue = value %}
 {% set itemLabel = label %}
-{{ block('list_widget_item') }}
+{{ block('list_widget_item') }} 
 {% endfor %}
 {% if not isResetItemRendered %}
 {% set itemValue = null %}
@@ -164,18 +200,22 @@
 {{ block('list_widget_item') }}
 {% endif %}
 </ul>
+{% endspaceless %}
 {% endblock %}
 	
 {% block list_widget_item %}
+{% spaceless %}
 {% if is_identical(itemValue|trans, filter.value) %}
 {% set attributes = filter.liActiveAttr %}
 {% else %}
 {% set attributes = filter.liAttr %}
 {% endif %}
 <li{{ block('attributes') }}><a href="{{ get_url({ (filter.name) : itemValue }) }}">{{ itemLabel }}</a></li>
+{% endspaceless %}
 {% endblock %}
 
 {% block select_widget %}
+{% spaceless %}
 {% set attributes = filter.attributes %}
 {% set values = filter.values|merge({ (filter.defaultValue) : (filter.resetLabel) }) %}
 <select name="{{ filter.name }}" id="{{ filter.name }}"{{ block('attributes') }}>
@@ -183,16 +223,23 @@
 	<option value="{{ value }}"{% if value == filter.value %} selected="selected"{% endif %}>{{ label }}</option>
 {% endfor %}
 </select>
+{% endspaceless %}
 {% endblock %}
 
 {% block choice_widget %}
+{% spaceless %}
 {% set attributes = filter.attributes %}
 {% set values = filter.values|merge({ (filter.defaultValue) : (filter.resetLabel) }) %}
 {% for value,label in values %}
 {% set id = filter.name~(value|replace({' ':'_'})) %}
 <input type="radio" id="{{ id }}" name="{{ filter.name }}" value="{{ value }}"{% if value == filter.value %} checked="checked"{% endif %}{{ block('attributes') }}><label for="{{ id }}">{{ label }}</label></option>
 {% endfor %}
+{% endspaceless %}
 {% endblock %}
 
-{% block date_widget %}
+{% block date_text_widget %}
+{% spaceless %}
+{% set attributes = filter.attributes %}
+<input type="date" name="{{ filter.name }}"{% if filter.value is not null %} value="{{ filter.value|date(filter.format) }}"{% endif %}{{ block('attributes') }} />
+{% endspaceless %}
 {% endblock %}

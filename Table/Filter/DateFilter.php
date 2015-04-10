@@ -3,6 +3,7 @@
 namespace JGM\TableBundle\Table\Filter;
 
 use JGM\TableBundle\Table\Renderer\RenderHelper;
+use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -74,4 +75,15 @@ class DateFilter extends AbstractFilter
 	{
 		
 	}
+
+	public function getWidgetBlockName() 
+	{
+		if($this->widget === 'text')
+		{
+			return 'date_text_widget';
+		}
+		
+		TableException::filterWidgetNotFound($this->widget);
+	}
+
 }
