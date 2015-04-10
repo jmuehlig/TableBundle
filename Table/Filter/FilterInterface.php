@@ -65,7 +65,13 @@ interface FilterInterface
 	 * 
 	 * @param mixed $value
 	 */
-	public function setValue($value);
+	public function setValue(array $value);
+	
+	/**
+	 * @return array			List of parameter names, which contain the value(s) of
+	 *							this filter.
+	 */
+	public function getParameterNames();
 	
 	/**
 	 * @return mixed			Value of the filter.

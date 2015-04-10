@@ -460,9 +460,14 @@ class Table
 		{
 			/* @var $filter FilterInterface */
 			
-			$filterValue = (string) $this->request->query->get($filter->getName(), '');
-
-			$filter->setValue(trim($filterValue));
+			$values = array();
+			
+			foreach($filter->getParameterNames() as $parameterName)
+			{
+				$values[$parameterName] = trim((string) $this->request->query->get($parameterName, ''));
+			}
+			
+			$filter->setValue($values);
 		}
 	}
 	

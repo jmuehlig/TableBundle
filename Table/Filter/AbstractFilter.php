@@ -140,9 +140,9 @@ abstract class AbstractFilter implements FilterInterface
 		$this->name = $name;
 	}
 	
-	public function setValue($value)
+	public function setValue(array $value)
 	{
-		$this->value = $value;
+		$this->value = $value[$this->getName()];
 	}
 
 	public function setOptions(array $options)
@@ -247,5 +247,10 @@ abstract class AbstractFilter implements FilterInterface
 		}
 		
 		return $this->optionPropertyMap[$propertyName];
+	}
+	
+	public function getParameterNames()
+	{
+		return array($this->getName());
 	}
 }
