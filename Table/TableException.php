@@ -152,7 +152,13 @@ class TableException extends \Exception
 	
 	public static function isNoValidFilter($filter)
 	{
-		$message = sprintf("The given filter '%s' is no valid filter. This can not be rendered.", $filter);
+		$message = sprintf("The given filter '%s' is not a valid filter. This can not be rendered.", $filter);
+		throw new TableException($message);
+	}
+	
+	public static function filterWidgetNotFound($widget)
+	{
+		$message = sprintf("The given filter widget '%s' is not valid.", $widget);
 		throw new TableException($message);
 	}
 	
