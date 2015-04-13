@@ -4,10 +4,12 @@ namespace JGM\TableBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+
 /**
  * Configuration for the TableBundle.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class Configuration implements ConfigurationInterface
 {

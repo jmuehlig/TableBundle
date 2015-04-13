@@ -2,9 +2,7 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
-use JGM\TableBundle\Table\Renderer\RenderHelper;
 use JGM\TableBundle\Table\TableException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,54 +24,14 @@ class DateFilter extends AbstractFilter
 		
 		$optionsResolver->setDefaults(array(
 			'format' => 'd.m.Y',
-			'widget' => 'choice',
-			'years' => range( date('Y', strtotime('-5 years')), date('Y', strtotime('+5 years')) ),
-			'days' => range(1,31)
+			'widget' => 'text',
+			//'years' => range( date('Y', strtotime('-5 years')), date('Y', strtotime('+5 years')) ),
+			//'days' => range(1,31)
 		));
 		
 		$optionsResolver->setAllowedValues(array(
-			'widget' => array('choice', 'text', 'single_text')
+			'widget' => array('text')
 		));
-	}
-
-	public function render(ContainerInterface $container)
-	{
-//		if($this->widget === 'single_text')
-//		{
-//			return $this->renderSingleText($container);
-//		}
-//		else if($this->widget === 'text')
-//		{
-			return $this->renderText($container);
-//		}
-//		else
-//		{
-//			return $this->renderChoice($container);
-//		}
-	}
-	
-	protected function renderChoice(ContainerInterface $container)
-	{
-		$content = "";
-		
-		// 
-		
-		return $content;
-	}
-	
-	protected function renderText(ContainerInterface $container)
-	{
-		return sprintf(
-			"<input type=\"date\" name=\"%s\"%s%s />",
-			$this->getName(),
-			$this->defaultValue === null ? '' : sprintf(" value=\"%s\"", date($this->format, strtotime($this->defaultValue))),
-			RenderHelper::attrToString($this->getAttributes())
-		);
-	}
-	
-	protected function renderSingleText(ContainerInterface $container)
-	{
-		
 	}
 
 	public function getWidgetBlockName() 

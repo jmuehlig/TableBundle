@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace JGM\TableBundle\Table\Type;
 
 use JGM\TableBundle\Table\DataSource\EntityDataSource;
@@ -15,9 +9,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Description of AnonymousTableType
+ * Table type for creating anonymous tables at the
+ * controller.
  *
- * @author Jan Mühlig
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class AnonymousTableType extends AbstractTableType
 {

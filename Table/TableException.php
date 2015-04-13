@@ -3,7 +3,11 @@
 namespace JGM\TableBundle\Table;
 
 /**
- * Table exception.
+ * Exception which will be used for all exceptions
+ * thrown by the table bundle itself.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class TableException extends \Exception
 {	

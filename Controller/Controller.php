@@ -4,7 +4,6 @@ namespace JGM\TableBundle\Controller;
 
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
-use JGM\TableBundle\Table\Table;
 
 /**
  * Extending the Symfony Controller with methods

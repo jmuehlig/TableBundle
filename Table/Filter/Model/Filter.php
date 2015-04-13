@@ -1,14 +1,14 @@
 <?php
 
-namespace JGM\TableBundle\Table\Model;
+namespace JGM\TableBundle\Table\Filter\Model;
 
 /**
  * Container for options of the filter component.
  *
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0.0
+ * @since	1.0
  */
-class FilterOptionsContainer
+class Filter
 {
 	/**
 	 * @var string
