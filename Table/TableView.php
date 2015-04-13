@@ -2,7 +2,7 @@
 
 namespace JGM\TableBundle\Table;
 
-use JGM\TableBundle\Table\Model\FilterOptionsContainer;
+use JGM\TableBundle\Table\Filter\Model\Filter;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
 
@@ -65,7 +65,7 @@ class TableView
 	 * Only, if filter are defined by
 	 * the table type.
 	 * 
-	 * @var FilterOptionsContainer 
+	 * @var Filter 
 	 */
 	protected $filter;
 	
@@ -76,7 +76,7 @@ class TableView
 	 * 
 	 * @var Order 
 	 */
-	protected $sortable;
+	protected $order;
 	
 	/**
 	 * The message, displayed if the rows-array
@@ -125,7 +125,7 @@ class TableView
 	protected $totalItems;
 	
 	public function __construct($name, array $columns, array $rows,
-		array $filters, $pagination, $sortable, $filter, $emptyValue, array $attributes,
+		array $filters, $pagination, $order, $filter, $emptyValue, array $attributes,
 		array $headAttributes, $totalPages, $totalItems
 	)
 	{
@@ -135,7 +135,7 @@ class TableView
 		$this->rows				= $rows;
 		$this->filters			= $filters;
 		$this->pagination		= $pagination;
-		$this->sortable			= $sortable;
+		$this->order			= $order;
 		$this->filter			= $filter;
 		$this->emptyValue		= $emptyValue;
 		$this->attributes		= $attributes;
@@ -170,9 +170,9 @@ class TableView
 		return $this->pagination;
 	}
 
-	public function getSortable()
+	public function getOrder()
 	{
-		return $this->sortable;
+		return $this->order;
 	}
 	
 	public function getFilter()

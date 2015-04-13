@@ -10,7 +10,8 @@ use Symfony\Component\DependencyInjection\Loader;
 /**
  * Extension for the TableBundle.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 class JGMTableExtension extends Extension
 {

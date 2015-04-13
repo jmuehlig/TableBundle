@@ -7,8 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Interface for adding filters to the table.
  * 
- * @author Jan Mühlig <mail@janmuehlig.de>
- * @since 1.0.0
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
  */
 interface FilterInterface
 {

@@ -17,6 +17,13 @@ use Twig_Extension;
 use Twig_Function_Method;
 use Twig_Template;
 
+/**
+ * Twig extension for render the table view
+ * at twig templates.
+ * 
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.0
+ */
 class TableExtension extends Twig_Extension
 {
 	/**
@@ -130,7 +137,7 @@ class TableExtension extends Twig_Extension
 		$paramterNames = array();
 		
 		// Fill it with sortable parameter names.
-		$sortable = $tableView->getSortable();
+		$sortable = $tableView->getOrder();
 		if($sortable != null)
 		{
 			$paramterNames['column'] = $sortable->getParamColumnName();
@@ -146,7 +153,7 @@ class TableExtension extends Twig_Extension
 		
 		return $this->template->renderBlock('table_head', array(
 			'columns' => $tableView->getColumns(),
-			'is_sortable' => $tableView->getSortable() != null,
+			'is_sortable' => $tableView->getOrder() != null,
 			'parameterNames' => $paramterNames,
 			'sort' => $sortable,
 			'pagination' => $pagination
@@ -327,12 +334,12 @@ class TableExtension extends Twig_Extension
 			TableException::tableViewNotSet();
 		}
 		
-		if($this->tableView->getSortable() === null)
+		if($this->tableView->getOrder() === null)
 		{
 			TableException::orderNotProvided();
 		}
 		
-		$order = $this->tableView->getSortable();
+		$order = $this->tableView->getOrder();
 		
 		$parameters = array($order->getParamColumnName() => $columnName);
 		if($order->getCurrentColumnName() == $columnName && $order->getCurrentDirection() == Order::DIRECTION_ASC)

@@ -1,6 +1,6 @@
 <?php
 
-namespace JGM\TableBundle\Table;
+namespace JGM\TableBundle\Table\Filter;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\TableException;

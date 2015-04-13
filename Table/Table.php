@@ -6,11 +6,13 @@ use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
 use Iterator;
 use JGM\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\Filter\FilterBuilder;
 use JGM\TableBundle\Table\Filter\FilterInterface;
-use JGM\TableBundle\Table\FilterBuilder;
-use JGM\TableBundle\Table\Model\FilterOptionsContainer;
-use JGM\TableBundle\Table\Model\SortableOptionsContainer;
+use JGM\TableBundle\Table\Filter\Model\Filter;
+use JGM\TableBundle\Table\Filter\Type\FilterTypeInterface;
+use JGM\TableBundle\Table\Filter\OptionsResolver\FilterOptionsResolver;
 use JGM\TableBundle\Table\OptionsResolver\TableOptionsResolver;
+use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptionsResolver;
 use JGM\TableBundle\Table\Order\Type\OrderTypeInterface;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
@@ -21,7 +23,6 @@ use JGM\TableBundle\Table\Type\AbstractTableType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -106,18 +107,18 @@ class Table
 	private $pagination;
 	
 	/**
-	 * Rehased sort information.
-	 * NULL, if sort is disabled.
+	 * Rehased order information.
+	 * NULL, if order is disabled.
 	 * 
-	 * @var SortableOptionsContainer
+	 * @var Order
 	 */
-	private $sortable;
+	private $order;
 	
 	/**
 	 * Rehashed filter information.
 	 * NULL, if filter is disabled.
 	 * 
-	 * @var FilterOptionsContainer
+	 * @var Filter
 	 */
 	private $filter;
 	
@@ -153,13 +154,13 @@ class Table
 	public function create(AbstractTableType $tableType)
 	{
 		$this->tableBuilder = new TableBuilder($this->container);
+		$this->tableType = $tableType;
 		
-		if($tableType instanceof Type\FilterableInterface)
+		if($this->isFilterProvider())
 		{
 			$this->filterBuilder = new FilterBuilder($this->container);
 		}
 		
-		$this->tableType = $tableType;
 		$this->tableType->setContainer($this->container);
 		$this->tableType->setEntityManager($this->entityManager);
 		
@@ -209,7 +210,7 @@ class Table
 			$this->rows,
 			$this->getFilters(),
 			$this->pagination,
-			$this->sortable,
+			$this->order,
 			$this->filter,
 			$this->options['empty_value'],
 			$this->options['attr'],
@@ -228,10 +229,10 @@ class Table
 	{		
 		// Build the type (adding all columns).
 		$this->tableType->buildTable($this->tableBuilder);
-		
+
 		// Build the filters, if the table type implements 
 		// the FilterInterface
-		if($this->tableType instanceof Type\FilterableInterface)
+		if($this->isFilterProvider())
 		{
 			$this->tableType->buildFilter($this->filterBuilder);
 		}
@@ -256,7 +257,7 @@ class Table
 			$this->tableBuilder->getColumns(),
 			$this->getFilters(),
 			$this->pagination, 
-			$this->sortable
+			$this->order
 		);
 
 		foreach($data as $dataRow)
@@ -291,11 +292,14 @@ class Table
 		// Resolve sortable options.
 		if($this->isOrderProvider())
 		{
-			$this->sortable = $this->resolveSortableOptions();
+			$this->order = $this->resolveOrderOptions();
 		}
 		
 		// Resole filter options.
-		$this->resolveFilterOptions();
+		if($this->isFilterProvider())
+		{
+			$this->filter = $this->resolveFilterOptions();
+		}
 		
 		// Read total items.
 		$this->totalItems = $this->tableType->getDataSource($this->container)->getCountItems(
@@ -357,7 +361,7 @@ class Table
 		return $pagination;		
 	}
 	
-	private function resolveSortableOptions()
+	private function resolveOrderOptions()
 	{		
 		// Configure the options resolver for the order options.
 		$sortableOptionsResolver = new OrderOptionsResolver();
@@ -414,46 +418,15 @@ class Table
 	}
 	
 	private function resolveFilterOptions()
-	{
-		if($this->tableType instanceof Type\FilterableInterface === false)
-		{
-			$this->filter = null;
-			return;
-		}
-		
+	{		
 		// Set button option default values.
-		$filterOptionsResolver = new OptionsResolver();
-		$filterOptionsResolver->setDefaults(array(
-			'submit' => array(),
-			'reset' => array()
-		));
+		$filterOptionsResolver = new FilterOptionsResolver();
+		
+		// Set filter options.
 		$this->tableType->setFilterButtonOptions($filterOptionsResolver);
-		
-		// Resolve the filter button options.
-		$filter = $filterOptionsResolver->resolve(array());
-		
-		// Set submit button default values.
-		$submitOptionsResolver = new OptionsResolver();
-		$submitOptionsResolver->setDefaults(array(
-			'label' => 'submit',
-			'attr' => array()
-		));
-		
-		// Resolve submit button options.
-		$submit = $submitOptionsResolver->resolve($filter['submit']);
-		
-		// Set submit button default values.
-		$resetOptionsResolver = new OptionsResolver();
-		$resetOptionsResolver->setDefaults(array(
-			'label' => 'reset',
-			'attr' => array()
-		));
-		
-		// Resolve submit button options.
-		$reset = $resetOptionsResolver->resolve($filter['reset']);
 
 		// Set up the options container.
-		$this->filter = new FilterOptionsContainer($submit['label'], $submit['attr'], $reset['label'], $reset['attr']);
+		$filterOptions = $filterOptionsResolver->toFilter();
 		
 		// Sets value of all filters.
 		foreach($this->getFilters() as $filter)
@@ -469,6 +442,8 @@ class Table
 			
 			$filter->setValue($values);
 		}
+		
+		return $filterOptions;
 	}
 	
 	public function getContainer()
@@ -504,5 +479,10 @@ class Table
 	private function isOrderProvider()
 	{
 		return $this->tableType instanceof OrderTypeInterface;
+	}
+	
+	private function isFilterProvider()
+	{
+		return $this->tableType instanceof FilterTypeInterface;
 	}
 }

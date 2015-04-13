@@ -1,8 +1,8 @@
 <?php
 
-namespace JGM\TableBundle\Table\Type;
+namespace JGM\TableBundle\Table\Filter\Type;
 
-use JGM\TableBundle\Table\FilterBuilder;
+use JGM\TableBundle\Table\Filter\FilterBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-interface FilterableInterface
+interface FilterTypeInterface
 {
 	public function buildFilter(FilterBuilder $filterBuilder);
 	

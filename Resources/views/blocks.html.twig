@@ -113,6 +113,7 @@
 {% spaceless %}
 {{ filter_begin(view) }}
 {{ filter_rows(view) }}
+<br />
 {{ filter_submit_button(view) }}
 {{ filter_reset_link(view) }}
 {{ filter_end(view) }}
@@ -240,6 +241,6 @@
 {% block date_text_widget %}
 {% spaceless %}
 {% set attributes = filter.attributes %}
-<input type="date" name="{{ filter.name }}"{% if filter.value is not null %} value="{{ filter.value|date(filter.format) }}"{% endif %}{{ block('attributes') }} />
+<input type="date" id="{{ filter.name }}}" name="{{ filter.name }}"{% if filter.value is not null %} value="{{ filter.value|date(filter.format) }}"{% endif %}{{ block('attributes') }} />
 {% endspaceless %}
 {% endblock %}
