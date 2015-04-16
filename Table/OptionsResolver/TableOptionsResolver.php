@@ -15,8 +15,6 @@ class TableOptionsResolver extends OptionsResolver
 {
 	function __construct() 
 	{
-		parent::__construct();
-		
 		$this->setDefaults(array(
 			'empty_value' => 'No data found.',
 			'attr' => array(),
