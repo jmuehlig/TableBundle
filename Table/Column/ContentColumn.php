@@ -40,7 +40,7 @@ class ContentColumn extends AbstractColumn
 	{
 		if($this->options['content_grabber'] !== null)
 		{
-			if($this->options['content_grabber'] instanceof ContentGrabberInterface)
+			if($this->options['content_grabber'] instanceof ContentGrabber\ContentGrabberInterface)
 			{
 				if(is_callable(array($this->options['content_grabber'], 'setContainer')))
 				{

@@ -16,8 +16,6 @@ class OrderOptionsResolver extends OptionsResolver
 {
 	function __construct() 
 	{
-		parent::__construct();
-		
 		$this->setDefaults(array(
 			'param_direction' => 'direction',
 			'param_column' => 'column',

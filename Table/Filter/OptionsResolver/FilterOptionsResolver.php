@@ -28,8 +28,6 @@ class FilterOptionsResolver extends OptionsResolver
 			
 	function __construct() 
 	{
-		parent::__construct();
-		
 		$this->setDefaults(array(
 			'submit' => array(),
 			'reset' => array()

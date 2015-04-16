@@ -16,8 +16,6 @@ class PaginationOptionsResolver extends OptionsResolver
 {
 	function __construct() 
 	{
-		parent::__construct();
-		
 		$this->setDefaults(array(
 			'param' => 'page',
 			'rows_per_page' => 20,
