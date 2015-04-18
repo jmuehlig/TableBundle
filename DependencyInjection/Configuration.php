@@ -35,6 +35,7 @@ class Configuration implements ConfigurationInterface
 		return array(
 			'content'	=> 'JGM\TableBundle\Table\Column\ContentColumn',
 			'entity'	=> 'JGM\TableBundle\Table\Column\EntityColumn',
+			'entities'	=> 'JGM\TableBundle\Table\Column\EntitiesColumn',
 			'date'		=> 'JGM\TableBundle\Table\Column\DateColumn',
 			'text'		=> 'JGM\TableBundle\Table\Column\TextColumn',
 			'number'	=> 'JGM\TableBundle\Table\Column\NumberColumn',
