@@ -21,7 +21,7 @@ class StrategyFactory
 	 */
 	public static function getStrategy($totalPages, $maxPages)
 	{
-		if($totalPages > $maxPages)
+		if($maxPages !== null && $totalPages > $maxPages)
 		{
 			return new SimpleLimitStrategy();
 		}
