@@ -43,11 +43,11 @@ abstract class AbstractValuedFilter extends AbstractFilter
 		));
 		
 		$optionsResolver->setAllowedValues(array(
-			'li_attr' => 'array',
-			'li_active_attr' => 'array',
-			'widget' => 'string',
-			'reset_pos' => 'integer',
-			'reset_label' => 'string'
+//			'li_attr' => 'array',
+//			'li_active_attr' => 'array',
+//			'widget' => 'string',
+//			'reset_pos' => 'integer',
+//			'reset_label' => 'string'
 		));
 	}
 	
