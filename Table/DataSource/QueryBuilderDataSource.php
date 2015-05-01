@@ -113,14 +113,25 @@ class QueryBuilderDataSource implements DataSourceInterface
 			// Build part for filter with all columns like: 'column1 = x or column2 = x ..'
 			$innerWhereParts = array();
 			foreach($filter->getColumns() as $column)
-			{
-				/* @var $column ColumnInterface */
-				
+			{			
 				// Add the table alias, if not used.
 				if(strpos($column, '.') === false)
 				{
 					$aliases = $queryBuilder->getRootAliases();
 					$column = sprintf("%s.%s", $aliases[0], $column);
+				}
+				
+				if(substr_count($column, '.') > 1)
+				{
+					$parts = array_merge($queryBuilder->getRootAliases(), explode('.', $column));
+					for($i = 0; $i < count($parts)-1; $i++)
+					{
+						$current = $parts[$i];
+						$next = $parts[$i+1];
+						$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
+					}
+					
+					$column = sprintf("%s.%s", $current, $next);
 				}
 				
 				$innerWhereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column, $filter->getName());

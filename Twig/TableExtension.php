@@ -3,7 +3,6 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
-use JGM\TableBundle\Table\Model\SortableOptionsContainer;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
