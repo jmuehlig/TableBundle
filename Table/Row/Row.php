@@ -2,7 +2,7 @@
 
 namespace JGM\TableBundle\Table\Row;
 
-use JGM\TableBundle\Table\TableException;
+use JGM\TableBundle\Table\Utils\ReflectionHelper;
 
 /**
  * Represents a row of tabla data.
@@ -47,36 +47,7 @@ class Row
 	
 	public function get($property)
 	{
-		if(isset($this->getEntity()->$property))
-		{
-			return $this->getEntity()->$property;
-		}
-		else if(is_array($this->getEntity()))
-		{
-			$entity = $this->getEntity();
-			return $entity[$property];
-		}
-		else
-		{
-			$propertyName = strtoupper($property[0]) . substr($property, 1);
-
-			$possibleGetter = array(
-				'get' . $propertyName,
-				'has' . $propertyName,
-				'is' . $propertyName
-			);
-
-			foreach($possibleGetter as $getter)
-			{
-				$callable = array($this->getEntity(), $getter);
-				if(is_callable($callable))
-				{
-					return call_user_func($callable);
-				}
-			}
-		}
-		
-		TableException::noSuchPorpertyOnEntity($property, $this->getEntity());
+		return ReflectionHelper::getPropertyOfEntity($this->getEntity(), $property);
 	}
 	
 	/**

@@ -2,8 +2,9 @@
 
 namespace JGM\TableBundle\Table\Column;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Utils\ReflectionHelper;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * This column will call the __toString method of an entity.
@@ -24,8 +25,18 @@ class EntityColumn extends AbstractColumn
 	
 	public function getContent(Row $row)
 	{
-		$value = $row->get($this->getName());
-		
+		$properties = explode(".", $this->getName());
+		$value = $row->get($properties[0]);
+		for($i = 1; $i < count($properties); $i++)
+		{
+			if($value === null)
+			{
+				return $this->options['empty_value'];
+			}
+			
+			$value = ReflectionHelper::getPropertyOfEntity($value, $properties[$i]);
+		}
+
 		if($value === null)
 		{
 			return $this->options['empty_value'];
