@@ -28,12 +28,18 @@ class EntityDataSource extends QueryBuilderDataSource
 	 */
 	protected $callback;
 	
+	/**
+	 * @var array
+	 */
+	protected $columnNameMap;
+	
 	public function __construct($entity, $callback = null)
 	{
 		parent::__construct(null);
 		
 		$this->entity = $entity;
 		$this->callback = $callback;
+		$this->columnNameMap = [];
 	}
 	
 	public function getData(ContainerInterface $container, array $columns, array $filters = null,
@@ -78,7 +84,13 @@ class EntityDataSource extends QueryBuilderDataSource
 			
 			if($column instanceof EntityColumn)
 			{
-				$queryBuilder->leftJoin('t.' . $column->getName(), strtolower($column->getName()));
+				$newColumnName = $this->processJoinColumn($column->getName(), $queryBuilder, true);
+				if($newColumnName !== $column->getName())
+				{
+					$this->columnNameMap[$column->getName()] = $newColumnName;
+//					$column->setName($newColumnName);
+				}
+				
 			}
 		}
 		

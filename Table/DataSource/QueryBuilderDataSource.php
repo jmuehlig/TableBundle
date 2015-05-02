@@ -4,7 +4,6 @@ namespace JGM\TableBundle\Table\DataSource;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
 use JGM\TableBundle\Table\Order\Model\Order;
@@ -31,10 +30,16 @@ class QueryBuilderDataSource implements DataSourceInterface
 	 * @var QueryBuilder
 	 */
 	protected $queryBuilder;
+	
+	/**
+	 * @var array
+	 */
+	protected $joinTable;
 
 	public function __construct(QueryBuilder $queryBuilder = null)
 	{
 		$this->queryBuilder = $queryBuilder;
+		$this->joinTable = [];
 	}
 	
 	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, Order $sortable = null)
@@ -48,11 +53,14 @@ class QueryBuilderDataSource implements DataSourceInterface
 		
 		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
 		
-		$aliases = $queryBuilder->getRootAliases();
 		
 		if($sortable !== null)
 		{
-			$queryBuilder->orderBy(sprintf('%s.%s', $aliases[0], $sortable->getCurrentColumnName()), $sortable->getCurrentDirection());
+			$rootAliases = $queryBuilder->getRootAliases();
+			$rootAlias = $rootAliases[0];
+			$column = $this->getQueryColoumnName($sortable->getCurrentColumnName(), $rootAlias);
+
+			$queryBuilder->orderBy($column, $sortable->getCurrentDirection());
 		}
 		
 		if($pagination !== null)
@@ -80,7 +88,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		$queryBuilder->select(sprintf('count(%s)', $aliases[0]));
 		
 		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
-		
+				
 		return $queryBuilder->getQuery()->getSingleScalarResult();
 	}
 	
@@ -100,6 +108,9 @@ class QueryBuilderDataSource implements DataSourceInterface
 
 		$whereParts = array();
 		
+		$rootAliases = $queryBuilder->getRootAliases();
+		$rootAlias = $rootAliases[0];
+		
 		foreach($filters as $filter)
 		{
 			/* @var $filter FilterInterface */
@@ -114,12 +125,11 @@ class QueryBuilderDataSource implements DataSourceInterface
 			$innerWhereParts = array();
 			foreach($filter->getColumns() as $column)
 			{			
-				// Add the table alias, if not used.
-				if(strpos($column, '.') === false)
-				{
-					$aliases = $queryBuilder->getRootAliases();
-					$column = sprintf("%s.%s", $aliases[0], $column);
-				}
+				// Add joins and the alias for the column.
+				$this->processJoinColumn($column, $queryBuilder);
+				
+				// Get the query column name: t.a if its property a, for example.
+				$column = $this->getQueryColoumnName($column, $rootAlias);
 				
 				if(substr_count($column, '.') > 1)
 				{
@@ -209,6 +219,59 @@ class QueryBuilderDataSource implements DataSourceInterface
 		else
 		{
 			return "%s like :%s";
+		}
+	}
+	
+	/**
+	 * Adds a join statement to the queryBuilder, if the column needs a join.
+	 * 
+	 * @param string $columnName			Name of the coloumn.
+	 * @param QueryBuilder $queryBuilder	Query builder.
+	 * @param boolean $isForSelect			Should we add a select to the query?
+	 * 
+	 * @return string						New name of the column.
+	 */
+	protected function processJoinColumn($columnName, QueryBuilder $queryBuilder, $isForSelect = false)
+	{
+		$rootAliases = $queryBuilder->getRootAliases();
+		$rootAlias = $rootAliases[0];
+
+		if(substr($columnName, 0 , strlen($rootAlias)) !== $rootAlias)
+		{
+			$columnName = sprintf("%s.%s", $rootAlias, $columnName);
+			// If we have construct like "t.prop_a.prop_b.prob_c[.prob_d]*"
+			if(substr_count($columnName, '.') > 1)
+			{
+				$parts = explode('.', $columnName);
+				for($i = 0; $i < count($parts)-1; $i++)
+				{
+					$current = $parts[$i];
+					$next = $parts[$i+1];
+					
+					if(!in_array($next, $this->joinTable))
+					{
+						$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
+						$this->joinTable[] = $next;
+					}					
+					if($isForSelect)
+					{
+						$queryBuilder->addSelect($next);
+					}
+				}
+			}
+		}
+	}
+	
+	protected function getQueryColoumnName($columnName, $rootAlias)
+	{
+		if(strpos($columnName, ".") === false)
+		{
+			return sprintf("%s.%s", $rootAlias, $columnName);
+		}
+		else
+		{
+			$parts = explode(".", $columnName);
+			return sprintf("%s.%s", $parts[count($parts)-2], $parts[count($parts)-1]);
 		}
 	}
 }

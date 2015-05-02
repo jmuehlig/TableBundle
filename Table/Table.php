@@ -4,13 +4,13 @@ namespace JGM\TableBundle\Table;
 
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
-use Iterator;
 use JGM\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\DataSource\DataSourceInterface;
 use JGM\TableBundle\Table\Filter\FilterBuilder;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\Model\Filter;
-use JGM\TableBundle\Table\Filter\Type\FilterTypeInterface;
 use JGM\TableBundle\Table\Filter\OptionsResolver\FilterOptionsResolver;
+use JGM\TableBundle\Table\Filter\Type\FilterTypeInterface;
 use JGM\TableBundle\Table\OptionsResolver\TableOptionsResolver;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptionsResolver;
@@ -136,6 +136,11 @@ class Table
 	 */
 	private $totalItems;
 	
+	/**
+	 * @var DataSourceInterface
+	 */
+	private $dataSource;
+	
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
 	{
 		// Save the parameters: Symfonys container, curent request,
@@ -155,6 +160,7 @@ class Table
 	{
 		$this->tableBuilder = new TableBuilder($this->container);
 		$this->tableType = $tableType;
+		$this->dataSource = $tableType->getDataSource($this->container);
 		
 		if($this->isFilterProvider())
 		{
@@ -252,7 +258,7 @@ class Table
 
 		// Store the data items as Row-Object in the $rows class var.
 		// Additional increment the counter for each row.
-		$data = $this->tableType->getDataSource($this->container)->getData(
+		$data = $this->dataSource->getData(
 			$this->container,
 			$this->tableBuilder->getColumns(),
 			$this->getFilters(),
@@ -302,7 +308,7 @@ class Table
 		}
 		
 		// Read total items.
-		$this->totalItems = $this->tableType->getDataSource($this->container)->getCountItems(
+		$this->totalItems = $this->dataSource->getCountItems(
 			$this->container,
 			$this->tableBuilder->getColumns(),
 			$this->getFilters()
@@ -319,19 +325,6 @@ class Table
 		
 			$this->totalPages = $countPages < 1 ? 1 : $countPages;
 		}
-	}
-
-
-	/**
-	 * Building the data iterator by executing the 
-	 * tableType.getQuery method and using pagination
-	 * and sort, if they are enabled.
-	 * 
-	 * @return Iterator
-	 */
-	private function getData()
-	{
-		return $this->tableType->getDataSource($this->container);
 	}
 
 	/**
@@ -371,7 +364,7 @@ class Table
 		// Read the column and direction from $request-object.
 		$column = $this->request->get( $order->getParamColumnName() );
 		$direction = $this->request->get( $order->getParamDirectionName() );
-		
+
 		// Find column and direction if the are empty.
 		if($column === null)
 		{
@@ -400,7 +393,7 @@ class Table
 			}
 		}
 		$order->setCurrentColumnName($column);
-		
+
 		if($direction === null)
 		{
 			$direction = $order->getEmptyDirection();
@@ -413,7 +406,7 @@ class Table
 		{
 			throw new NotFoundHttpException();
 		}
-		
+
 		return $order;
 	}
 	
