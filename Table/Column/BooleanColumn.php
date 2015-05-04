@@ -25,7 +25,7 @@ class BooleanColumn extends AbstractColumn
 	
 	public function getContent(Row $row)
 	{
-		$value = $row->get($this->getName());
+		$value = $this->getValue($row);
 		
 		if($value == 1)
 		{

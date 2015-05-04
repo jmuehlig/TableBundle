@@ -82,16 +82,7 @@ class EntityDataSource extends QueryBuilderDataSource
 		{
 			/* @var $column ColumnInterface */
 			
-			if($column instanceof EntityColumn)
-			{
-				$newColumnName = $this->processJoinColumn($column->getName(), $queryBuilder, true);
-				if($newColumnName !== $column->getName())
-				{
-					$this->columnNameMap[$column->getName()] = $newColumnName;
-//					$column->setName($newColumnName);
-				}
-				
-			}
+			$this->processJoinColumn($column->getName(), $queryBuilder, true);
 		}
 		
 		if($this->callback !== null)

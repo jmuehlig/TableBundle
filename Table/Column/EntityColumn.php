@@ -25,23 +25,13 @@ class EntityColumn extends AbstractColumn
 	
 	public function getContent(Row $row)
 	{
-		$properties = explode(".", $this->getName());
-		$value = $row->get($properties[0]);
-		for($i = 1; $i < count($properties); $i++)
-		{
-			if($value === null)
-			{
-				return $this->options['empty_value'];
-			}
-			
-			$value = ReflectionHelper::getPropertyOfEntity($value, $properties[$i]);
-		}
+		$value = $this->getValue($row);
 
 		if($value === null)
 		{
 			return $this->options['empty_value'];
 		}
 		
-		return $value->__toString();
+		return (string) $value;
 	}
 }

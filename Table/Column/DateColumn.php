@@ -26,7 +26,8 @@ class DateColumn extends AbstractColumn
 
 	public function getContent(Row $row)
 	{
-		$value = $row->get($this->getName());
+		$value = $this->getValue($row);
+		
 		if($value === null || (is_string($value) && strlen($value) === 0))
 		{
 			return $this->options['empty_value'];

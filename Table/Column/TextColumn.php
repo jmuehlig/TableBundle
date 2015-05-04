@@ -28,7 +28,7 @@ class TextColumn extends AbstractColumn
 	
 	public function getContent(Row $row)
 	{
-		$value = $row->get($this->getName());
+		$value = $this->getValue($row);
 		
 		if($value === null || strlen($value) === 0)
 		{

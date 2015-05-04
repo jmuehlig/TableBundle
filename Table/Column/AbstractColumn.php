@@ -2,6 +2,8 @@
 
 namespace JGM\TableBundle\Table\Column;
 
+use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Utils\ReflectionHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -103,5 +105,28 @@ abstract class AbstractColumn implements ColumnInterface
 			'sortable' => false,
 			'label' => $this->getName()
 		));
+	}
+	
+	/**
+	 * Returns the value of the property.
+	 * 
+	 * @param Row $row
+	 * @return mixed
+	 */
+	protected function getValue(Row $row)
+	{
+		$properties = explode(".", $this->getName());
+		$value = $row->get($properties[0]);
+		for($i = 1; $i < count($properties); $i++)
+		{
+			if($value === null)
+			{
+				return null;
+			}
+			
+			$value = ReflectionHelper::getPropertyOfEntity($value, $properties[$i]);
+		}
+
+		return $value;
 	}
 }
