@@ -2,6 +2,8 @@
 
 namespace JGM\TableBundle\Table\Utils;
 
+use JGM\TableBundle\Table\TableException;
+
 /**
  * Helper for entity reflection.
  *
