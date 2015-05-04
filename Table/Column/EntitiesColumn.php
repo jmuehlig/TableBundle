@@ -25,7 +25,7 @@ class EntitiesColumn extends AbstractColumn
 	
 	public function getContent(Row $row)
 	{
-		$values = $row->get($this->getName());
+		$values = $this->getValue($row);
 		
 		if($values === null)
 		{
