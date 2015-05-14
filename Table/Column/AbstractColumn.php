@@ -111,11 +111,17 @@ abstract class AbstractColumn implements ColumnInterface
 	 * Returns the value of the property.
 	 * 
 	 * @param Row $row
+	 * @param string $columnName
 	 * @return mixed
 	 */
-	protected function getValue(Row $row)
+	protected function getValue(Row $row, $columnName = null)
 	{
-		$properties = explode(".", $this->getName());
+		if($columnName === null)
+		{
+			$columnName = $this->getName();
+		}
+		
+		$properties = explode(".", $columnName);
 		$value = $row->get($properties[0]);
 		for($i = 1; $i < count($properties); $i++)
 		{
