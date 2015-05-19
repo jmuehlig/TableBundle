@@ -6,12 +6,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use JGM\TableBundle\Table\Row\Row;
 
 /**
- * This column will call the __toString method of each entity in the entities array.
+ * This column will list all items of an array, seperated
+ * by a given glue.
  *
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class EntitiesColumn extends AbstractColumn
+class ArrayColumn extends AbstractColumn
 {
 	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
 	{

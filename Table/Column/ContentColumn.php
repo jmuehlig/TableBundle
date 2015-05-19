@@ -2,11 +2,13 @@
 
 namespace JGM\TableBundle\Table\Column;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use JGM\TableBundle\Table\Column\AbstractColumn;
+use JGM\TableBundle\Table\Column\ContentGrabber\ContentGrabberInterface;
 use JGM\TableBundle\Table\Row\Row;
-use JGM\TableBundle\Table\Content\ContentGrabber\ContentGrabberInterface;
 use JGM\TableBundle\Table\TableException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 
 /**
  * Uses a ContentGrabber or a ContentFunction to generate
@@ -40,7 +42,7 @@ class ContentColumn extends AbstractColumn
 	{
 		if($this->options['content_grabber'] !== null)
 		{
-			if($this->options['content_grabber'] instanceof ContentGrabber\ContentGrabberInterface)
+			if($this->options['content_grabber'] instanceof ContentGrabberInterface)
 			{
 				if(is_callable(array($this->options['content_grabber'], 'setContainer')))
 				{

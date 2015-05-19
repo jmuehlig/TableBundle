@@ -33,12 +33,12 @@ class Configuration implements ConfigurationInterface
 	public function getDefaultColumns() 
 	{
 		return array(
+			'array'		=> 'JGM\TableBundle\Table\Column\ArrayColumn',
 			'boolean'	=> 'JGM\TableBundle\Table\Column\BooleanColumn',
 			'content'	=> 'JGM\TableBundle\Table\Column\ContentColumn',
 			'counter'	=> 'JGM\TableBundle\Table\Column\CounterColumn',
 			'date'		=> 'JGM\TableBundle\Table\Column\DateColumn',
 			'entity'	=> 'JGM\TableBundle\Table\Column\EntityColumn',
-			'entities'	=> 'JGM\TableBundle\Table\Column\EntitiesColumn',
 			'number'	=> 'JGM\TableBundle\Table\Column\NumberColumn',
 			'text'		=> 'JGM\TableBundle\Table\Column\TextColumn',
 			'url'		=> 'JGM\TableBundle\Table\Column\UrlColumn'

@@ -19,19 +19,55 @@ class EntityColumn extends AbstractColumn
 		parent::setDefaultOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
-			'empty_value' => null
+			'empty_value' => null,
+			'property' => null,
+			'glue' => ', '
 		));
 	}
 	
 	public function getContent(Row $row)
 	{
-		$value = $this->getValue($row);
+		$entity = $this->getValue($row);
 
-		if($value === null)
+		if($entity === null)
 		{
 			return $this->options['empty_value'];
 		}
 		
-		return (string) $value;
+		if(is_array($this->options['property']))
+		{
+			$parts = array();
+			foreach($this->options['property'] as $property)
+			{
+				$partValue = ReflectionHelper::getPropertyOfEntity($entity, $property);
+				if($partValue !== null && strlen($partValue) > 0)
+				{
+					$parts[] = $partValue;
+				}
+			}
+			
+			if(count($parts) > 0)
+			{
+				return implode($this->options['glue'], $parts);
+			}
+		}
+		else 
+		{
+			if($this->options['property'] !== null)
+			{
+				$value = ReflectionHelper::getPropertyOfEntity($entity, $this->options['property']);
+			}
+			else
+			{
+				$value = (string) $entity;
+			}
+			
+			if($value !== null && strlen($value) > 0)
+			{
+				return $value;
+			}
+		}
+		
+		return $this->options['empty_value']; 
 	}
 }

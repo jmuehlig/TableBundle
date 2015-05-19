@@ -5,28 +5,32 @@ Welcome to TableBundle - a bundle to create your tables in an easy way.
 * [Why should I use this bundle?](index.md#why)
 * [How to insall](index.md#install)
 
-## Documentation
-* [Create a simple table](doc/simple_table.md)
+## Tutorials
+* [Create a simple table](doc/tutorial/simple_table.md)
 * Use pagination in your table (TODO)
 * Sort your table (TODO)
 * Add filters to your table (TODO)
 * Custom table rendering (TODO)
 
+## Documenation
+* Twig-Functions
+* Columns 
+* Content grabber
+* Filter
+
 ## API
-* Column (TODO)
-* Content grabber (TODO)
-* Filter (TODO)
-* DataSource (TODO)
-* Renderer (TODO)
+* Add your own Column
+* Add your own Filter (TODO)
+* Add your own DataSource (TODO)
 
 <a name="why"></a>
 ## Why should I use this bundle?
 Creating tables for data, stored in your database or file system, is a cumbersome procedure.
-You have to do this many times, so times you are using the same table in different views.
+You have to do this many times, sometimes you may use the same table in different views.
 Additional, you have to keep your horrible html sources in good condition.
 Here is why you should use this bundle:
 * Create your tables in a small file, using a php class
-* Use this table as often as you want
+* Use instances of that table as often as you want
 * Keep only one file in good condition
 * Don't worry about pagination, sortable fields or search for content, the table bundle will do this for you
 

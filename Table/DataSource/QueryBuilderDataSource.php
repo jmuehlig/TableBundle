@@ -151,22 +151,14 @@ class QueryBuilderDataSource implements DataSourceInterface
 			{
 				$whereParts[] = sprintf('(%s)', implode(' or ', $innerWhereParts));
 				
-				$value = $filter->getValue();
-				if($filter instanceof \JGM\TableBundle\Table\Filter\DateFilter)
-				{
-					$value = \DateTime::createFromFormat($filter->format, $value);
-					/* @var $value \DateTime */
-					$value->setTime(0, 0, 0);
-				}
-				
 				// Add the filters value to the query builder parameters map.
 				if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
 				{
-					$queryBuilder->setParameter($filter->getName(), '%' . $value . '%');
+					$queryBuilder->setParameter($filter->getName(), '%' . $filter->getValue() . '%');
 				}
 				else
 				{
-					$queryBuilder->setParameter($filter->getName(), $value);
+					$queryBuilder->setParameter($filter->getName(), $filter->getValue());
 				}
 			}
 		}
