@@ -134,7 +134,7 @@
 
 {% block filter_label %}
 {% spaceless %}
-{% set attributes = filter.attributes  %}
+{% set attributes = filter.labelAttributes  %}
 <label for="{{ filter.name }}"{{ block('attributes') }}>{{ filter.label }}</label>
 {% endspaceless %}
 {% endblock %}
