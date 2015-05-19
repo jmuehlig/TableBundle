@@ -25,26 +25,43 @@ class DateFilter extends AbstractFilter
 		$optionsResolver->setDefaults(array(
 			'format' => 'd.m.Y',
 			'widget' => 'text',
+			'type' => 'text'
 			//'years' => range( date('Y', strtotime('-5 years')), date('Y', strtotime('+5 years')) ),
 			//'days' => range(1,31)
 		));
 		
 		$optionsResolver->setAllowedValues(array(
-			'widget' => array('text', 'raw_text')
+			'widget' => array('text'),
+			'type' => array('text', 'date')
 		));
 	}
 
 	public function getWidgetBlockName() 
 	{
-		if($this->widget === 'raw_text')
-		{
-			return 'text_widget';
-		} 
-		else if($this->widget === 'text')
+		if($this->widget === 'text')
 		{
 			return 'date_text_widget';
 		}
 		
 		TableException::filterWidgetNotFound($this->widget);
+	}
+	
+	public function setValue(array $value)
+	{
+		$dateAsString = $value[$this->getName()];
+		if($dateAsString !== null && $dateAsString !== "")
+		{
+			$timestampFromString = strtotime($dateAsString);
+			
+			$date = new \DateTime();
+			$date->setTimestamp($timestampFromString);
+			$date->setTime(0, 0, 0);
+			
+			$this->value = $date;
+		}
+		else
+		{
+			$this->value = null;
+		}
 	}
 }

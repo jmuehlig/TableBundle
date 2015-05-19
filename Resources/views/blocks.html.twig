@@ -243,6 +243,11 @@
 {% block date_text_widget %}
 {% spaceless %}
 {% set attributes = filter.attributes %}
-<input type="date" id="{{ filter.name }}}" name="{{ filter.name }}"{% if filter.value is not null %} value="{{ filter.value|date(filter.format) }}"{% endif %}{{ block('attributes') }} />
+{% if filter.type == "date" %}
+{% set format = "Y-m-d" %}
+{% else %}
+{% set format = filter.format %}
+{% endif %}
+<input type="{{ filter.type }}" id="{{ filter.name }}}" name="{{ filter.name }}"{% if filter.value is not null %} value="{{ filter.value|date(format) }}"{% endif %}{{ block('attributes') }} />
 {% endspaceless %}
 {% endblock %}
