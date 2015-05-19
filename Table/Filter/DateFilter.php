@@ -30,18 +30,21 @@ class DateFilter extends AbstractFilter
 		));
 		
 		$optionsResolver->setAllowedValues(array(
-			'widget' => array('text')
+			'widget' => array('text', 'raw_text')
 		));
 	}
 
 	public function getWidgetBlockName() 
 	{
-		if($this->widget === 'text')
+		if($this->widget === 'raw_text')
+		{
+			return 'text_widget';
+		} 
+		else if($this->widget === 'text')
 		{
 			return 'date_text_widget';
 		}
 		
 		TableException::filterWidgetNotFound($this->widget);
 	}
-
 }

@@ -109,6 +109,11 @@ abstract class AbstractFilter implements FilterInterface
 	{
 		return $this->label;
 	}
+	
+	public function getLabelAttributes()
+	{
+		return $this->labelAttributes;
+	}
 
 	public function getName()
 	{
