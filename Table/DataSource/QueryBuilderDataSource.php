@@ -147,7 +147,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 				/* @var $column ColumnExpressionInterface */ 
 				
 				// Add joins and the alias for the column.
-				$this->processJoinColumn($column->getColumnName(), $queryBuilder);
+				$this->processJoinColumn($column->getColumnName(), $queryBuilder, $filter instanceof \JGM\TableBundle\Table\Filter\EntityFilter);
 				
 				// Get the query column name: t.a if its property a, for example.
 				$columnName = $this->getQueryColoumnName($column->getColumnName(), $rootAlias);
@@ -159,11 +159,11 @@ class QueryBuilderDataSource implements DataSourceInterface
 					{
 						$current = $parts[$i];
 						$next = $parts[$i+1];
-						if(!in_array($next, $this->joinTable))
-						{
-							$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
-							$this->joinTable[] = $next;
-						}
+//						if(!in_array($next, $this->joinTable))
+//						{
+//							$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
+//							$this->joinTable[] = $next;
+//						}
 					}
 					
 					$columnName = sprintf("%s.%s", $current, $next);
@@ -241,7 +241,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 	 * 
 	 * @return string						New name of the column.
 	 */
-	protected function processJoinColumn($columnName, QueryBuilder $queryBuilder, $isForSelect = false)
+	protected function processJoinColumn($columnName, QueryBuilder $queryBuilder, $joinLastItem, $isForSelect = false)
 	{
 		$rootAliases = $queryBuilder->getRootAliases();
 		$rootAlias = $rootAliases[0];
@@ -253,7 +253,8 @@ class QueryBuilderDataSource implements DataSourceInterface
 			if(substr_count($columnName, '.') > 1)
 			{
 				$parts = explode('.', $columnName);
-				for($i = 0; $i < count($parts)-1; $i++)
+				$max = $joinLastItem ? count($parts)-1 : count($parts)-2;
+				for($i = 0; $i < $max; $i++)
 				{
 					$current = $parts[$i];
 					$next = $parts[$i+1];
