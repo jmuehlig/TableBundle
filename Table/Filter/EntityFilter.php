@@ -21,7 +21,7 @@ class EntityFilter extends AbstractValuedFilter
 		$optionsResolver->setDefaults(array(
 			'operator' => FilterOperator::EQ,
 			'widget' => 'select',
-			'order_by' => array('id', 'asc'),
+			'order_by' => array('id' => 'asc'),
 			'find_by' => array()
 		));
 		
@@ -44,8 +44,7 @@ class EntityFilter extends AbstractValuedFilter
 		/* @var $repository EntityRepository */
 
 		$values = array();
-		//$repository->findBy($this->findBy, $this->orderBy)
-		foreach($repository->findAll() as $item)
+		foreach($repository->findBy($this->findBy, $this->orderBy) as $item)
 		{
 			$values[$item->getId()] = (string) $item;
 		}
