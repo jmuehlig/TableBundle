@@ -161,17 +161,33 @@ abstract class AbstractFilter implements FilterInterface
 		$this->options = $optionsResolver->resolve($options);
 		
 		// Set intern properties from options.
+		$columns = array();
 		if(!is_array($this->options['columns']))
 		{
-			$this->columns = array($this->options['columns']);
-		}
-		else if(count($this->options['columns']) < 1)
-		{
-			$this->columns = array($this->getName());
+			$columns = array($this->options['columns']);
 		}
 		else
 		{
-			$this->columns = $this->options['columns'];
+			$columns = $this->options['columns'];
+		}
+		
+		foreach($columns as $column)
+		{
+			if($column instanceof ColumnExpression\ColumnExpressionInterface)
+			{
+				$this->columns[] = $column;
+			}
+			else if(is_string($column))
+			{
+				$this->columns[] = new ColumnExpression\ColumnNameExpression($column);
+			}
+			
+			//TODO: otherwise throw exception: no known column expression.
+		}
+		
+		if(count($this->columns) < 1)
+		{
+			$this->columns[] = new ColumnExpression\ColumnNameExpression($this->getName());
 		}
 
 		$this->label = $this->options['label'];

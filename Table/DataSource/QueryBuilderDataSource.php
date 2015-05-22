@@ -4,6 +4,8 @@ namespace JGM\TableBundle\Table\DataSource;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use JGM\TableBundle\Table\Filter\ColumnExpression\ColumnDateDiffExpression;
+use JGM\TableBundle\Table\Filter\ColumnExpression\ColumnExpressionInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
 use JGM\TableBundle\Table\Order\Model\Order;
@@ -36,10 +38,26 @@ class QueryBuilderDataSource implements DataSourceInterface
 	 */
 	protected $joinTable;
 
+	/**
+	 * @var array
+	 */
+	protected $operatorMap;
+
 	public function __construct(QueryBuilder $queryBuilder = null)
 	{
 		$this->queryBuilder = $queryBuilder;
 		$this->joinTable = [];
+		
+		$this->operatorMap = array(
+			FilterOperator::EQ => '=',
+			FilterOperator::NOT_EQ => '!=',
+			FilterOperator::GT => '>',
+			FilterOperator::GEQ => '>=',
+			FilterOperator::LT => '<',
+			FilterOperator::LEQ => '<=',
+			FilterOperator::NOT_LIKE => 'not like',
+			FilterOperator::LIKE => 'like'
+		);
 	}
 	
 	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, Order $sortable = null)
@@ -124,16 +142,18 @@ class QueryBuilderDataSource implements DataSourceInterface
 			// Build part for filter with all columns like: 'column1 = x or column2 = x ..'
 			$innerWhereParts = array();
 			foreach($filter->getColumns() as $column)
-			{			
+			{
+				/* @var $column ColumnExpressionInterface */ 
+				
 				// Add joins and the alias for the column.
-				$this->processJoinColumn($column, $queryBuilder);
+				$this->processJoinColumn($column->getColumnName(), $queryBuilder);
 				
 				// Get the query column name: t.a if its property a, for example.
-				$column = $this->getQueryColoumnName($column, $rootAlias);
+				$columnName = $this->getQueryColoumnName($column->getColumnName(), $rootAlias);
 				
-				if(substr_count($column, '.') > 1)
+				if(substr_count($column->getColumnName(), '.') > 1)
 				{
-					$parts = array_merge($queryBuilder->getRootAliases(), explode('.', $column));
+					$parts = array_merge($queryBuilder->getRootAliases(), explode('.', $column->getColumnName()));
 					for($i = 0; $i < count($parts)-1; $i++)
 					{
 						$current = $parts[$i];
@@ -141,10 +161,27 @@ class QueryBuilderDataSource implements DataSourceInterface
 						$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
 					}
 					
-					$column = sprintf("%s.%s", $current, $next);
+					$columnName = sprintf("%s.%s", $current, $next);
 				}
 				
-				$innerWhereParts[] = sprintf($this->createWherePart($filter->getOperator()), $column, $filter->getName());
+				if($column instanceof ColumnDateDiffExpression)
+				{
+					/* @var $column ColumnDateDiffExpression */
+					$dateDiffParameter = sprintf("%s_dateDiff_%s", $filter->getName(), $column->getDiffDate()->getTimestamp());
+					$innerWhereParts[] = sprintf(
+						"(DATE_DIFF(:%s, %s)/%s) %s :%s",
+						$dateDiffParameter,
+						$columnName,
+						$column->getQuotient(),
+						$this->operatorMap[$filter->getOperator()], 
+						$filter->getName()
+					);
+					$queryBuilder->setParameter($dateDiffParameter, $column->getDiffDate());
+				}
+				else
+				{
+					$innerWhereParts[] = sprintf("%s %s :%s", $columnName, $this->operatorMap[$filter->getOperator()], $filter->getName());
+				}
 			}
 			
 			if(count($innerWhereParts) > 0)
@@ -179,47 +216,15 @@ class QueryBuilderDataSource implements DataSourceInterface
 		}
 	}
 	
-	/**
-	 * Creates a where part with placeholders, like '${column} <= ${parameter}' for operator 'LT'.
-	 * 
-	 * @param int $filterOperator	Operator of the filter.
-	 * 
-	 * @return string				Where part.
-	 */
-	protected function createWherePart($filterOperator)
+	protected function createColumnExpression($newColumnName, ColumnExpressionInterface $columnExpression, QueryBuilder $queryBuilder)
 	{
-		if($filterOperator === FilterOperator::EQ)
+		if($columnExpression instanceof ColumnDateDiffExpression)
 		{
-			return "%s = :%s";
+			/* @var $columnExpression ColumnDateDiffExpression */
+			return 'DATE_DIFF(%s';
 		}
-		else if($filterOperator === FilterOperator::NOT_EQ)
-		{
-			return "%s != :%s";
-		}
-		else if($filterOperator === FilterOperator::GT)
-		{
-			return "%s > :%s";
-		}
-		else if($filterOperator === FilterOperator::GEQ)
-		{
-			return "%s >= :%s";
-		}
-		else if($filterOperator === FilterOperator::LT)
-		{
-			return "%s < :%s";
-		}
-		else if($filterOperator === FilterOperator::LEQ)
-		{
-			return "%s <= :%s";
-		}
-		else if($filterOperator === FilterOperator::NOT_LIKE)
-		{
-			return "%s not like :%s";
-		}
-		else
-		{
-			return "%s like :%s";
-		}
+		
+		return $columnExpression;
 	}
 	
 	/**
