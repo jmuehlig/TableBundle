@@ -124,6 +124,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 			return;
 		}
 
+		$this->joinTable = array();
 		$whereParts = array();
 		
 		$rootAliases = $queryBuilder->getRootAliases();
@@ -158,7 +159,11 @@ class QueryBuilderDataSource implements DataSourceInterface
 					{
 						$current = $parts[$i];
 						$next = $parts[$i+1];
-						$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
+						if(!in_array($next, $this->joinTable))
+						{
+							$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
+							$this->joinTable[] = $next;
+						}
 					}
 					
 					$columnName = sprintf("%s.%s", $current, $next);
@@ -257,7 +262,8 @@ class QueryBuilderDataSource implements DataSourceInterface
 					{
 						$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
 						$this->joinTable[] = $next;
-					}					
+					}
+					
 					if($isForSelect)
 					{
 						$queryBuilder->addSelect($next);
