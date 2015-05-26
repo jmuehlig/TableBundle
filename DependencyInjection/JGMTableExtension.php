@@ -34,10 +34,13 @@ class JGMTableExtension extends Extension
 	{		
 		$configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-
+		
 		$container->setParameter('jgm_table.columns', array_merge($config['columns'], $configuration->getDefaultColumns()));
 		$container->setParameter('jgm_table.filters', array_merge($config['filters'], $configuration->getDefaultFilters()));
-		
+		$container->setParameter('jgm_table.filter_expressions', array_merge_recursive(
+			$config['filter_expressions'], 
+			$configuration->getDefaultFilterExpressionManipulators()
+		));
 	}
 	
 	public function getAlias()

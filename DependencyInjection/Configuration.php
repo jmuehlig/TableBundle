@@ -23,8 +23,21 @@ class Configuration implements ConfigurationInterface
 
 		$rootNode
 			->children()
-				->arrayNode('columns')->prototype('scalar')->end()->end()
-				->arrayNode('filters')->prototype('scalar')->end()->end()
+				
+				->arrayNode('columns')
+					->prototype('scalar')->end()
+				->end()
+				
+				->arrayNode('filters')
+					->prototype('scalar')->end()
+				->end()
+				
+				->arrayNode('filter_expressions')
+					->prototype('array')
+						->prototype('scalar')->end()
+					->end()
+				->end()
+				
 			->end();
 
         return $treeBuilder;
@@ -53,6 +66,19 @@ class Configuration implements ConfigurationInterface
 			'boolean'	=> 'JGM\TableBundle\Table\Filter\BooleanFilter',
 			'valued'	=> 'JGM\TableBundle\Table\Filter\ValuedFilter',
 			'date'		=> 'JGM\TableBundle\Table\Filter\DateFilter'
+		);
+	}
+	
+	public function getDefaultFilterExpressionManipulators()
+	{
+		return array(
+			'doctrine'	=> array(
+				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineCountExpressionManipulator',
+				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineSumExpressionManipulator',
+				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineMinExpressionManipulator',
+				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineMaxExpressionManipulator',
+				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineAvgExpressionManipulator'
+			)
 		);
 	}
 			

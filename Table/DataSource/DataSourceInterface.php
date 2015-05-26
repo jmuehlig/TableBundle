@@ -49,4 +49,11 @@ interface DataSourceInterface
 		array $columns,
 		array $filters = null
 	);
+	
+	/**
+	 * Returns the name of the type.
+	 * 
+	 * @return string
+	 */
+	public function getType();
 }

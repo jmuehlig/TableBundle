@@ -2,6 +2,8 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
+use JGM\TableBundle\Table\DataSource\DataSourceInterface;
+use JGM\TableBundle\Table\Filter\ExpressionManipulator\ExpressionManipulatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,6 +43,20 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var array
 	 */
 	protected $columns;
+	
+	/**
+	 * Expression name for each column.
+	 * 
+	 * @var array
+	 */
+	protected $columnExpressionNames;
+	
+	/**
+	 * Expression for each column (not the name - the instance!).
+	 * 
+	 * @var array
+	 */
+	protected $columnExpressions;
 	
 	/**
 	 * Attributes for rendering.
@@ -83,6 +99,13 @@ abstract class AbstractFilter implements FilterInterface
 	protected $containeInterface;
 	
 	/**
+	 * Cache for all available filter expressions.
+	 * 
+	 * @var array
+	 */
+	protected $allFilterExpressions;
+	
+	/**
 	 * Map of property names and option
 	 * indexes.
 	 * 
@@ -93,6 +116,7 @@ abstract class AbstractFilter implements FilterInterface
 	public function __construct(ContainerInterface $container)
 	{
 		$this->containeInterface = $container;
+		$this->columnExpressions = array();
 	}
 
 	public function getAttributes()
@@ -103,6 +127,41 @@ abstract class AbstractFilter implements FilterInterface
 	public function getColumns()
 	{
 		return $this->columns;
+	}
+	
+	public function getExpressionForColumn(DataSourceInterface $dataSource, $columnName)
+	{
+		if(array_key_exists($columnName, $this->columnExpressionNames))
+		{
+			$expressionName = $this->columnExpressionNames[$columnName];
+			
+			if(!array_key_exists($columnName, $this->columnExpressions))
+			{
+				$filterExpressions = $this->getAllFilterExpressions();
+				if(!array_key_exists($dataSource->getType(), $filterExpressions))
+				{
+					return $columnName;
+				}
+
+				foreach($filterExpressions[$dataSource->getType()] as $expressionClass)
+				{
+					$expressionInstance = new $expressionClass;
+					/* @var $expressionInstance ExpressionManipulatorInterface */
+
+					if($expressionInstance->getName() == $expressionName)
+					{
+						$this->columnExpressions[$columnName] = $expressionInstance;
+					}
+				}
+			}
+			
+			$expressionManipulator = $this->columnExpressions[$columnName];
+			/* @var $expressionManipulator ExpressionManipulatorInterface */
+			
+			return $expressionManipulator->getExpression($columnName);
+		}
+		
+		return $columnName;
 	}
 
 	public function getLabel()
@@ -162,34 +221,37 @@ abstract class AbstractFilter implements FilterInterface
 		
 		// Set intern properties from options.
 		$columns = array();
-		if(!is_array($this->options['columns']))
+		if(is_array($this->options['columns']))
+		{
+			$columns = $this->options['columns'];
+		}
+		else if(is_string($this->options['columns']))
 		{
 			$columns = array($this->options['columns']);
 		}
 		else
 		{
-			$columns = $this->options['columns'];
+			$columns = array($this->getName());
 		}
 		
-		foreach($columns as $column)
+		// Set expressions.
+		$this->columnExpressionNames = array();
+		foreach($columns as $key => $column)
 		{
-			if($column instanceof ColumnExpression\ColumnExpressionInterface)
+			if(strpos($column, '|') !== false)
 			{
-				$this->columns[] = $column;
+				// Split column in (0 => here.is.the.column.name) and (1 => expressionName).
+				$columnParts = explode('|', $column);
+				
+				// Set the right column name without name of the expression,
+				$columns[$key] = $columnParts[0];
+				
+				// Set expression.
+				$this->columnExpressionNames[$columnParts[0]] = $columnParts[1];
 			}
-			else if(is_string($column))
-			{
-				$this->columns[] = new ColumnExpression\ColumnNameExpression($column);
-			}
-			
-			//TODO: otherwise throw exception: no known column expression.
 		}
 		
-		if(count($this->columns) < 1)
-		{
-			$this->columns[] = new ColumnExpression\ColumnNameExpression($this->getName());
-		}
-
+		$this->columns = $columns;
 		$this->label = $this->options['label'];
 		$this->operator = $this->options['operator'];
 		$this->attributes = $this->options['attr'];
@@ -208,7 +270,7 @@ abstract class AbstractFilter implements FilterInterface
 	protected function setDefaultFilterOptions(OptionsResolver $optionsResolver)
 	{
 		$optionsResolver->setDefaults(array(
-			'columns' => array(),
+			'columns' => null,
 			'label' => '',
 			'operator' => FilterOperator::LIKE,
 			'attr' => array(),
@@ -273,5 +335,15 @@ abstract class AbstractFilter implements FilterInterface
 	public function getParameterNames()
 	{
 		return array($this->getName());
+	}
+	
+	protected function getAllFilterExpressions()
+	{
+		if($this->allFilterExpressions === null)
+		{
+			$this->allFilterExpressions = $this->containeInterface->getParameter('jgm_table.filter_expressions');
+		}
+		
+		return $this->allFilterExpressions;
 	}
 }

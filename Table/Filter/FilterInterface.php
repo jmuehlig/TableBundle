@@ -2,6 +2,7 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
+use JGM\TableBundle\Table\DataSource\DataSourceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -48,6 +49,11 @@ interface FilterInterface
 	 * @return array			Columns, the filter will work on.
 	 */
 	public function getColumns();
+	
+	/**
+	 * @return mixed			Expression for the column name and data source.
+	 */
+	public function getExpressionForColumn(DataSourceInterface $dataSource, $columnName);
 	
 	/**
 	 * @return array			Attributes for every row (tr).
