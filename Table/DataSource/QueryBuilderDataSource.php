@@ -2,10 +2,10 @@
 
 namespace JGM\TableBundle\Table\DataSource;
 
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use JGM\TableBundle\Table\Filter\ColumnExpression\ColumnDateDiffExpression;
-use JGM\TableBundle\Table\Filter\ColumnExpression\ColumnExpressionInterface;
+use JGM\TableBundle\Table\Filter\EntityFilter;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
 use JGM\TableBundle\Table\Order\Model\Order;
@@ -60,6 +60,11 @@ class QueryBuilderDataSource implements DataSourceInterface
 		);
 	}
 	
+	public function getType()
+	{
+		return 'doctrine';
+	}
+	
 	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, Order $sortable = null)
 	{
 		if($this->queryBuilder === null)
@@ -103,11 +108,20 @@ class QueryBuilderDataSource implements DataSourceInterface
 		
 		$aliases = $queryBuilder->getRootAliases();
 		
-		$queryBuilder->select(sprintf('count(%s)', $aliases[0]));
+		$queryBuilder->select(sprintf('count(%s) a', $aliases[0]));
 		
 		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
-				
-		return $queryBuilder->getQuery()->getSingleScalarResult();
+		
+		try
+		{
+			$result = $queryBuilder->getQuery()->getSingleScalarResult();
+		} 
+		catch (NoResultException $ex) 
+		{
+			$result = 0;
+		}
+		
+		return $result;
 	}
 	
 	/**
@@ -126,6 +140,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 
 		$this->joinTable = array();
 		$whereParts = array();
+		$haveParts = array();
 		
 		$rootAliases = $queryBuilder->getRootAliases();
 		$rootAlias = $rootAliases[0];
@@ -142,50 +157,25 @@ class QueryBuilderDataSource implements DataSourceInterface
 			
 			// Build part for filter with all columns like: 'column1 = x or column2 = x ..'
 			$innerWhereParts = array();
+			$innerHaveParts = array();
 			foreach($filter->getColumns() as $column)
 			{
-				/* @var $column ColumnExpressionInterface */ 
-				
 				// Add joins and the alias for the column.
-				$this->processJoinColumn($column->getColumnName(), $queryBuilder, $filter instanceof \JGM\TableBundle\Table\Filter\EntityFilter);
+				$this->processJoinColumn($column, $queryBuilder, $filter instanceof EntityFilter);
 				
 				// Get the query column name: t.a if its property a, for example.
-				$columnName = $this->getQueryColoumnName($column->getColumnName(), $rootAlias);
+				$columnName = $this->getQueryColoumnName($column, $rootAlias);
 				
-				if(substr_count($column->getColumnName(), '.') > 1)
-				{
-					$parts = array_merge($queryBuilder->getRootAliases(), explode('.', $column->getColumnName()));
-					for($i = 0; $i < count($parts)-1; $i++)
-					{
-						$current = $parts[$i];
-						$next = $parts[$i+1];
-//						if(!in_array($next, $this->joinTable))
-//						{
-//							$queryBuilder->leftJoin(sprintf("%s.%s", $current, $next), $next);
-//							$this->joinTable[] = $next;
-//						}
-					}
-					
-					$columnName = sprintf("%s.%s", $current, $next);
-				}
+				$columnExpression = str_replace($column, $columnName, $filter->getExpressionForColumn($this, $column));
 				
-				if($column instanceof ColumnDateDiffExpression)
+				$term = sprintf("%s %s :%s", $columnExpression, $this->operatorMap[$filter->getOperator()], $filter->getName());
+				if($this->isAggregate($columnExpression))
 				{
-					/* @var $column ColumnDateDiffExpression */
-					$dateDiffParameter = sprintf("%s_dateDiff_%s", $filter->getName(), $column->getDiffDate()->getTimestamp());
-					$innerWhereParts[] = sprintf(
-						"(DATE_DIFF(:%s, %s)/%s) %s :%s",
-						$dateDiffParameter,
-						$columnName,
-						$column->getQuotient(),
-						$this->operatorMap[$filter->getOperator()], 
-						$filter->getName()
-					);
-					$queryBuilder->setParameter($dateDiffParameter, $column->getDiffDate());
+					$innerHaveParts[] = $term;
 				}
 				else
 				{
-					$innerWhereParts[] = sprintf("%s %s :%s", $columnName, $this->operatorMap[$filter->getOperator()], $filter->getName());
+					$innerWhereParts[] = $term;
 				}
 			}
 			
@@ -203,6 +193,12 @@ class QueryBuilderDataSource implements DataSourceInterface
 					$queryBuilder->setParameter($filter->getName(), $filter->getValue());
 				}
 			}
+			
+			if(count($innerHaveParts) > 0)
+			{
+				$haveParts[] = sprintf('(%s)', implode(' or ', $innerHaveParts));
+				$queryBuilder->setParameter($filter->getName(), $filter->getValue());
+			}
 		}
 
 		// If there was more than one filter used, add them all to the query builder.
@@ -219,17 +215,20 @@ class QueryBuilderDataSource implements DataSourceInterface
 				$queryBuilder->andWhere($whereStatement);
 			}
 		}
-	}
-	
-	protected function createColumnExpression($newColumnName, ColumnExpressionInterface $columnExpression, QueryBuilder $queryBuilder)
-	{
-		if($columnExpression instanceof ColumnDateDiffExpression)
-		{
-			/* @var $columnExpression ColumnDateDiffExpression */
-			return 'DATE_DIFF(%s';
-		}
 		
-		return $columnExpression;
+		if(count($haveParts) > 0)
+		{
+			$haveStatement = implode(' and ', $haveParts);
+
+			if(strpos(strtolower($queryBuilder->getDQL()), 'having') === false)
+			{
+				$queryBuilder->having($haveStatement);
+			}
+			else
+			{
+				$queryBuilder->andHaving($haveStatement);
+			}
+		}
 	}
 	
 	/**
@@ -285,5 +284,28 @@ class QueryBuilderDataSource implements DataSourceInterface
 			$parts = explode(".", $columnName);
 			return sprintf("%s.%s", $parts[count($parts)-2], $parts[count($parts)-1]);
 		}
+	}
+	
+	/**
+	 * Returns true, if the given expression is
+	 * an aggregate function and needs to be
+	 * applied after group by.
+	 * 
+	 * @param string $expression	Expression like column name or count(columnName).
+	 * @return boolean
+	 */
+	protected function isAggregate($expression)
+	{
+		$aggregations = array('count', 'sum', 'avg', 'min', 'max');
+		$expression = strtolower($expression);
+		foreach($aggregations as $aggregation)
+		{
+			if(strpos($expression, $aggregation) !== false)
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }
