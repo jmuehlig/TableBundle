@@ -6,6 +6,7 @@ use JGM\TableBundle\Table\Column\AbstractColumn;
 use JGM\TableBundle\Table\Column\ContentGrabber\ContentGrabberInterface;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\TableException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -17,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class ContentColumn extends AbstractColumn
+class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 {
 	/**
 	 * @var ContainerInterface 
@@ -33,7 +34,7 @@ class ContentColumn extends AbstractColumn
 		));
 	}
 
-	public function setContainer(ContainerInterface $container)
+	public function setContainer(ContainerInterface $container = null)
 	{
 		$this->container = $container;
 	}

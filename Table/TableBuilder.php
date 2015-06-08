@@ -2,7 +2,11 @@
 
 namespace JGM\TableBundle\Table;
 
+use JGM\TableBundle\Table\Column\AccessValidation\CallableAccess;
+use JGM\TableBundle\Table\Column\AccessValidation\ColumnAccessInterface;
+use JGM\TableBundle\Table\Column\AccessValidation\RoleAccess;
 use JGM\TableBundle\Table\Column\ColumnInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -91,7 +95,7 @@ class TableBuilder
 		$column->setName($name);
 		$column->setOptions($options);
 		
-		if(is_callable(array($column, 'setContainer')))
+		if($column instanceof ContainerAwareInterface)
 		{
 			$column->setContainer($this->container);
 		}
@@ -101,10 +105,24 @@ class TableBuilder
 		return $this;
 	}
 	
+	/**
+	 * Removes a column by its name.
+	 * 
+	 * @param string $columnName	Name of the column.
+	 */
+	public function removeColumn($columnName)
+	{
+		if(array_key_exists($columnName, $this->columns))
+		{
+			unset($this->columns[$columnName]);
+		}
+	}
+	
 	public function getColumns()
 	{
 		return $this->columns;
 	}
+	
 	
 	/**
 	 * Checks whether the logged user has access to see this column.
@@ -121,17 +139,17 @@ class TableBuilder
 		// If we found an array or string, it may be a role or a list of them.
 		if(is_string($accessOption) || is_array($accessOption))
 		{
-			$accessOption = new Column\AccessValidation\RoleAccess($accessOption);
+			$accessOption = new RoleAccess($accessOption);
 		}
 
 		// If the option is callable, call them and check the result.
 		else if(is_callable($accessOption))
 		{
-			$accessOption = new Column\AccessValidation\CallableAccess($accessOption);
+			$accessOption = new CallableAccess($accessOption);
 		}
 
 		// If the option is a column access interface, call it and check the result.
-		if($accessOption instanceof Column\AccessValidation\ColumnAccessInterface)
+		if($accessOption instanceof ColumnAccessInterface)
 		{
 			try
 			{
