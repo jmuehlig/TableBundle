@@ -273,6 +273,26 @@ class Table
 			
 			$this->rows[] = $row;
 		}
+		
+		if($this->options['hide_empty_columns'] === true && $this->totalItems > 0)
+		{
+			foreach($this->tableBuilder->getColumns() as $name => $column)
+			{
+				/* @var $column ColumnInterface */
+
+				foreach($this->rows as $row)
+				{
+					/* @var $row Row */
+					$content = $column->getContent($row);
+					if($content !== null && $content !== "")
+					{
+						continue 2;
+					}
+				}
+
+				$this->tableBuilder->removeColumn($name);
+			}
+		}
 	}
 	
 	/**

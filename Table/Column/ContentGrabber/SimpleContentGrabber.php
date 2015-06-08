@@ -2,8 +2,9 @@
 
 namespace JGM\TableBundle\Table\Column\ContentGrabber;
 
-use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Column\ColumnInterface;
+use JGM\TableBundle\Table\Row\Row;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -12,14 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class SimpleContentGrabber implements ContentGrabberInterface
+class SimpleContentGrabber implements ContentGrabberInterface, ContainerAwareInterface
 {
 	/**
 	 * @var ContainerInterface
 	 */
 	protected $_container;
 	
-	public function setContainer(ContainerInterface $container)
+	public function setContainer(ContainerInterface $container = null)
 	{
 		$this->_container = $container;
 	}

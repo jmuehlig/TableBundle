@@ -19,6 +19,7 @@ class TableOptionsResolver extends OptionsResolver
 			'empty_value' => 'No data found.',
 			'attr' => array(),
 			'head_attr' => array(),
+			'hide_empty_columns' => false
 		));
 		
 		$this->setAllowedTypes(array(
