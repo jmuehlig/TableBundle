@@ -141,6 +141,10 @@ class Table
 	 */
 	private $dataSource;
 	
+	private $isPreparedForBuild = false;
+	
+	private $isBuild = false;
+	
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
 	{
 		// Save the parameters: Symfonys container, curent request,
@@ -227,12 +231,15 @@ class Table
 	}
 	
 	/**
-	 * Builds the table by processiong the tableBuilder
-	 * and fetching all rows.
-	 * Last are stored in the rows-array.
+	 * Prepares the table for loading data.
 	 */
-	private function buildTable()
-	{		
+	private function prepareTableForBuild()
+	{
+		if($this->isPreparedForBuild)
+		{
+			return;
+		}
+		
 		// Build the type (adding all columns).
 		$this->tableType->buildTable($this->tableBuilder);
 
@@ -245,6 +252,23 @@ class Table
 		
 		// Resolve all options, defined in the table type.
 		$this->resolveOptions();
+		
+		$this->isPreparedForBuild = true;
+	}
+	
+	/**
+	 * Builds the table by processiong the tableBuilder
+	 * and fetching all rows.
+	 * Last are stored in the rows-array.
+	 */
+	private function buildTable()
+	{	
+		if($this->isBuild)
+		{
+			return;
+		}
+		
+		$this->prepareTableForBuild();
 		
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
@@ -293,6 +317,8 @@ class Table
 				$this->tableBuilder->removeColumn($name);
 			}
 		}
+		
+		$this->isBuild = true;
 	}
 	
 	/**
@@ -484,22 +510,15 @@ class Table
 	 */
 	public function getData($isFiltered = true, $isOrdered = true)
 	{
-		$entities = array();
-		$rows = $this->dataSource->getData(
+		$this->prepareTableForBuild();
+		
+		return $this->dataSource->getData(
 			$this->container,
 			$this->tableBuilder->getColumns(),
 			$isFiltered ? $this->getFilters() : null,
 			null, 
 			$isOrdered ? $this->order : null
 		);
-		
-		foreach($rows as $row)
-		{
-			/* @var $row Row */
-			$entities[] = $row;
-		}
-		
-		return $entities;
 	}
 	
 	private function getFilters()
