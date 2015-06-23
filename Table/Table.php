@@ -474,6 +474,34 @@ class Table
 		return $this->router;
 	}
 	
+	/**
+	 * Returning all Entities.
+	 * 
+	 * @param boolean $isFiltered	Should the entities be filtered by the filters?
+	 * @param boolean $isOrdered	Should the entites ordered, like the table?
+	 * 
+	 * @return array
+	 */
+	public function getData($isFiltered = true, $isOrdered = true)
+	{
+		$entities = array();
+		$rows = $this->dataSource->getData(
+			$this->container,
+			$this->tableBuilder->getColumns(),
+			$isFiltered ? $this->getFilters() : null,
+			null, 
+			$isOrdered ? $this->order : null
+		);
+		
+		foreach($rows as $row)
+		{
+			/* @var $row Row */
+			$entities[] = $row;
+		}
+		
+		return $entities;
+	}
+	
 	private function getFilters()
 	{
 		if($this->filterBuilder === null)
