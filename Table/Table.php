@@ -194,6 +194,23 @@ class Table
 		return $columns[$columnName];
 	}
 	
+	/**
+	 * Returns a filter identified by the name.
+	 * 
+	 * @param string $filterName Name of the column.
+	 * @return FilterInterface
+	 */
+	public function getFilter($filterName)
+	{
+		$filters = $this->getFilters();
+		if(!is_array($filters) || !array_key_exists($filterName, $filters))
+		{
+			TableException::noSuchFilter($filterName);
+		}
+		
+		return $filters[$filterName];
+	}
+	
 	public function getRowAttributes(Row $row)
 	{
 		$attr = $this->tableType->getRowAttributes($row);
