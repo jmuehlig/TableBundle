@@ -82,6 +82,12 @@ class TableException extends \Exception
 		throw new TableException(sprintf($message, $columnName));
 	}
 	
+	public static function noSuchFilter($filterName)
+	{
+		$message = "There is no filter named '%s'.";
+		throw new TableException(sprintf($message, $filterName));
+	}
+	
 	public static function noSuchPorpertyOnEntity($property, $entity)
 	{
 		$message = "There is no property named '%s' on entity class '%s'.";
