@@ -191,11 +191,10 @@ abstract class AbstractFilter implements FilterInterface
 	 */
 	public function getValue()
 	{
-		if($this->value === null && $this->defaultValue !== null)
+		if(($this->value === null || empty($this->value)) && $this->defaultValue !== null)
 		{
 			return $this->defaultValue;
 		}
-
 		return $this->value;
 	}
 
@@ -257,7 +256,6 @@ abstract class AbstractFilter implements FilterInterface
 		$this->attributes = $this->options['attr'];
 		$this->labelAttributes = $this->options['label_attr'];
 		$this->defaultValue = $this->options['default_value'];
-		
 		FilterOperator::validate($this->operator);
 	}
 	

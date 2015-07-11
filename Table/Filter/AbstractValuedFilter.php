@@ -37,7 +37,7 @@ abstract class AbstractValuedFilter extends AbstractFilter
 			'li_attr' => array(),
 			'li_active_attr' => array()
 		));
-		
+
 		$optionsResolver->setAllowedValues(array(
 			'widget' => $this->getAvailableWidgets(),
 		));
