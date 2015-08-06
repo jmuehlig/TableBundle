@@ -22,16 +22,14 @@ class EntityFilter extends AbstractValuedFilter
 			'operator' => FilterOperator::EQ,
 			'widget' => 'select',
 			'order_by' => array('id' => 'asc'),
-			'find_by' => array()
-		));
-		
-		$optionsResolver->setRequired(array(
-			'entity'
+			'find_by' => array(),
+			'entity' => null,
+			'entities' => array()
 		));
 		
 		$optionsResolver->setAllowedTypes(array(
 			'order_by' => 'array',
-			'find_by' => 'array'
+			'find_by' => 'array',
 		));
 	}
 
@@ -40,15 +38,34 @@ class EntityFilter extends AbstractValuedFilter
 	 */
 	public function getValues()
 	{
-		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
-		/* @var $repository EntityRepository */
-
-		$values = array();
-		foreach($repository->findBy($this->findBy, $this->orderBy) as $item)
+		if($this->entity !== null)
 		{
-			$values[$item->getId()] = (string) $item;
+			$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
+			/* @var $repository EntityRepository */
+
+			$values = array();
+			foreach($repository->findBy($this->findBy, $this->orderBy) as $item)
+			{
+				$values[$item->getId()] = (string) $item;
+			}
+
+			return $values;
+		}
+		else if($this->entities !== null)
+		{
+			return $this->entities;
 		}
 		
-		return $values;
+		return array();
 	}
+//	
+//	public function getValue()
+//	{
+//		$id = parent::getValue();
+//		
+//		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
+//		/* @var $repository EntityRepository */
+//		
+//		return $repository->findOneBy(array('id' => $id));
+//	}
 }
