@@ -143,7 +143,15 @@ class ArrayDataSource implements DataSourceInterface
 			foreach($filters as $key => $filter)
 			{
 				/* @var $filter FilterInterface */
-				$value += sprintf("%s:%s;", $key, $filter->getValue());
+				
+				if($filter instanceof \JGM\TableBundle\Table\Filter\DateFilter)
+				{
+					$value += sprintf("%s:%s;", $key, $filter->getValue()->getTimestamp());
+				}
+				else
+				{
+					$value += sprintf("%s:%s;", $key, $filter->getValue());
+				}
 			}
 		}
 		
