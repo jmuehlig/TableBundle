@@ -325,7 +325,6 @@ class Table
 		{
 			return;
 		}
-		
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
 		// For example, the counter should start at 11, if 

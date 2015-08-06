@@ -2,6 +2,8 @@
 
 namespace JGM\TableBundle\Table\DataSource;
 
+use JGM\TableBundle\Table\Filter\DateFilter;
+use JGM\TableBundle\Table\Filter\EntityFilter;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
 use JGM\TableBundle\Table\Order\Model\Order;
@@ -144,7 +146,12 @@ class ArrayDataSource implements DataSourceInterface
 			{
 				/* @var $filter FilterInterface */
 				
-				if($filter instanceof \JGM\TableBundle\Table\Filter\DateFilter)
+				if($filter->getValue() === null || $filter->getValue() === "")
+				{
+					continue;
+				}
+				
+				if($filter instanceof DateFilter)
 				{
 					$value += sprintf("%s:%s;", $key, $filter->getValue()->getTimestamp());
 				}
@@ -206,7 +213,7 @@ class ArrayDataSource implements DataSourceInterface
 			foreach($filter->getColumns() as $column)
 			{
 				$itemValue = ReflectionHelper::getPropertyOfEntity($item, $column);
-				if($filter instanceof \JGM\TableBundle\Table\Filter\EntityFilter)
+				if($filter instanceof EntityFilter)
 				{
 					$itemValue = ReflectionHelper::getPropertyOfEntity($itemValue, 'id');
 				}
