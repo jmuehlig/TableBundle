@@ -227,9 +227,9 @@ class Table
 	 * 
 	 * @return View of the table.
 	 */
-	public function createView()
+	public function createView($loadData = true)
 	{
-		$this->buildTable();
+		$this->buildTable($loadData);
 		
 		return new TableView(
 			$this->tableType->getName(),
@@ -277,8 +277,10 @@ class Table
 	 * Builds the table by processiong the tableBuilder
 	 * and fetching all rows.
 	 * Last are stored in the rows-array.
+	 * 
+	 * @param boolean $loadData	Load data?
 	 */
-	private function buildTable()
+	private function buildTable($loadData)
 	{	
 		if($this->isBuild)
 		{
@@ -287,32 +289,35 @@ class Table
 		
 		$this->prepareTableForBuild();
 		
-		// Initialise the row counter, raise the counter,
-		// if the table uses pagination.
-		// For example, the counter should start at 11, if 
-		// the table is on page 2 and uses 10 rows per page.
-		$count = 0;
-		if($this->pagination !== null)
+		if($loadData === true)
 		{
-			$count = $this->pagination->getCurrentPage() * $this->pagination->getItemsPerRow();
-		}
+			// Initialise the row counter, raise the counter,
+			// if the table uses pagination.
+			// For example, the counter should start at 11, if 
+			// the table is on page 2 and uses 10 rows per page.
+			$count = 0;
+			if($this->pagination !== null)
+			{
+				$count = $this->pagination->getCurrentPage() * $this->pagination->getItemsPerRow();
+			}
 
-		// Store the data items as Row-Object in the $rows class var.
-		// Additional increment the counter for each row.
-		$data = $this->dataSource->getData(
-			$this->container,
-			$this->tableBuilder->getColumns(),
-			$this->getFilters(),
-			$this->pagination, 
-			$this->order
-		);
+			// Store the data items as Row-Object in the $rows class var.
+			// Additional increment the counter for each row.
+			$data = $this->dataSource->getData(
+				$this->container,
+				$this->tableBuilder->getColumns(),
+				$this->getFilters(),
+				$this->pagination, 
+				$this->order
+			);
 
-		foreach($data as $dataRow)
-		{
-			$row = new Row($dataRow, ++$count);
-			$row->setAttributes( $this->tableType->getRowAttributes($row) );
-			
-			$this->rows[] = $row;
+			foreach($data as $dataRow)
+			{
+				$row = new Row($dataRow, ++$count);
+				$row->setAttributes( $this->tableType->getRowAttributes($row) );
+
+				$this->rows[] = $row;
+			}
 		}
 		
 		if($this->options['hide_empty_columns'] === true && $this->totalItems > 0)

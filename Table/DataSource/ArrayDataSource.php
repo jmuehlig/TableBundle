@@ -198,6 +198,10 @@ class ArrayDataSource implements DataSourceInterface
 			foreach($filter->getColumns() as $column)
 			{
 				$itemValue = ReflectionHelper::getPropertyOfEntity($item, $column);
+				if($filter instanceof \JGM\TableBundle\Table\Filter\EntityFilter)
+				{
+					$itemValue = ReflectionHelper::getPropertyOfEntity($itemValue, 'id');
+				}
 				
 				if($filter->getOperator() === FilterOperator::EQ)
 				{
