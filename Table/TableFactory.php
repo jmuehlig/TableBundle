@@ -46,6 +46,14 @@ class TableFactory
 	 */
 	private $router;
 	
+	/**
+	 * Are there multiple instances of tables
+	 * on this view?
+	 * 
+	 * @var boolean
+	 */
+	private $isMulti = false;
+	
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
 	{
 		$this->container = $container;
@@ -62,7 +70,9 @@ class TableFactory
 	 */
 	public function createTable(AbstractTableType $tableType)
 	{
-		$table = new Table($this->container, $this->entityManager, $this->request, $this->router);
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->isMulti);
+		
+		$this->isMulti = true;
 		
 		return $table->create($tableType);
 	}

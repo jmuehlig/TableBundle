@@ -102,5 +102,13 @@ class Order
 		$this->currentColumnName = $currentColumnName;
 	}
 
+	public function setParamDirectionName($name)
+	{
+		$this->paramDirectionName = $name;
+	}
 
+	public function setParamColumnName($name)
+	{
+		$this->paramColumnName = $name;
+	}
 }

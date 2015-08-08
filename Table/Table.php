@@ -147,7 +147,18 @@ class Table
 	
 	private $isDataLoaded = false;
 	
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
+	private $usePrefix;
+	
+	/**
+	 * Creates a new instance of an table.
+	 * 
+	 * @param ContainerInterface $container	Container.
+	 * @param EntityManager $entityManager	Entity Manager.
+	 * @param Request $request				Current request.
+	 * @param RouterInterface $router		Router.
+	 * @param boolean $prefix				Should the table use a prefix for filter, pagenination and order?
+	 */
+	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix = false)
 	{
 		// Save the parameters: Symfonys container, curent request,
 		// url router and doctrines entityManager
@@ -155,6 +166,7 @@ class Table
 		$this->entityManager = $entityManager;
 		$this->request = $request;
 		$this->router = $router;
+		$this->usePrefix = $usePrefix;
 		
 		// Set up rows, filters and optionsResolver
 		// for the table type.
@@ -251,8 +263,10 @@ class Table
 	
 	/**
 	 * Prepares the table for loading data.
+	 * 
+	 * @param boolean $loadData	Load data?
 	 */
-	private function prepareTableForBuild()
+	private function prepareTableForBuild($loadData)
 	{
 		if($this->isPreparedForBuild)
 		{
@@ -267,10 +281,18 @@ class Table
 		if($this->isFilterProvider())
 		{
 			$this->tableType->buildFilter($this->filterBuilder);
+			if($this->usePrefix)
+			{
+				foreach($this->getFilters() as $filter)
+				{
+					/* @var $filter FilterInterface */
+					$filter->setName(sprintf("%s%s", $this->getPrefix(), $filter->getName()));
+				}
+			}
 		}
 		
 		// Resolve all options, defined in the table type.
-		$this->resolveOptions();
+		$this->resolveOptions($loadData);
 		
 		$this->isPreparedForBuild = true;
 	}
@@ -289,7 +311,7 @@ class Table
 			return;
 		}
 		
-		$this->prepareTableForBuild();
+		$this->prepareTableForBuild($loadData);
 		
 		if($loadData === true)
 		{
@@ -362,8 +384,10 @@ class Table
 	 * table type.
 	 * 
 	 * Options are stored in the $options class var.
+	 * 
+	 * @param boolean $loadData	Load data?
 	 */
-	protected function resolveOptions()
+	protected function resolveOptions($loadData)
 	{
 		// Resolve Options of the table.
 		$optionsResolver = new TableOptionsResolver();
@@ -388,23 +412,26 @@ class Table
 			$this->filter = $this->resolveFilterOptions();
 		}
 		
-		// Read total items.
-		$this->totalItems = $this->dataSource->getCountItems(
-			$this->container,
-			$this->tableBuilder->getColumns(),
-			$this->getFilters()
-		);
-		
-		// Read total pages.
-		if($this->pagination !== null)
+		if($loadData === true)
 		{
-			$countPages = ceil($this->totalItems / $this->pagination->getItemsPerRow());
-			if(	$this->pagination->getCurrentPage() < 0 || $this->pagination->getCurrentPage() > $countPages)
+			// Read total items.
+			$this->totalItems = $this->dataSource->getCountItems(
+				$this->container,
+				$this->tableBuilder->getColumns(),
+				$this->getFilters()
+			);
+
+			// Read total pages.
+			if($this->pagination !== null)
 			{
-				throw new NotFoundHttpException();
+				$countPages = ceil($this->totalItems / $this->pagination->getItemsPerRow());
+				if(	$this->pagination->getCurrentPage() < 0 || $this->pagination->getCurrentPage() > $countPages)
+				{
+					throw new NotFoundHttpException();
+				}
+
+				$this->totalPages = $countPages < 1 ? 1 : $countPages;
 			}
-		
-			$this->totalPages = $countPages < 1 ? 1 : $countPages;
 		}
 	}
 
@@ -427,6 +454,10 @@ class Table
 		
 		// Setup options container.
 		$pagination = $paginationOptionsResolver->toPagination();
+		if($this->usePrefix)
+		{
+			$pagination->setParameterName(sprintf("%s%s", $this->getPrefix(), $pagination->getParameterName()));
+		}
 		
 		// Read current page.
 		$currentPage = max(0, ((int) $this->request->get( $pagination->getParameterName() )) - 1);
@@ -441,6 +472,11 @@ class Table
 		$sortableOptionsResolver = new OrderOptionsResolver();
 		$this->tableType->setOrderDefaultOptions($sortableOptionsResolver);
 		$order = $sortableOptionsResolver->toOrder();
+		if($this->usePrefix)
+		{
+			$order->setParamColumnName(sprintf("%s%s", $this->getPrefix(), $order->getParamColumnName()));
+			$order->setParamDirectionName(sprintf("%s%s", $this->getPrefix(), $order->getParamDirectionName()));
+		}
 		
 		// Read the column and direction from $request-object.
 		$column = $this->request->get( $order->getParamColumnName() );
@@ -545,7 +581,7 @@ class Table
 	 */
 	public function getData($isFiltered = true, $isOrdered = true)
 	{
-		$this->prepareTableForBuild();
+		$this->prepareTableForBuild(true);
 		
 		return $this->dataSource->getData(
 			$this->container,
@@ -579,5 +615,10 @@ class Table
 	private function isFilterProvider()
 	{
 		return $this->tableType instanceof FilterTypeInterface;
+	}
+	
+	private function getPrefix()
+	{
+		return $this->tableType->getName() . '_';
 	}
 }
