@@ -107,4 +107,9 @@ class Pagination
 	{
 		$this->currentPage = $currentPage;
 	}
+	
+	public function setParameterName($parameterName)
+	{
+		$this->parameterName = $parameterName;
+	}
 }
