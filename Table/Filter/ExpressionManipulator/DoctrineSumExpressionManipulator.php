@@ -12,7 +12,7 @@ namespace JGM\TableBundle\Table\Filter\ExpressionManipulator;
  */
 class DoctrineSumExpressionManipulator implements ExpressionManipulatorInterface
 {
-	public function getExpression($columnName)
+	public function getExpression($columnName, $columnValue = null)
 	{
 		return sprintf("sum(%s)", $columnName);
 	}

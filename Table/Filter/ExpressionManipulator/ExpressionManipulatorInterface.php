@@ -20,9 +20,10 @@ interface ExpressionManipulatorInterface
 	
 	/**
 	 * Returns the manipulated expression
-	 * of the given columns name.
+	 * of the given columns name and value,
+	 * if the value is known.
 	 * 
 	 * @return mixed
 	 */
-	public function getExpression($columnName);
+	public function getExpression($columnName, $columnValue = null);
 }

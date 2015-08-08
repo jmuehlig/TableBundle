@@ -12,7 +12,7 @@ namespace JGM\TableBundle\Table\Filter\ExpressionManipulator;
  */
 class DoctrineAvgExpressionManipulator implements ExpressionManipulatorInterface
 {
-	public function getExpression($columnName)
+	public function getExpression($columnName, $columnValue = null)
 	{
 		return sprintf("avg(%s)", $columnName);
 	}

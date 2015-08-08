@@ -12,7 +12,7 @@ namespace JGM\TableBundle\Table\Filter\ExpressionManipulator;
  */
 class DoctrineMinExpressionManipulator implements ExpressionManipulatorInterface
 {
-	public function getExpression($columnName)
+	public function getExpression($columnName, $columnValue = null)
 	{
 		return sprintf("min(%s)", $columnName);
 	}
