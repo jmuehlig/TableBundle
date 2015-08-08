@@ -2,7 +2,7 @@
 
 namespace JGM\TableBundle\Table\DataSource;
 
-use JGM\TableBundle\Table\Filter\DateFilter;
+use DateTime;
 use JGM\TableBundle\Table\Filter\EntityFilter;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;
@@ -122,7 +122,7 @@ class ArrayDataSource implements DataSourceInterface
 	
 	public function getType()
 	{
-		return 'collection';
+		return 'array';
 	}
 	
 	/**
@@ -151,7 +151,7 @@ class ArrayDataSource implements DataSourceInterface
 					continue;
 				}
 				
-				if($filter instanceof DateFilter)
+				if($filter->getValue() instanceof DateTime)
 				{
 					$value += sprintf("%s:%s;", $key, $filter->getValue()->getTimestamp());
 				}
@@ -213,6 +213,12 @@ class ArrayDataSource implements DataSourceInterface
 			foreach($filter->getColumns() as $column)
 			{
 				$itemValue = ReflectionHelper::getPropertyOfEntity($item, $column);
+				if($itemValue === null)
+				{
+					$surviveFilter = $surviveFilter || false;
+					continue;
+				}
+				
 				if($filter instanceof EntityFilter)
 				{
 					$itemValue = ReflectionHelper::getPropertyOfEntity($itemValue, 'id');

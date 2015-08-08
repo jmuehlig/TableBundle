@@ -175,7 +175,8 @@
 {% block text_widget %}
 {% spaceless %}
 {% set attributes = filter.attributes %}
-<input type="text" id="{{ filter.name }}" name="{{ filter.name }}"{{ block('attributes') }}{% if filter.value is not null %} value="{{ filter.value }}"{% endif %} />
+{% set filterValue = filter.getValue(constant('JGM\\TableBundle\\Table\\Filter\\FilterInterface::FOR_RENDERING')) %}
+<input type="text" id="{{ filter.name }}" name="{{ filter.name }}"{{ block('attributes') }}{% if filterValue is not null %} value="{{ filterValue }}"{% endif %} />
 {% endspaceless %}
 {% endblock %}
 
@@ -248,6 +249,7 @@
 {% else %}
 {% set format = filter.format %}
 {% endif %}
-<input type="{{ filter.type }}" id="{{ filter.name }}}" name="{{ filter.name }}"{% if filter.value is not null %} value="{{ filter.value|date(format) }}"{% endif %}{{ block('attributes') }} />
+{% set filterValue = filter.getValue(constant('JGM\\TableBundle\\Table\\Filter\\FilterInterface::FOR_RENDERING')) %}
+<input type="{{ filter.type }}" id="{{ filter.name }}}" name="{{ filter.name }}"{% if filterValue is not null %} value="{{ filterValue|date(format) }}"{% endif %}{{ block('attributes') }} />
 {% endspaceless %}
 {% endblock %}

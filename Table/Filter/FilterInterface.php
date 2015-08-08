@@ -13,6 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 interface FilterInterface
 {
+	const FOR_RENDERING = 0;
+	const FOR_FILTERING = 1;
+	
 	public function __construct(ContainerInterface $container);
 
 		/**
@@ -80,9 +83,11 @@ interface FilterInterface
 	public function getParameterNames();
 	
 	/**
+	 * @param int $mode			Mode, the value is for (FOR_FILTERING | FOR_RENDERING).
+	 * 
 	 * @return mixed			Value of the filter.
 	 */
-	public function getValue();
+	public function getValue($mode = FilterInterface::FOR_FILTERING);
 	
 	/**
 	 * @return string			Name of the filter widgets block name.

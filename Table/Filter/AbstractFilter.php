@@ -4,6 +4,7 @@ namespace JGM\TableBundle\Table\Filter;
 
 use JGM\TableBundle\Table\DataSource\DataSourceInterface;
 use JGM\TableBundle\Table\Filter\ExpressionManipulator\ExpressionManipulatorInterface;
+use JGM\TableBundle\Table\Filter\ValueManipulator\ValueManipulatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -113,6 +114,13 @@ abstract class AbstractFilter implements FilterInterface
 	 */
 	protected $optionPropertyMap = array();
 	
+	/**
+	 * Value Manipulator.
+	 * 
+	 * @var ValueManipulatorInterface
+	 */
+	protected $valueManipulator;
+	
 	public function __construct(ContainerInterface $container)
 	{
 		$this->containeInterface = $container;
@@ -129,7 +137,7 @@ abstract class AbstractFilter implements FilterInterface
 		return $this->columns;
 	}
 	
-	public function getExpressionForColumn(DataSourceInterface $dataSource, $columnName)
+	public function getExpressionForColumn(DataSourceInterface $dataSource, $columnName, $columnValue = null)
 	{
 		if(array_key_exists($columnName, $this->columnExpressionNames))
 		{
@@ -158,7 +166,7 @@ abstract class AbstractFilter implements FilterInterface
 			$expressionManipulator = $this->columnExpressions[$columnName];
 			/* @var $expressionManipulator ExpressionManipulatorInterface */
 			
-			return $expressionManipulator->getExpression($columnName);
+			return $expressionManipulator->getExpression($columnName, $columnValue);
 		}
 		
 		return $columnName;
@@ -189,12 +197,18 @@ abstract class AbstractFilter implements FilterInterface
 	 * @return mixed	Value of this filter or default value,
 	 *					if value is null and default value is not.
 	 */
-	public function getValue()
+	public function getValue($mode = FilterInterface::FOR_FILTERING)
 	{
 		if(($this->value === null || empty($this->value)) && $this->defaultValue !== null)
 		{
 			return $this->defaultValue;
 		}
+		
+		if($this->valueManipulator !== null && $mode === FilterInterface::FOR_FILTERING)
+		{
+			return $this->valueManipulator->getValue($this->value);
+		}
+		
 		return $this->value;
 	}
 
@@ -256,6 +270,7 @@ abstract class AbstractFilter implements FilterInterface
 		$this->attributes = $this->options['attr'];
 		$this->labelAttributes = $this->options['label_attr'];
 		$this->defaultValue = $this->options['default_value'];
+		$this->valueManipulator = $this->options['value_manipulator'];
 		FilterOperator::validate($this->operator);
 	}
 	
@@ -273,7 +288,8 @@ abstract class AbstractFilter implements FilterInterface
 			'operator' => FilterOperator::LIKE,
 			'attr' => array(),
 			'label_attr' => array('styles' => 'font-weight: bold'),
-			'default_value' => null
+			'default_value' => null,
+			'value_manipulator' => null
 		));
 	}
 	
