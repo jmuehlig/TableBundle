@@ -209,6 +209,11 @@ class ArrayDataSource implements DataSourceInterface
 				continue;
 			}
 			
+			if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
+			{
+				$filterValue = strtolower($filterValue);
+			}
+			
 			$surviveFilter = false;
 			foreach($filter->getColumns() as $column)
 			{
@@ -250,7 +255,7 @@ class ArrayDataSource implements DataSourceInterface
 				}
 				else if($filter->getOperator() === FilterOperator::LIKE)
 				{
-					$surviveFilter = $surviveFilter || strpos($itemValue, $filterValue) !== false;
+					$surviveFilter = $surviveFilter || strpos(strtolower($itemValue), $filterValue) !== false;
 				}
 				else if($filter->getOperator() === FilterOperator::NOT_LIKE)
 				{
