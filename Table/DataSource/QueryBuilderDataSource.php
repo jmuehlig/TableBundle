@@ -167,6 +167,10 @@ class QueryBuilderDataSource implements DataSourceInterface
 				$columnName = $this->getQueryColoumnName($column, $rootAlias);
 				
 				$columnExpression = str_replace($column, $columnName, $filter->getExpressionForColumn($this, $column));
+				if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
+				{
+					$columnExpression = sprintf("lower(%s)", $columnExpression);
+				}
 				
 				$term = sprintf("%s %s :%s", $columnExpression, $this->operatorMap[$filter->getOperator()], $filter->getName());
 				if($this->isAggregate($columnExpression))
@@ -186,7 +190,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 				// Add the filters value to the query builder parameters map.
 				if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
 				{
-					$queryBuilder->setParameter($filter->getName(), '%' . $filter->getValue() . '%');
+					$queryBuilder->setParameter($filter->getName(), '%' . strtolower($filter->getValue()) . '%');
 				}
 				else
 				{
