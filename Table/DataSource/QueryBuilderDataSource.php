@@ -3,6 +3,7 @@
 namespace JGM\TableBundle\Table\DataSource;
 
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use JGM\TableBundle\Table\Filter\EntityFilter;
@@ -74,7 +75,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		
 		$queryBuilder = clone $this->queryBuilder;
 		
-		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
+		$this->applyFilters($queryBuilder, $filters);
 		
 		
 		if($sortable !== null)
@@ -110,7 +111,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 		
 		$queryBuilder->select(sprintf('count(%s) a', $aliases[0]));
 		
-		$this->applyFilters($container->get('request'), $queryBuilder, $filters);
+		$this->applyFilters($queryBuilder, $filters);
 		
 		try
 		{
@@ -127,18 +128,17 @@ class QueryBuilderDataSource implements DataSourceInterface
 	/**
 	 * Applys the filters to the query builder and sets required parameters.
 	 * 
-	 * @param Request $request				The http request.
 	 * @param QueryBuilder $queryBuilder	The query builder.
 	 * @param array $filters				Array with filters.
 	 */
-	protected function applyFilters(Request $request, QueryBuilder $queryBuilder, array $filters = array())
+	protected function applyFilters(QueryBuilder $queryBuilder, array $filters = array())
 	{
 		if(count($filters) < 1)
 		{
 			return;
 		}
 
-		$this->joinTable = array();
+		$this->joinTable = $this->getJoinedColumns($queryBuilder);
 		$whereParts = array();
 		$haveParts = array();
 		
@@ -166,13 +166,18 @@ class QueryBuilderDataSource implements DataSourceInterface
 				// Get the query column name: t.a if its property a, for example.
 				$columnName = $this->getQueryColoumnName($column, $rootAlias);
 				
+				// Get the column expression.
 				$columnExpression = str_replace($column, $columnName, $filter->getExpressionForColumn($this, $column));
+				
+				// Make the like column sensitive.
 				if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
 				{
 					$columnExpression = sprintf("lower(%s)", $columnExpression);
 				}
 				
+				// Create the where or having term.
 				$term = sprintf("%s %s :%s", $columnExpression, $this->operatorMap[$filter->getOperator()], $filter->getName());
+				
 				if($this->isAggregate($columnExpression))
 				{
 					$innerHaveParts[] = $term;
@@ -300,7 +305,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 	 */
 	protected function isAggregate($expression)
 	{
-		$aggregations = array('count', 'sum', 'avg', 'min', 'max');
+		$aggregations = array('count(', 'sum(', 'avg(', 'min(', 'max(', 'count (', 'sum (', 'avg (', 'min (', 'max (');
 		$expression = strtolower($expression);
 		foreach($aggregations as $aggregation)
 		{
@@ -311,5 +316,28 @@ class QueryBuilderDataSource implements DataSourceInterface
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Registeres all joins of the query builder,
+	 * for skipping these joins on join filter columns.
+	 * 
+	 * @param	QueryBuilder $queryBuilder	QueryBuilder for data request.
+	 * @return	array
+	 */
+	protected function getJoinedColumns(QueryBuilder $queryBuilder)
+	{
+		$joins = array();
+		foreach($queryBuilder->getDQLPart('join') as $joinParts)
+		{
+			foreach($joinParts as $join)
+			{
+				/* @var $join Join */
+				$nameParts = explode('.', $join->getJoin());
+				$joins[] = $nameParts[count($nameParts)-1];
+			}
+		}
+		
+		return $joins;
 	}
 }
