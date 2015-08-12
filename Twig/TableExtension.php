@@ -9,7 +9,7 @@ use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
 use JGM\TableBundle\Table\Renderer\RendererInterface;
 use JGM\TableBundle\Table\TableException;
 use JGM\TableBundle\Table\TableView;
-use JGM\TableBundle\Table\UrlHelper;
+use JGM\TableBundle\Table\Utils\UrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig_Environment;
 use Twig_Extension;

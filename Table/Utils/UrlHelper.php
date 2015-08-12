@@ -1,6 +1,6 @@
 <?php
 
-namespace JGM\TableBundle\Table;
+namespace JGM\TableBundle\Table\Utils;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;

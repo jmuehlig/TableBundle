@@ -41,24 +41,25 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 
 	public function getContent(Row $row)
 	{
-		if($this->options['content_grabber'] !== null)
+		if($this->options['content_grabber'] === null)
 		{
-			if($this->options['content_grabber'] instanceof ContentGrabberInterface)
+			TableException::noContentDefined($this->getName());
+		}
+		
+		if($this->options['content_grabber'] instanceof ContentGrabberInterface)
+		{
+			if($this->options['content_grabber'] instanceof ContainerAwareInterface)
 			{
-				if(is_callable(array($this->options['content_grabber'], 'setContainer')))
-				{
-					$this->options['content_grabber']->setContainer($this->container);
-				}
-			
-				return $this->options['content_grabber']->getContent($row, $this);
+				$this->options['content_grabber']->setContainer($this->container);
 			}
-			else if(is_callable($this->options['content_grabber']))
-			{
-				return $this->options['content_grabber']($row, $this);
-			}
+
+			return $this->options['content_grabber']->getContent($row, $this);
+		}
+		else if(is_callable($this->options['content_grabber']))
+		{
+			return $this->options['content_grabber']($row, $this);
 		}
 		
 		TableException::noContentDefined($this->getName());
 	}
-
 }
