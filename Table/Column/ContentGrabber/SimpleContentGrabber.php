@@ -18,22 +18,22 @@ class SimpleContentGrabber implements ContentGrabberInterface, ContainerAwareInt
 	/**
 	 * @var ContainerInterface
 	 */
-	protected $_container;
+	protected $container;
 	
 	public function setContainer(ContainerInterface $container = null)
 	{
-		$this->_container = $container;
+		$this->container = $container;
 	}
 	
 	protected function getContainer()
 	{
-		return $this->_container;
+		return $this->container;
 	}
 
 	public function getContent(Row $row, ColumnInterface $column)
 	{
 		$field = $row->get($column->getName());
-		if($field == null || $field == '')
+		if($field === null || $field === '')
 		{
 			return $column->getDefaultValue();
 		}
