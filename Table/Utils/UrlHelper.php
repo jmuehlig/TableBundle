@@ -3,6 +3,7 @@
 namespace JGM\TableBundle\Table\Utils;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -24,9 +25,9 @@ class UrlHelper
 	 */
 	private $router;
 	
-	public function __construct(Request $request, RouterInterface $router)
+	public function __construct(RequestStack $requestStack, RouterInterface $router)
 	{
-		$this->request = $request;
+		$this->request = $requestStack->getCurrentRequest();
 		$this->router = $router;
 	}
 	
