@@ -10,5 +10,4 @@ services:
         arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router"]
     jgm.url_helper:
         class: JGM\TableBundle\Table\Utils\UrlHelper
-        scope: request
-        arguments: ["@request","@router"]
+        arguments: ["@request_stack","@router"]

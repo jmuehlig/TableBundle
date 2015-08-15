@@ -7,7 +7,9 @@
         "email" : "mail@janmuehlig.de"
     }],
     "keywords" : [
-        "symfony table bundle"
+        "symfony",
+		"table",
+		"bundle"
     ],
     "license" : [
         "MIT"
