@@ -2,8 +2,8 @@
 
 namespace JGM\TableBundle\Table\Column;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use JGM\TableBundle\Table\Row\Row;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Rendering a boolean value.
@@ -13,7 +13,7 @@ use JGM\TableBundle\Table\Row\Row;
  */
 class BooleanColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	protected function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		

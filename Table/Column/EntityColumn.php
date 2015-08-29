@@ -4,7 +4,7 @@ namespace JGM\TableBundle\Table\Column;
 
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Utils\ReflectionHelper;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * This column will call the __toString method of an entity.
@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class EntityColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	protected function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		

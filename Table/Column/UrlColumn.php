@@ -3,8 +3,9 @@
 namespace JGM\TableBundle\Table\Column;
 
 use JGM\TableBundle\Table\Row\Row;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * 
@@ -12,14 +13,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class UrlColumn extends AbstractColumn
+class UrlColumn extends AbstractColumn implements ContainerAwareInterface
 {
 	/**
 	 * @var ContainerInterface 
 	 */
 	protected $container;
 	
-	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	protected function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		

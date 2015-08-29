@@ -2,8 +2,8 @@
 
 namespace JGM\TableBundle\Table\Column;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use JGM\TableBundle\Table\Row\Row;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * This column will list all items of an array, seperated
@@ -14,7 +14,7 @@ use JGM\TableBundle\Table\Row\Row;
  */
 class ArrayColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	protected function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		

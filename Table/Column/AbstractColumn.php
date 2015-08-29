@@ -5,7 +5,6 @@ namespace JGM\TableBundle\Table\Column;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Utils\ReflectionHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Abstract column, helpfull for the most options.
@@ -97,7 +96,7 @@ abstract class AbstractColumn implements ColumnInterface
 		$this->options = $this->optionsResolver->resolve($options);
 	}
 	
-	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	protected function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		$optionsResolver->setDefaults(array(
 			'attr' => array(),

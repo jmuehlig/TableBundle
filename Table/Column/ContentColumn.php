@@ -8,7 +8,7 @@ use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 /**
@@ -25,7 +25,13 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 	 */
 	protected $container;
 	
-	public function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	/**
+	 * @var callable
+	 */
+	protected $contentCallable;
+
+
+	public function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		
@@ -33,33 +39,44 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 			'content_grabber' => null
 		));
 	}
+	
+	public function setOptions(array $options)
+	{
+		parent::setOptions($options);
+		
+		$contentGrabber = $this->options['content_grabber'];
+		
+		if($contentGrabber === null)
+		{
+			TableException::noContentDefined($this->getName());
+		}
+		else if($contentGrabber instanceof ContentGrabberInterface)
+		{
+			$this->contentCallable = array($contentGrabber, 'getContent');
+		}
+		else if(is_callable($contentGrabber))
+		{
+			$this->contentCallable = $contentGrabber;
+		}
+		else
+		{
+			TableException::noContentDefined($this->getName());
+		}
+	}
 
 	public function setContainer(ContainerInterface $container = null)
 	{
 		$this->container = $container;
+		
+		$contentGrabber = $this->options['content_grabber'];
+		if($contentGrabber instanceof ContainerAwareInterface)
+		{
+			$contentGrabber->setContainer($container);
+		}
 	}
 
 	public function getContent(Row $row)
 	{
-		if($this->options['content_grabber'] === null)
-		{
-			TableException::noContentDefined($this->getName());
-		}
-		
-		if($this->options['content_grabber'] instanceof ContentGrabberInterface)
-		{
-			if($this->options['content_grabber'] instanceof ContainerAwareInterface)
-			{
-				$this->options['content_grabber']->setContainer($this->container);
-			}
-
-			return $this->options['content_grabber']->getContent($row, $this);
-		}
-		else if(is_callable($this->options['content_grabber']))
-		{
-			return $this->options['content_grabber']($row, $this);
-		}
-		
-		TableException::noContentDefined($this->getName());
+		return call_user_func_array($this->contentCallable, array($row, $this));		
 	}
 }

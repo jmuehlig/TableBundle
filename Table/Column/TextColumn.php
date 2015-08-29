@@ -2,8 +2,8 @@
 
 namespace JGM\TableBundle\Table\Column;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use JGM\TableBundle\Table\Row\Row;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * This column will only fetch the value of the property,
@@ -14,7 +14,7 @@ use JGM\TableBundle\Table\Row\Row;
  */
 class TextColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	protected function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		
