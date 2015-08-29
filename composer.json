@@ -9,13 +9,20 @@
     "keywords" : [
         "symfony",
 		"table",
-		"bundle"
+		"bundle",
+		"simple tables",
+		"pagnination",
+		"filter"
     ],
     "license" : [
         "MIT"
     ],
     "require" : {
-		"php": ">=5.3.3"
+		"php": ">=5.3.9",
+		"symfony/symfony": "~2.5",
+		"symfony/yaml": "~2.5",
+		"symfony/symfony": "~2.5",
+		"doctrine/common": "~2.4"
     },
     "autoload" : {
         "psr-0" : {
@@ -23,11 +30,9 @@
         }
     },
     "target-dir" : "JGM/TableBundle",
-    "repositories" : [{
-	}],
     "extra" : {
-    "branch-alias" : {
-            "dev-master" : "1.0-dev"
+    	"branch-alias" : {
+            "dev-master" : "1.0.x-dev"
         }
     }
 }
