@@ -2,8 +2,9 @@
 
 namespace JGM\TableBundle\Table\Column;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use DateTime;
 use JGM\TableBundle\Table\Row\Row;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Column for rendering date in format you like.
@@ -13,7 +14,7 @@ use JGM\TableBundle\Table\Row\Row;
  */
 class DateColumn extends AbstractColumn
 {
-	public function setDefaultOptions(OptionsResolverInterface $optionsResolver)
+	public function setDefaultOptions(OptionsResolver $optionsResolver)
 	{
 		parent::setDefaultOptions($optionsResolver);
 		
@@ -33,7 +34,7 @@ class DateColumn extends AbstractColumn
 			return $this->options['empty_value'];
 		}
 		
-		if($value instanceof \DateTime)
+		if($value instanceof DateTime)
 		{
 			return $value->format($this->options['format']);
 		}
