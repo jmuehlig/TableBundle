@@ -14,15 +14,18 @@
 		"pagnination",
 		"filter"
     ],
-    "license" : [
-        "MIT"
-    ],
+    "license" : [ "MIT" ],
     "require" : {
 		"php": ">=5.3.9",
 		"symfony/symfony": "~2.5",
+		"symfony/config": "~2.5",
 		"symfony/yaml": "~2.5",
-		"symfony/symfony": "~2.5",
-		"doctrine/common": "~2.4"
+		"symfony/security": "~2.5",
+		"symfony/templating": "~2.5",
+		"symfony/http-foundation": "~2.5",
+		"symfony/http-kernel": "~2.5",
+		"symfony/dependency-injection": "~2.5",
+		"doctrine/common": "~2.3"
     },
     "autoload" : {
         "psr-0" : {
