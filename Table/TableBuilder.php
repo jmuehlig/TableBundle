@@ -70,7 +70,7 @@ class TableBuilder
 	 * @param string $name		Name of the column.
 	 * @param array $options	Array with options for the column.
 	 * 
-	 * @return TableBuilder		TableBuilder for add more columns, set options and so on.
+	 * @return TableBuilder
 	 */
 	public function add($type, $name, array $options = array())
 	{
@@ -127,6 +127,11 @@ class TableBuilder
 		}
 	}
 	
+	/**
+	 * Returns all columns as an array.
+	 * 
+	 * @return array
+	 */
 	public function getColumns()
 	{
 		return $this->columns;

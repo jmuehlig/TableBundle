@@ -75,7 +75,7 @@ class TableFactory
 	 * Builds a table by a table type.
 	 * 
 	 * @param AbstractTableType $tableType	TableType.
-	 * @return	Table						Table.
+	 * @return	Table
 	 */
 	public function createTable(AbstractTableType $tableType)
 	{
@@ -93,7 +93,7 @@ class TableFactory
 	 * @param callable		$build	Function for building the table.
 	 * @param string|null	$name	Name of the table.
 	 * 
-	 * @return Table			Table.
+	 * @return Table
 	 */
 	public function createAnonymousTable($entity, $build, $name = 'table')
 	{
