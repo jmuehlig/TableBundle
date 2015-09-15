@@ -164,7 +164,7 @@ class Table
 	 * @param EntityManager $entityManager	Entity Manager.
 	 * @param Request $request				Current request.
 	 * @param RouterInterface $router		Router.
-	 * @param boolean $prefix				Should the table use a prefix for filter, pagenination and order?
+	 * @param boolean $usePrefix			Should the table use a prefix for filter, pagenination and order?
 	 */
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix = false)
 	{
