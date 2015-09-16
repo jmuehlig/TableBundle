@@ -42,7 +42,7 @@ class UrlColumn extends AbstractColumn implements ContainerAwareInterface
 		));
 	}
 	
-	public function setContainer(ContainerInterface $container)
+	public function setContainer(ContainerInterface $container = null)
 	{
 		$this->container = $container;
 	}
