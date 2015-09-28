@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the TableBundle.
+ *
+ * (c) Jan Mühlig <mail@janmuehlig.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace JGM\TableBundle\Table;
 
 use Doctrine\DBAL\Schema\View;
@@ -26,8 +35,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * The table forms the core class of the bundle.
- * It will be build by the table builder and represented
+ * The table will be build by the table builder and represented
  * by the table view.
  * 
  * @author	Jan Mühlig <mail@janmuehlig.de>
@@ -156,7 +164,7 @@ class Table
 	 * @param EntityManager $entityManager	Entity Manager.
 	 * @param Request $request				Current request.
 	 * @param RouterInterface $router		Router.
-	 * @param boolean $prefix				Should the table use a prefix for filter, pagenination and order?
+	 * @param boolean $usePrefix			Should the table use a prefix for filter, pagenination and order?
 	 */
 	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix = false)
 	{
