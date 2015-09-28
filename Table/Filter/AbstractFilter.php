@@ -101,7 +101,7 @@ abstract class AbstractFilter implements FilterInterface
 	 * 
 	 * @var array
 	 */
-	protected $options;
+	protected $options = null;
 	
 	/**
 	 * @var ContainerInterface
@@ -233,6 +233,17 @@ abstract class AbstractFilter implements FilterInterface
 
 	public function setOptions(array $options)
 	{
+		if($this->options !== null)
+		{
+			foreach($this->options as $key => $value)
+			{
+				if(!array_key_exists($key, $options))
+				{
+					$options[$key] = $value;
+				}
+			}
+		}
+		
 		$optionsResolver = new OptionsResolver();
 
 		// Set this filter default options.
