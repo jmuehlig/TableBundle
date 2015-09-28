@@ -227,22 +227,37 @@ class TableExtension extends Twig_Extension
 		));
 	}
 	
-	public function getFilterWidgetContent(FilterInterface $filter)
+	public function getFilterWidgetContent(FilterInterface $filter, $options = null)
 	{
+		if($options !== null && is_array($options))
+		{
+			$filter->setOptions($options);
+		}
+		
 		return $this->template->renderBlock('filter_widget', array(
 			'filter' => $filter
 		));
 	}
 	
-	public function getFilterLabelContent(FilterInterface $filter)
+	public function getFilterLabelContent(FilterInterface $filter, $options = null)
 	{
+		if($options !== null && is_array($options))
+		{
+			$filter->setOptions($options);
+		}
+		
 		return $this->template->renderBlock('filter_label', array(
 			'filter' => $filter
 		));
 	}
 	
-	public function getFilterRowContent(FilterInterface $filter)
+	public function getFilterRowContent(FilterInterface $filter, $options = null)
 	{
+		if($options !== null && is_array($options))
+		{
+			$filter->setOptions($options);
+		}
+		
 		return $this->template->renderBlock('filter_row', array(
 			'filter' => $filter
 		));
