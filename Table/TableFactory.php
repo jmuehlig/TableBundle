@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the TableBundle.
+ *
+ * (c) Jan Mühlig <mail@janmuehlig.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace JGM\TableBundle\Table;
 
 use Doctrine\ORM\EntityManager;
@@ -66,7 +75,7 @@ class TableFactory
 	 * Builds a table by a table type.
 	 * 
 	 * @param AbstractTableType $tableType	TableType.
-	 * @return	Table						Table.
+	 * @return	Table
 	 */
 	public function createTable(AbstractTableType $tableType)
 	{
@@ -84,7 +93,7 @@ class TableFactory
 	 * @param callable		$build	Function for building the table.
 	 * @param string|null	$name	Name of the table.
 	 * 
-	 * @return Table			Table.
+	 * @return Table
 	 */
 	public function createAnonymousTable($entity, $build, $name = 'table')
 	{
