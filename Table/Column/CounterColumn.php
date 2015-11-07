@@ -21,8 +21,15 @@ use JGM\TableBundle\Table\Row\Row;
  */
 class CounterColumn extends AbstractColumn
 {	
+	public function configureOptions(\Symfony\Component\OptionsResolver\OptionsResolver $optionsResolver)
+	{
+		parent::configureOptions($optionsResolver);
+		
+		$optionsResolver->setDefault('prefix', '');
+	}
+	
 	public function getContent(Row $row)
 	{
-		return $row->getCount();
+		return $this->options['prefix'] . $row->getCount();
 	}
 }

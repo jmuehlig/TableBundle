@@ -44,11 +44,46 @@ class JGMTableExtension extends Extension
 		$configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 		
-		$container->setParameter('jgm_table.columns', array_merge($config['columns'], $configuration->getDefaultColumns()));
-		$container->setParameter('jgm_table.filters', array_merge($config['filters'], $configuration->getDefaultFilters()));
+		// Columns.
+		$container->setParameter('jgm_table.columns', array_merge(
+			$config['columns'], 
+			$configuration->getDefaultColumns()
+		));
+		
+		// Filters.
+		$container->setParameter('jgm_table.filters', array_merge(
+				$config['filters'], 
+				$configuration->getDefaultFilters()
+		));
+		
+		// Filter expression.
 		$container->setParameter('jgm_table.filter_expressions', array_merge_recursive(
 			$config['filter_expressions'], 
 			$configuration->getDefaultFilterExpressionManipulators()
+		));
+		
+		// Default table options.
+		$container->setParameter('jgm_table.default_options', array_merge(
+			$config['default_options'], 
+			$configuration->getDefaultOptions()
+		));
+		
+		// Default filter options.
+		$container->setParameter('jgm_table.filter_default_options', array_merge(
+			$config['filter_default_options'], 
+			$configuration->getDefaultFilterButtonOptions()
+		));
+		
+		// Default pagination options.
+		$container->setParameter('jgm_table.pagination_default_options', array_merge(
+			$config['pagination_default_options'], 
+			$configuration->getDefaultPaginationOptions()
+		));
+		
+		// Default order options.
+		$container->setParameter('jgm_table.order_default_options', array_merge(
+			$config['order_default_options'], 
+			$configuration->getDefaultOrderOptions()
 		));
 	}
 	

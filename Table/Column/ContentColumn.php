@@ -40,9 +40,9 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 	protected $contentCallable;
 
 
-	public function setDefaultOptions(OptionsResolver $optionsResolver)
+	public function configureOptions(OptionsResolver $optionsResolver)
 	{
-		parent::setDefaultOptions($optionsResolver);
+		parent::configureOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
 			'content_grabber' => null

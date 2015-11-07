@@ -22,9 +22,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BooleanColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolver $optionsResolver)
+	protected function configureOptions(OptionsResolver $optionsResolver)
 	{
-		parent::setDefaultOptions($optionsResolver);
+		parent::configureOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
 			'true' => '<input type="checkbox" checked="checked" disabled="disabled" />',

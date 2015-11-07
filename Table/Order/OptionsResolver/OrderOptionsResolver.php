@@ -12,6 +12,7 @@
 namespace JGM\TableBundle\Table\Order\OptionsResolver;
 
 use JGM\TableBundle\Table\Order\Model\Order;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -24,15 +25,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OrderOptionsResolver extends OptionsResolver
 {
-	function __construct() 
+	function __construct(ContainerInterface $container) 
 	{
+		$globalDefaults = $container->getParameter('jgm_table.order_default_options');
+		
 		$this->setDefaults(array(
-			'param_direction' => 'direction',
-			'param_column' => 'column',
-			'empty_direction' => 'desc',
-			'empty_column' => null,
-			'class_asc' => '',
-			'class_desc' => ''
+			'param_direction' => $globalDefaults['param_direction'],
+			'param_column' => $globalDefaults['param_column'],
+			'empty_direction' => $globalDefaults['empty_direction'],
+			'empty_column' => $globalDefaults['empty_column'],
+			'class_asc' => $globalDefaults['class_asc'],
+			'class_desc' => $globalDefaults['class_desc']
 		));
 	}
 	
@@ -51,7 +54,10 @@ class OrderOptionsResolver extends OptionsResolver
 			$order['param_column'],
 			$order['empty_direction'],
 			$order['empty_column'],
-			array(Order::DIRECTION_ASC => $order['class_asc'], Order::DIRECTION_DESC => $order['class_desc'])
+			array(
+				Order::DIRECTION_ASC => $order['class_asc'], 
+				Order::DIRECTION_DESC => $order['class_desc']
+			)
 		);
 	}
 }

@@ -398,8 +398,9 @@ class Table
 	protected function resolveOptions($loadData)
 	{
 		// Resolve Options of the table.
-		$optionsResolver = new TableOptionsResolver();
-		$this->tableType->setDefaultOptions($optionsResolver);
+		$optionsResolver = new TableOptionsResolver($this->container);
+		$this->tableType->setDefaultOptions($optionsResolver); // TODO: Remove in v1.2
+		$this->tableType->configureOptions($optionsResolver);
 		$this->options = $optionsResolver->resolve(array());
 		
 		// Resolve options of pagination.
@@ -455,10 +456,11 @@ class Table
 	private function resolvePaginationOptions()
 	{	
 		// Configure the options resolver for the pagination.
-		$paginationOptionsResolver = new PaginationOptionsResolver();
+		$paginationOptionsResolver = new PaginationOptionsResolver($this->container);
 		
 		// Set the defaults by the table type.
-		$this->tableType->setPaginationDefaultOptions($paginationOptionsResolver);
+		$this->tableType->setPaginationDefaultOptions($paginationOptionsResolver); // TODO: Remove in v1.2
+		$this->tableType->configurePaginationOptions($paginationOptionsResolver);
 		
 		// Setup options container.
 		$pagination = $paginationOptionsResolver->toPagination();
@@ -477,8 +479,9 @@ class Table
 	private function resolveOrderOptions()
 	{		
 		// Configure the options resolver for the order options.
-		$sortableOptionsResolver = new OrderOptionsResolver();
-		$this->tableType->setOrderDefaultOptions($sortableOptionsResolver);
+		$sortableOptionsResolver = new OrderOptionsResolver($this->container);
+		$this->tableType->setOrderDefaultOptions($sortableOptionsResolver); // TODO: Remove in v1.2
+		$this->tableType->configureOrderOptions($sortableOptionsResolver);
 		$order = $sortableOptionsResolver->toOrder();
 		if($this->usePrefix)
 		{
@@ -538,10 +541,11 @@ class Table
 	private function resolveFilterOptions()
 	{		
 		// Set button option default values.
-		$filterOptionsResolver = new FilterOptionsResolver();
+		$filterOptionsResolver = new FilterOptionsResolver($this->container);
 		
 		// Set filter options.
-		$this->tableType->setFilterButtonOptions($filterOptionsResolver);
+		$this->tableType->setFilterButtonOptions($filterOptionsResolver); // TODO: Remove in v1.2
+		$this->tableType->configureFilterButtonOptions($filterOptionsResolver);
 
 		// Set up the options container.
 		$filterOptions = $filterOptionsResolver->toFilter();
