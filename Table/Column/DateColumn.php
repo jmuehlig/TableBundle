@@ -23,9 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateColumn extends AbstractColumn
 {
-	public function setDefaultOptions(OptionsResolver $optionsResolver)
+	public function configureOptions(OptionsResolver $optionsResolver)
 	{
-		parent::setDefaultOptions($optionsResolver);
+		parent::configureOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
 			'format' => 'd.m.Y H:i',

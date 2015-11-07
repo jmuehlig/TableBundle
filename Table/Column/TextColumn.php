@@ -23,9 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TextColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolver $optionsResolver)
+	protected function configureOptions(OptionsResolver $optionsResolver)
 	{
-		parent::setDefaultOptions($optionsResolver);
+		parent::configureOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
 			'nl2br' => false,

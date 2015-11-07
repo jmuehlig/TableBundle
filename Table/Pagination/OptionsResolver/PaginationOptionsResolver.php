@@ -12,6 +12,7 @@
 namespace JGM\TableBundle\Table\Pagination\OptionsResolver;
 
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -24,19 +25,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PaginationOptionsResolver extends OptionsResolver
 {
-	function __construct() 
+	function __construct(ContainerInterface $container) 
 	{
+		$globalDefaults = $container->getParameter('jgm_table.pagination_default_options');
+		
 		$this->setDefaults(array(
-			'param' => 'page',
-			'rows_per_page' => 20,
-			'show_empty' => true,
-			'ul_class' => 'pagination',
-			'li_class' => null,
-			'li_class_active' => 'active',
-			'li_class_disabled' => 'disabled',
-			'prev_label' => '&laquo;',
-			'next_label' => '&raquo;',
-			'max_pages' => null
+			'param' => $globalDefaults['param'],
+			'rows_per_page' => $globalDefaults['rows_per_page'],
+			'show_empty' => $globalDefaults['show_empty'],
+			'ul_class' => $globalDefaults['ul_class'],
+			'li_class' => $globalDefaults['li_class'],
+			'li_class_active' => $globalDefaults['li_class_active'],
+			'li_class_disabled' => $globalDefaults['li_class_disabled'],
+			'prev_label' => $globalDefaults['prev_label'],
+			'next_label' => $globalDefaults['next_label'],
+			'max_pages' => $globalDefaults['max_pages']
 		));
 	}
 	

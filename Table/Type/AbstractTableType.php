@@ -12,25 +12,25 @@
 namespace JGM\TableBundle\Table\Type;
 
 use Doctrine\ORM\EntityManager;
-use JGM\TableBundle\Table\DataSource\DataSourceInterface;
+use InvalidArgumentException;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\TableBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * The abstract table type which user defined table types based on.
  * User defined table types have to implement the abstract methods
- * `buildTable`, `getName` and `setDefaultOptions`.
- * Further they can implement the methos `buildQuery`, `refineQuery` 
- * and `getRowAttributes`.
+ * `buildTable`, `getName` and `configureOptions`.
+ * Further they can implement optionally the method `getRowAttributes`.
  * 
  * The table type injects the container and the entity manager.
  * 
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-abstract class AbstractTableType
+abstract class AbstractTableType implements TableTypeInterface
 {
 	/**
 	 * Container
@@ -46,56 +46,72 @@ abstract class AbstractTableType
 	 */
 	protected $entityManager;
 	
+	/**
+	 * {@inheritdoc}
+	 */
 	public final function getContainer()
 	{
 		return $this->container;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public final function getEntityManager()
 	{
 		return $this->entityManager;
 	}
 
-	public final function setContainer(ContainerInterface $container)
+	/**
+	 * {@inheritdoc}
+	 */
+	public final function setContainer(ContainerInterface $container = null)
 	{
 		$this->container = $container;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public final function setEntityManager(EntityManager $entityManager)
 	{
 		$this->entityManager = $entityManager;
 	}
 	
 	/**
-	 * Generates the attributes for a row at
-	 * the given index.
-	 * 
-	 * @param Row $row Row.
-	 * @return array Array with attributes (e.g. class)
+	 * {@inheritdoc}
 	 */
 	public function getRowAttributes(Row $row)
 	{
 		return array();
 	}
-	
-	/**
-	 * Returns the data source, the table gets the data from.
-	 * 
-	 * @return DataSourceInterface
-	 */
-	public abstract function getDataSource(ContainerInterface $container);
 
-	public abstract function buildTable(TableBuilder $builder);
+	/**
+	 * {@inheritdoc}
+	 */
+	public function buildTable(TableBuilder $builder)
+	{
+	}
 	
 	/**
-	 * @return string Name of the table type.
+	 * {@inheritdoc}
 	 */
-	public abstract function getName();
+	public function setDefaultOptions(OptionsResolverInterface $resolver)
+	{
+		if($resolver instanceof OptionsResolver === false)
+		{
+			throw new InvalidArgumentException(
+				"The resolver has to be an instance of 'Symfony\Component\OptionsResolver\OptionsResolver'."
+			);
+		}
+		
+		$this->configureOptions($resolver);
+	}
 	
 	/**
-	 * Sets the default options for the table type.
-	 * 
-	 * @param OptionsResolverInterface $resolver
+	 * {@inheritdoc}
 	 */
-	public abstract function setDefaultOptions(OptionsResolverInterface $resolver);
+	public function configureOptions(OptionsResolver $resolver)
+	{
+	}
 }

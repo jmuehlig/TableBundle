@@ -21,6 +21,13 @@ use JGM\TableBundle\Table\TableException;
  */
 class ReflectionHelper 
 {
+	/**
+	 * Cache for property getter function names.
+	 * 
+	 * @var array
+	 */
+	private static $propertyGetterFunctionCache = array();
+	
 	public static function getPropertyOfEntity($entity, $property)
 	{
 		if(isset($entity->$property))
@@ -33,6 +40,34 @@ class ReflectionHelper
 		}
 		else
 		{
+			$callable = self::getGetterNameOfProperty($entity, $property);
+			if($callable !== null)
+			{
+				return call_user_func($callable);
+			}
+		}
+		
+		TableException::noSuchPorpertyOnEntity($property, $entity);
+	}
+	
+	/**
+	 * Finds the name of the getter of a property of an entity and
+	 * returns its callable.
+	 * 
+	 * @param object $entity	Entity.
+	 * @param string $property	Name of the property.
+	 * @return callable
+	 */
+	private static function getGetterNameOfProperty($entity, $property)
+	{
+		$entityClassName = get_class($entity);
+		if(!array_key_exists($entityClassName, self::$propertyGetterFunctionCache))
+		{
+			self::$propertyGetterFunctionCache[$entityClassName] = array();
+		}
+		
+		if(!array_key_exists($property, self::$propertyGetterFunctionCache[$entityClassName]))
+		{			
 			$propertyName = strtoupper($property[0]) . substr($property, 1);
 
 			$possibleGetter = array(
@@ -46,11 +81,17 @@ class ReflectionHelper
 				$callable = array($entity, $getter);
 				if(is_callable($callable))
 				{
-					return call_user_func($callable);
+					self::$propertyGetterFunctionCache[$entityClassName][$property] = $getter;
+					break;
 				}
 			}
 		}
 		
-		TableException::noSuchPorpertyOnEntity($property, $entity);
+		if(array_key_exists($property, self::$propertyGetterFunctionCache[$entityClassName]))
+		{
+			return array($entity, self::$propertyGetterFunctionCache[$entityClassName][$property]);
+		}
+		
+		return null;
 	}
 }

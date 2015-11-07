@@ -47,6 +47,22 @@ class Configuration implements ConfigurationInterface
 					->end()
 				->end()
 				
+				->arrayNode('default_options')
+					->prototype('scalar')->end()
+				->end()
+				
+				->arrayNode('filter_default_options')
+					->prototype('scalar')->end()
+				->end()
+				
+				->arrayNode('pagination_default_options')
+					->prototype('scalar')->end()
+				->end()
+				
+				->arrayNode('order_default_options')
+					->prototype('scalar')->end()
+				->end()
+				
 			->end();
 
         return $treeBuilder;
@@ -63,6 +79,7 @@ class Configuration implements ConfigurationInterface
 			'entity'	=> 'JGM\TableBundle\Table\Column\EntityColumn',
 			'number'	=> 'JGM\TableBundle\Table\Column\NumberColumn',
 			'text'		=> 'JGM\TableBundle\Table\Column\TextColumn',
+			'twig'		=> 'JGM\TableBundle\Table\Column\TwigColumn',
 			'url'		=> 'JGM\TableBundle\Table\Column\UrlColumn'
 		);
 	}
@@ -88,6 +105,54 @@ class Configuration implements ConfigurationInterface
 				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineMaxExpressionManipulator',
 				'JGM\TableBundle\Table\Filter\ExpressionManipulator\DoctrineAvgExpressionManipulator'
 			)
+		);
+	}
+	
+	public function getDefaultOptions()
+	{
+		return array(
+			'empty_value' => 'No data found.',
+			'attr' => array(),
+			'head_attr' => array(),
+			'hide_empty_columns' => false
+		);
+	}
+	
+	public function getDefaultFilterButtonOptions()
+	{
+		return array(
+			'submit_label' => 'Ok',
+			'submit_attr' => array(),
+			'reset_label' => 'Reset',
+			'reset_attr' => array()
+		);
+	}
+	
+	public function getDefaultOrderOptions()
+	{
+		return array(
+			'param_direction' => 'direction',
+			'param_column' => 'column',
+			'empty_direction' => 'desc',
+			'empty_column' => null,
+			'class_asc' => '',
+			'class_desc' => ''
+		);
+	}
+	
+	public function getDefaultPaginationOptions()
+	{
+		return array(
+			'param' => 'page',
+			'rows_per_page' => 20,
+			'show_empty' => true,
+			'ul_class' => 'pagination',
+			'li_class' => null,
+			'li_class_active' => 'active',
+			'li_class_disabled' => 'disabled',
+			'prev_label' => '&laquo;',
+			'next_label' => '&raquo;',
+			'max_pages' => null	
 		);
 	}
 			

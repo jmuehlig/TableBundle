@@ -12,8 +12,8 @@
 namespace JGM\TableBundle\Table\Filter\OptionsResolver;
 
 use JGM\TableBundle\Table\Filter\Model\Filter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * OptionsResolver for filter options, used to resolve
@@ -24,34 +24,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class FilterOptionsResolver extends OptionsResolver
 {
-	/**
-	 * @var OptionsResolverInterface
-	 */
-	protected $submitButtonResolver;
-	
-	/**
-	 * @var OptionsResolverInterface
-	 */
-	protected $resetLinkResolver;
-	
-			
-	function __construct() 
+	function __construct(ContainerInterface $container) 
 	{
+		$globalDefaults = $container->getParameter('jgm_table.filter_default_options');
+		
 		$this->setDefaults(array(
-			'submit' => array(),
-			'reset' => array()
-		));
-		
-		$this->submitButtonResolver = new OptionsResolver();
-		$this->submitButtonResolver->setDefaults(array(
-			'label' => 'Ok',
-			'attr' => array()
-		));
-		
-		$this->resetLinkResolver = new OptionsResolver();
-		$this->resetLinkResolver->setDefaults(array(
-			'label' => 'Reset',
-			'attr' => array()
+			'submit_label' => $globalDefaults['submit_label'],
+			'reset_label' => $globalDefaults['reset_label'],
+			'submit_attr' => $globalDefaults['submit_attr'],
+			'reset_attr' => $globalDefaults['reset_attr']
 		));
 	}
 	
@@ -62,15 +43,13 @@ class FilterOptionsResolver extends OptionsResolver
 	 */
 	public function toFilter()
 	{
-		$filter = $this->resolve(array());
-		$submit = $this->submitButtonResolver->resolve($filter['submit']);
-		$reset = $this->submitButtonResolver->resolve($filter['reset']);
+		$options = $this->resolve(array());
 		
 		return new Filter(
-			$submit['label'], 
-			$submit['attr'],
-			$reset['label'],
-			$reset['attr']
+			$options['submit_label'], 
+			$options['submit_attr'],
+			$options['reset_label'],
+			$options['reset_attr']
 		);
 	}
 }

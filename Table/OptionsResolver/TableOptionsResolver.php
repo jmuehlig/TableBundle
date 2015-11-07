@@ -11,6 +11,7 @@
 
 namespace JGM\TableBundle\Table\OptionsResolver;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -22,13 +23,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TableOptionsResolver extends OptionsResolver
 {
-	function __construct() 
+	function __construct(ContainerInterface $container) 
 	{
+		$globalDefaults = $container->getParameter('jgm_table.default_options');
+		
 		$this->setDefaults(array(
-			'empty_value' => 'No data found.',
-			'attr' => array(),
-			'head_attr' => array(),
-			'hide_empty_columns' => false
+			'empty_value' => $globalDefaults['empty_value'],
+			'attr' => $globalDefaults['attr'],
+			'head_attr' => $globalDefaults['head_attr'],
+			'hide_empty_columns' => $globalDefaults['hide_empty_columns']
 		));
 		
 		$this->setAllowedTypes(array(

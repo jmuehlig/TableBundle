@@ -23,9 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EntityColumn extends AbstractColumn
 {
-	protected function setDefaultOptions(OptionsResolver $optionsResolver)
+	protected function configureOptions(OptionsResolver $optionsResolver)
 	{
-		parent::setDefaultOptions($optionsResolver);
+		parent::configureOptions($optionsResolver);
 		
 		$optionsResolver->setDefaults(array(
 			'empty_value' => null,

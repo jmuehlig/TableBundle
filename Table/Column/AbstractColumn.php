@@ -100,12 +100,12 @@ abstract class AbstractColumn implements ColumnInterface
 	public function setOptions(array $options)
 	{
 		$this->optionsResolver = new OptionsResolver();
-		$this->setDefaultOptions($this->optionsResolver);
+		$this->configureOptions($this->optionsResolver);
 		
 		$this->options = $this->optionsResolver->resolve($options);
 	}
 	
-	protected function setDefaultOptions(OptionsResolver $optionsResolver)
+	protected function configureOptions(OptionsResolver $optionsResolver)
 	{
 		$optionsResolver->setDefaults(array(
 			'attr' => array(),
