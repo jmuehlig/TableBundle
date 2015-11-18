@@ -48,19 +48,99 @@ class Configuration implements ConfigurationInterface
 				->end()
 				
 				->arrayNode('default_options')
-					->prototype('scalar')->end()
+					->children()
+						->scalarNode('empty_value')
+							->defaultValue('No data found.')
+						->end()
+						->arrayNode('attr')
+							->prototype('scalar')->end()
+						->end()
+						->arrayNode('head_attr')
+							->prototype('scalar')->end()
+						->end()
+						->booleanNode('hide_empty_columns')
+							->defaultFalse()
+						->end()
+					->end()
+					->addDefaultsIfNotSet()
 				->end()
 				
 				->arrayNode('filter_default_options')
-					->prototype('scalar')->end()
+					->children()
+						->scalarNode('submit_label')
+							->defaultValue('Ok')
+						->end()
+						->arrayNode('submit_attr')
+							->prototype('scalar')->end()
+						->end()
+						->booleanNode('Reset')
+							->defaultValue('Reset')
+						->end()
+						->arrayNode('reset_attr')
+							->prototype('scalar')->end()
+						->end()
+					->end()
+					->addDefaultsIfNotSet()
 				->end()
 				
 				->arrayNode('pagination_default_options')
-					->prototype('scalar')->end()
+					->children()
+						->scalarNode('param')
+							->defaultValue('page')
+						->end()
+						->scalarNode('rows_per_page')
+							->defaultValue(20)
+						->end()
+						->scalarNode('show_empty')
+							->defaultTrue()
+						->end()
+						->scalarNode('ul_class')
+							->defaultValue('pagination')
+						->end()
+						->scalarNode('li_class')
+							->defaultValue(null)
+						->end()
+						->scalarNode('li_class_active')
+							->defaultValue('active')
+						->end()
+						->scalarNode('li_class_disabled')
+							->defaultValue('disabled')
+						->end()
+						->scalarNode('prev_label')
+							->defaultValue('&laquo')
+						->end()
+						->scalarNode('next_label')
+							->defaultValue('&raquo')
+						->end()
+						->scalarNode('max_pages')
+							->defaultValue(null)
+						->end()
+					->end()
+					->addDefaultsIfNotSet()
 				->end()
 				
 				->arrayNode('order_default_options')
-					->prototype('scalar')->end()
+					->children()
+						->scalarNode('param_direction')
+							->defaultValue('direction')
+						->end()
+						->scalarNode('param_column')
+							->defaultValue('column')
+						->end()
+						->scalarNode('empty_direction')
+							->defaultValue('desc')
+						->end()
+						->scalarNode('empty_column')
+							->defaultValue(null)
+						->end()
+						->scalarNode('class_asc')
+							->defaultValue('')
+						->end()
+						->scalarNode('class_desc')
+							->defaultValue('')
+						->end()
+					->end()
+					->addDefaultsIfNotSet()
 				->end()
 				
 			->end();
@@ -107,53 +187,4 @@ class Configuration implements ConfigurationInterface
 			)
 		);
 	}
-	
-	public function getDefaultOptions()
-	{
-		return array(
-			'empty_value' => 'No data found.',
-			'attr' => array(),
-			'head_attr' => array(),
-			'hide_empty_columns' => false
-		);
-	}
-	
-	public function getDefaultFilterButtonOptions()
-	{
-		return array(
-			'submit_label' => 'Ok',
-			'submit_attr' => array(),
-			'reset_label' => 'Reset',
-			'reset_attr' => array()
-		);
-	}
-	
-	public function getDefaultOrderOptions()
-	{
-		return array(
-			'param_direction' => 'direction',
-			'param_column' => 'column',
-			'empty_direction' => 'desc',
-			'empty_column' => null,
-			'class_asc' => '',
-			'class_desc' => ''
-		);
-	}
-	
-	public function getDefaultPaginationOptions()
-	{
-		return array(
-			'param' => 'page',
-			'rows_per_page' => 20,
-			'show_empty' => true,
-			'ul_class' => 'pagination',
-			'li_class' => null,
-			'li_class_active' => 'active',
-			'li_class_disabled' => 'disabled',
-			'prev_label' => '&laquo;',
-			'next_label' => '&raquo;',
-			'max_pages' => null	
-		);
-	}
-			
 }

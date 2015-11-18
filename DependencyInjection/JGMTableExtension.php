@@ -63,32 +63,43 @@ class JGMTableExtension extends Extension
 		));
 		
 		// Default table options.
-		$container->setParameter('jgm_table.default_options', array_merge(
-			$config['default_options'], 
-			$configuration->getDefaultOptions()
-		));
+		$container->setParameter('jgm_table.default_options', $config['default_options']);
 		
 		// Default filter options.
-		$container->setParameter('jgm_table.filter_default_options', array_merge(
-			$config['filter_default_options'], 
-			$configuration->getDefaultFilterButtonOptions()
-		));
+		$container->setParameter('jgm_table.filter_default_options', $config['filter_default_options']);
 		
 		// Default pagination options.
-		$container->setParameter('jgm_table.pagination_default_options', array_merge(
-			$config['pagination_default_options'], 
-			$configuration->getDefaultPaginationOptions()
-		));
+		$container->setParameter('jgm_table.pagination_default_options', $config['pagination_default_options']);
 		
 		// Default order options.
-		$container->setParameter('jgm_table.order_default_options', array_merge(
-			$config['order_default_options'], 
-			$configuration->getDefaultOrderOptions()
-		));
+		$container->setParameter('jgm_table.order_default_options', $config['order_default_options']);
 	}
 	
 	public function getAlias()
 	{
 		return 'jgm_table';
 	}
+}
+
+function replace(array $array1, array $array2)
+{
+	print_r($array2);
+	foreach($array1 as $key => $value)
+	{
+		if(array_key_exists($key, $array2))
+		{
+			if(is_array($array1[$key]) && is_array($array2[$key]))
+			{
+				$value = replace($array1[$key], $array2[$key]);
+			}
+			else
+			{
+				$value = $array2[$key];
+			}
+			
+			$array1[$key] = $value;
+		}
+	}
+	
+	return $array1;
 }
