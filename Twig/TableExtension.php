@@ -130,7 +130,7 @@ class TableExtension extends Twig_Extension
 	public function getTableBeginContent(TableView $tableView)
 	{
 		$this->tableView = $tableView;
-		
+
 		return $this->template->renderBlock('table_begin', array(
 			'name' => $tableView->getName(),
 			'attributes' => $tableView->getAttributes()
