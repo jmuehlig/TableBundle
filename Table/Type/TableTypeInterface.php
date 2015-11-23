@@ -78,15 +78,6 @@ interface TableTypeInterface extends ContainerAwareInterface
 	public function getName();
 	
 	/**
-	 * Sets the default options for the table type.
-	 * 
-	 * @param OptionsResolverInterface $resolver
-	 * @deprecated since version	1.1, to be removed in 1.2.
-	 *								Use the method `configureOptions` instead.
-	 */
-	public function setDefaultOptions(OptionsResolverInterface $resolver);
-	
-	/**
 	 * Configure the default options for the table type.
 	 * 
 	 * @since	1.1

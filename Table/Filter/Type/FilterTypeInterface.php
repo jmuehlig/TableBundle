@@ -34,15 +34,6 @@ interface FilterTypeInterface
 	public function buildFilter(FilterBuilder $filterBuilder);
 	
 	/**
-	 * Sets the options for the filter buttons.
-	 * 
-	 * @param OptionsResolverInterface $resolver
-	 * @deprecated since version	1.1, to be removed in 1.2.
-	 *								Use the method `configureFilterButtonOptions` instead.
-	 */
-	public function setFilterButtonOptions(OptionsResolverInterface $resolver);
-	
-	/**
 	 * Configures the options for the filter buttons.
 	 * 
 	 * @param OptionsResolver $resolver
