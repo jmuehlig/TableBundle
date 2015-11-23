@@ -73,7 +73,7 @@ class Configuration implements ConfigurationInterface
 						->arrayNode('submit_attr')
 							->prototype('scalar')->end()
 						->end()
-						->booleanNode('Reset')
+						->booleanNode('reset_label')
 							->defaultValue('Reset')
 						->end()
 						->arrayNode('reset_attr')
