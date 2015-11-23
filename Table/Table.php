@@ -399,7 +399,6 @@ class Table
 	{
 		// Resolve Options of the table.
 		$optionsResolver = new TableOptionsResolver($this->container);
-		$this->tableType->setDefaultOptions($optionsResolver); // TODO: Remove in v1.2
 		$this->tableType->configureOptions($optionsResolver);
 		$this->options = $optionsResolver->resolve(array());
 		
@@ -459,7 +458,6 @@ class Table
 		$paginationOptionsResolver = new PaginationOptionsResolver($this->container);
 		
 		// Set the defaults by the table type.
-		$this->tableType->setPaginationDefaultOptions($paginationOptionsResolver); // TODO: Remove in v1.2
 		$this->tableType->configurePaginationOptions($paginationOptionsResolver);
 		
 		// Setup options container.
@@ -480,7 +478,6 @@ class Table
 	{		
 		// Configure the options resolver for the order options.
 		$sortableOptionsResolver = new OrderOptionsResolver($this->container);
-		$this->tableType->setOrderDefaultOptions($sortableOptionsResolver); // TODO: Remove in v1.2
 		$this->tableType->configureOrderOptions($sortableOptionsResolver);
 		$order = $sortableOptionsResolver->toOrder();
 		if($this->usePrefix)
@@ -544,7 +541,6 @@ class Table
 		$filterOptionsResolver = new FilterOptionsResolver($this->container);
 		
 		// Set filter options.
-		$this->tableType->setFilterButtonOptions($filterOptionsResolver); // TODO: Remove in v1.2
 		$this->tableType->configureFilterButtonOptions($filterOptionsResolver);
 
 		// Set up the options container.

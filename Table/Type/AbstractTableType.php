@@ -96,21 +96,6 @@ abstract class AbstractTableType implements TableTypeInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function setDefaultOptions(OptionsResolverInterface $resolver)
-	{
-		if($resolver instanceof OptionsResolver === false)
-		{
-			throw new InvalidArgumentException(
-				"The resolver has to be an instance of 'Symfony\Component\OptionsResolver\OptionsResolver'."
-			);
-		}
-		
-		$this->configureOptions($resolver);
-	}
-	
-	/**
-	 * {@inheritdoc}
-	 */
 	public function configureOptions(OptionsResolver $resolver)
 	{
 	}

@@ -26,15 +26,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 interface OrderTypeInterface
 {
 	/**
-	 * Sets the options for the order table type.
-	 * 
-	 * @param OptionsResolverInterface $resolver
-	 * @deprecated since version	1.1, to be removed in 1.2.
-	 *								Use the method `configureOrderOptions` instead.
-	 */
-	public function setOrderDefaultOptions(OptionsResolverInterface $resolver);
-	
-	/**
 	 * Configures the default options for the order table type.
 	 * 
 	 * @param OptionsResolver $resolver

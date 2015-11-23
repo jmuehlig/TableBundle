@@ -17,15 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 interface PaginationTypeInterface
 {
 	/**
-	 * Sets the default options for the pagination of the table type.
-	 * 
-	 * @param OptionsResolverInterface $resolver
-	 * @deprecated since version	1.1, to be removed in 1.2.
-	 *								Use the method `configurePaginationOptions` instead.
-	 */
-	public function setPaginationDefaultOptions(OptionsResolverInterface $resolver);
-	
-	/**
 	 * Configures the options for the pagination of the table type.
 	 * 
 	 * @since 1.1
