@@ -179,11 +179,12 @@ class Table
 		// Set up rows, filters and optionsResolver
 		// for the table type.
 		$this->rows = array();
-		$this->options = array();
 	}
 	
-	public function create(AbstractTableType $tableType)
+	public function create(AbstractTableType $tableType, array $options = array())
 	{
+		$this->options = $options;
+		
 		$this->tableBuilder = new TableBuilder($this->container);
 		$this->tableType = $tableType;
 		$this->dataSource = $tableType->getDataSource($this->container);
@@ -400,7 +401,7 @@ class Table
 		// Resolve Options of the table.
 		$optionsResolver = new TableOptionsResolver($this->container);
 		$this->tableType->configureOptions($optionsResolver);
-		$this->options = $optionsResolver->resolve(array());
+		$this->options = $optionsResolver->resolve($this->options);
 		
 		// Resolve options of pagination.
 		if($this->isPaginationProvider())

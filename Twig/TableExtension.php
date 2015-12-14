@@ -22,7 +22,8 @@ use JGM\TableBundle\Table\Utils\UrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig_Environment;
 use Twig_Extension;
-use Twig_Function_Method;
+use Twig_Extension_InitRuntimeInterface;
+use Twig_SimpleFunction;
 use Twig_Template;
 
 /**
@@ -32,7 +33,7 @@ use Twig_Template;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class TableExtension extends Twig_Extension
+class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntimeInterface
 {
 	/**
 	 * @var RendererInterface
@@ -91,30 +92,30 @@ class TableExtension extends Twig_Extension
 	{
 		return array(
 			// Table rendering.
-			'table' => new Twig_Function_Method($this, 'getTableContent', array('is_safe' => array('html'))),
-			'table_begin' => new Twig_Function_Method($this, 'getTableBeginContent', array('is_safe' => array('html'))),
-			'table_head' => new Twig_Function_Method($this, 'getTableHeadContent', array('is_safe' => array('html'))),
-			'table_body' => new Twig_Function_Method($this, 'getTableBodyContent', array('is_safe' => array('html'))),
-			'table_end' => new Twig_Function_Method($this, 'getTableEndContent', array('is_safe' => array('html'))),
-			'table_pagination' => new Twig_Function_Method($this, 'getTablePaginationContent', array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table', array($this, 'getTableContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table_begin', array($this, 'getTableBeginContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table_head', array($this, 'getTableHeadContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table_body', array($this, 'getTableBodyContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table_end', array($this, 'getTableEndContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table_pagination', array($this, 'getTablePaginationContent'), array('is_safe' => array('html'))),
 			
 			// Filter rendering.
-			'filter' => new Twig_Function_Method($this, 'getFilterContent', array('is_safe' => array('html'))),
-			'filter_label' => new Twig_Function_Method($this, 'getFilterLabelContent', array('is_safe' => array('html'))),
-			'filter_widget' => new Twig_Function_Method($this, 'getFilterWidgetContent', array('is_safe' => array('html'))),
-			'filter_row' => new Twig_Function_Method($this, 'getFilterRowContent', array('is_safe' => array('html'))),
-			'filter_rows' => new Twig_Function_Method($this, 'getFilterRowsContent', array('is_safe' => array('html'))),
-			'filter_begin' => new Twig_Function_Method($this, 'getFilterBeginContent', array('is_safe' => array('html'))),
-			'filter_submit_button' => new Twig_Function_Method($this, 'getFilterSubmitButtonContent', array('is_safe' => array('html'))),
-			'filter_reset_link' => new Twig_Function_Method($this, 'getFilterResetLinkContent', array('is_safe' => array('html'))),
-			'filter_end' => new Twig_Function_Method($this, 'getFilterEndContent', array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter', array($this, 'getFilterContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_label', array($this, 'getFilterLabelContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_widget', array($this, 'getFilterWidgetContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_row', array($this, 'getFilterRowContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_rows', array($this, 'getFilterRowsContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_begin', array($this, 'getFilterBeginContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_submit_button', array($this, 'getFilterSubmitButtonContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_reset_link', array($this, 'getFilterResetLinkContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_end', array($this, 'getFilterEndContent'), array('is_safe' => array('html'))),
 			
 			// Some helper methods.
-			'get_url_for_order' => new Twig_Function_Method($this, 'getUrlForOrder'),
-			'get_url_for_page' => new Twig_Function_Method($this, 'getUrlForPage'),
-			'get_url' => new Twig_Function_Method($this, 'getUrl'),
+			new Twig_SimpleFunction ('get_url_for_order', array($this, 'getUrlForOrder')),
+			new Twig_SimpleFunction ('get_url_for_page', array($this, 'getUrlForPage')),
+			new Twig_SimpleFunction ('get_url', array($this, 'getUrl')),
 			
-			'is_identical' => new Twig_Function_Method($this, 'isIdentical'),
+			new Twig_SimpleFunction ('is_identical', array($this, 'isIdentical')),
 		);
 	}
 	

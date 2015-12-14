@@ -77,13 +77,13 @@ class TableFactory
 	 * @param AbstractTableType $tableType	TableType.
 	 * @return	Table
 	 */
-	public function createTable(AbstractTableType $tableType)
+	public function createTable(AbstractTableType $tableType, array $options = array())
 	{
 		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->isMulti);
 		
 		$this->isMulti = true;
 		
-		return $table->create($tableType);
+		return $table->create($tableType, $options);
 	}
 	
 	/**
