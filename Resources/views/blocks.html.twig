@@ -207,7 +207,7 @@
 	
 {% block list_widget_item %}
 {% spaceless %}
-{% if is_identical(itemValue|trans, filter.value) %}
+{% if itemValue|trans is same as(filter.value) %}
 {% set attributes = filter.liActiveAttr %}
 {% else %}
 {% set attributes = filter.liAttr %}
@@ -223,7 +223,7 @@
 <select name="{{ filter.name }}" id="{{ filter.name }}"{{ block('attributes') }}>
 	<option value="{{ filter.defaultValue }}" selected="selected">{{ filter.resetLabel }}</option>
 {% for value,label in values %}
-	<option value="{{ value }}"{% if is_identical(value|trans,filter.value) %} selected="selected"{% endif %}>{{ label }}</option>
+	<option value="{{ value }}"{% if value|trans is same as(filter.value) %} selected="selected"{% endif %}>{{ label }}</option>
 {% endfor %}
 </select>
 {% endspaceless %}
