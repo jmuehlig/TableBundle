@@ -113,9 +113,7 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 			// Some helper methods.
 			new Twig_SimpleFunction ('get_url_for_order', array($this, 'getUrlForOrder')),
 			new Twig_SimpleFunction ('get_url_for_page', array($this, 'getUrlForPage')),
-			new Twig_SimpleFunction ('get_url', array($this, 'getUrl')),
-			
-			new Twig_SimpleFunction ('is_identical', array($this, 'isIdentical')),
+			new Twig_SimpleFunction ('get_url', array($this, 'getUrl'))
 		);
 	}
 	
@@ -384,11 +382,4 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 		
 		return $needsFormEnviroment;
 	}
-	
-	public function isIdentical($obj1, $obj2)
-	{
-		return $obj1 === $obj2;
-	}
 }
-
-?>
