@@ -31,7 +31,10 @@ class TableOptionsResolver extends OptionsResolver
 			'empty_value' => $globalDefaults['empty_value'],
 			'attr' => $globalDefaults['attr'],
 			'head_attr' => $globalDefaults['head_attr'],
-			'hide_empty_columns' => $globalDefaults['hide_empty_columns']
+			'hide_empty_columns' => $globalDefaults['hide_empty_columns'],
+			'use_filter' => $globalDefaults['use_filter'],
+			'use_pagination' => $globalDefaults['use_pagination'],
+			'use_order' => $globalDefaults['use_order']
 		));
 		
 		$this->setAllowedTypes(array(

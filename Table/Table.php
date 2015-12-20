@@ -630,4 +630,14 @@ class Table
 	{
 		return $this->tableType->getName() . '_';
 	}
+	
+	public function handleRequest(Request $request)
+	{
+		if($this->isBuild)
+		{
+			TableException::canNotHandleRequestAfterBild();
+		}
+		
+		$this->request = $request;
+	}
 }

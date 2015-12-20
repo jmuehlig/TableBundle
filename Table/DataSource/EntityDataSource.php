@@ -36,18 +36,33 @@ class EntityDataSource extends QueryBuilderDataSource
 	 * @var callable
 	 */
 	protected $callback;
-	
+
+	/**
+	 * @var string
+	 */
+	protected $alias;
+
 	/**
 	 * @var array
 	 */
 	protected $columnNameMap;
 	
-	public function __construct($entity, $callback = null)
+	public function __construct($entity, $aliasOrCallback = 't', $callbackOrAlias = null)
 	{
 		parent::__construct(null);
 		
 		$this->entity = $entity;
-		$this->callback = $callback;
+		if(is_callable($aliasOrCallback))
+		{
+			$this->alias = 't';
+			$this->callback = $callbackOrAlias;
+		}
+		else
+		{
+			$this->alias = $aliasOrCallback;
+			$this->callback = $callbackOrAlias;
+		}
+		
 		$this->columnNameMap = [];
 	}
 	
@@ -85,7 +100,7 @@ class EntityDataSource extends QueryBuilderDataSource
 		$queryBuilder = $container->get('doctrine')->getManager()->createQueryBuilder();
 		/* @var $queryBuilder QueryBuilder */
 		
-		$queryBuilder->select('t')->from($this->entity, 't');
+		$queryBuilder->select($this->alias)->from($this->entity, $this->alias);
 		
 		foreach($columns as $column)
 		{
