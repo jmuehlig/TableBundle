@@ -225,4 +225,9 @@ class TableException extends \Exception
 	{
 		throw new TableException("Order is not provided. Please use the OrderTypeInterface to add these feature");
 	}
+	
+	public static function canNotHandleRequestAfterBild()
+	{
+		throw new TableException("Can not handle request after build the table.");
+	}
 }

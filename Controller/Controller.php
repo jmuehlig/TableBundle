@@ -11,6 +11,8 @@
 
 namespace JGM\TableBundle\Controller;
 
+use JGM\TableBundle\Table\AnonymousTableBuilder;
+use JGM\TableBundle\Table\Table;
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
 
@@ -27,24 +29,24 @@ class Controller extends SymfonyController
 	 * Builds a table by a table type.
 	 * 
 	 * @param AbstractTableType $tableType	TableType.
-	 * @return	Table						Table.
+	 * @return	Table
 	 */
-	public function createTable(AbstractTableType $tableType)
+	public function createTable(AbstractTableType $tableType, array $options = array())
 	{
-		return $this->get('jgm.table')->createTable($tableType);
+		return $this->get('jgm.table')->createTable($tableType, $options);
 	}
 	
 	/**
-	 * Builds a table based on a anonymous builder function.
+	 * Creats a table builder, which is used to create
+	 * tables without implementing a table type.
 	 * 
-	 * @param string		$entity	Name of the entity.
-	 * @param callable		$build	Function for building the table.
-	 * @param string|null	$name	Name of the table.
+	 * @param string $name	Name of the table.
+	 * @param array $options	Options of the table.
 	 * 
-	 * @return Table			Table.
+	 * @return AnonymousTableBuilder
 	 */
-	public function createAnonymousTable($entity, $build, $name = 'table')
+	public function getTableBuilder($name, array $options = array())
 	{
-		return $this->get('jgm.table')->createAnonymousTable($entity, $build, $name);
+		return $this->get('jgm.table')->getTableBuilder($name, $options);
 	}
 }

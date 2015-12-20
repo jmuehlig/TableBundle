@@ -13,7 +13,6 @@ namespace JGM\TableBundle\Table;
 
 use Doctrine\ORM\EntityManager;
 use JGM\TableBundle\Table\Type\AbstractTableType;
-use JGM\TableBundle\Table\Type\AnonymousTableType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
@@ -75,6 +74,7 @@ class TableFactory
 	 * Builds a table by a table type.
 	 * 
 	 * @param AbstractTableType $tableType	TableType.
+	 * @param array $options	Options of the table.
 	 * @return	Table
 	 */
 	public function createTable(AbstractTableType $tableType, array $options = array())
@@ -87,16 +87,20 @@ class TableFactory
 	}
 	
 	/**
-	 * Builds a table based on a anonymous builder function.
+	 * Creats a table builder, which is used to create
+	 * tables without implementing a table type.
 	 * 
-	 * @param string		$entity	Name of the entity.
-	 * @param callable		$build	Function for building the table.
-	 * @param string|null	$name	Name of the table.
+	 * @param string $name	Name of the table.
+	 * @param array $options	Options of the table.
 	 * 
-	 * @return Table
+	 * @return AnonymousTableBuilder
 	 */
-	public function createAnonymousTable($entity, $build, $name = 'table')
+	public function getTableBuilder($name, array $options = array())
 	{
-		return $this->createTable(new AnonymousTableType($entity, $build, $name));
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->isMulti);
+		
+		$this->isMulti = true;
+		
+		return new AnonymousTableBuilder($name, $options, $table);
 	}
 }
