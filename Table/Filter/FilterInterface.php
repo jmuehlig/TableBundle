@@ -102,4 +102,11 @@ interface FilterInterface
 	 * @return string			Name of the filter widgets block name.
 	 */
 	public function getWidgetBlockName();
+	
+	/**
+	 * Returns True, if the filter is active.
+	 * 
+	 * @return boolean
+	 */
+	public function isActive();
 }

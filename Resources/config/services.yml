@@ -7,7 +7,9 @@ services:
     jgm.table:
         class: JGM\TableBundle\Table\TableFactory
         scope: request
-        arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router"]
+        arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router", "@logger"]
     jgm.url_helper:
         class: JGM\TableBundle\Table\Utils\UrlHelper
         arguments: ["@request_stack","@router"]
+    jgm.table_context:
+        class: JGM\TableBundle\DependencyInjection\Service\TableContext

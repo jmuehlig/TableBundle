@@ -37,9 +37,7 @@ class TableOptionsResolver extends OptionsResolver
 			'use_order' => $globalDefaults['use_order']
 		));
 		
-		$this->setAllowedTypes(array(
-			'attr' => 'array',
-			'head_attr' => 'array'
-		));
+		$this->setAllowedTypes('attr', 'array');
+		$this->setAllowedTypes('head_attr', 'array');
 	}
 }

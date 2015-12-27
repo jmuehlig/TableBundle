@@ -11,6 +11,7 @@
 
 namespace JGM\TableBundle\Table;
 
+use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\Model\Filter;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
@@ -187,6 +188,28 @@ class TableView
 	public function getFilter()
 	{
 		return $this->filter;
+	}
+	
+	/**
+	 * Returns an array of active filters.
+	 * 
+	 * @return array
+	 */
+	public function getActiveFilter()
+	{
+		$filter = array();
+		
+		foreach($this->filter as $filter)
+		{
+			/* @var $filter FilterInterface */
+			
+			if($filter->isActive() === true)
+			{
+				$filter[] = $filter;
+			}
+		}
+		
+		return $filter;
 	}
 
 	public function getEmptyValue()

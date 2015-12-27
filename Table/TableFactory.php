@@ -13,6 +13,7 @@ namespace JGM\TableBundle\Table;
 
 use Doctrine\ORM\EntityManager;
 use JGM\TableBundle\Table\Type\AbstractTableType;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
@@ -55,6 +56,13 @@ class TableFactory
 	private $router;
 	
 	/**
+	 * Logger.
+	 * 
+	 * @var LoggerInterface
+	 */
+	private $logger;
+	
+	/**
 	 * Are there multiple instances of tables
 	 * on this view?
 	 * 
@@ -62,12 +70,13 @@ class TableFactory
 	 */
 	private $isMulti = false;
 	
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger)
 	{
 		$this->container = $container;
 		$this->entityManager = $entityManager;
 		$this->request = $request;
 		$this->router = $router;
+		$this->logger = $logger;
 	}
 	
 	/**
@@ -79,7 +88,7 @@ class TableFactory
 	 */
 	public function createTable(AbstractTableType $tableType, array $options = array())
 	{
-		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->isMulti);
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti);
 		
 		$this->isMulti = true;
 		
@@ -97,7 +106,7 @@ class TableFactory
 	 */
 	public function getTableBuilder($name, array $options = array())
 	{
-		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->isMulti);
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti);
 		
 		$this->isMulti = true;
 		
