@@ -226,7 +226,7 @@ class Table
 		$columns = $this->tableBuilder->getColumns();
 		if(!array_key_exists($columnName, $columns))
 		{
-			TableException::noSuchColumn($columnName);
+			TableException::noSuchColumn($this->getName(), $columnName);
 		}
 		
 		return $columns[$columnName];
@@ -243,7 +243,7 @@ class Table
 		$filters = $this->getFilters();
 		if(!is_array($filters) || !array_key_exists($filterName, $filters))
 		{
-			TableException::noSuchFilter($filterName);
+			TableException::noSuchFilter($this->getName(), $filterName);
 		}
 		
 		return $filters[$filterName];
@@ -537,7 +537,7 @@ class Table
 				
 				if($column === null)
 				{
-					TableException::noSortableColumn();
+					TableException::noSortableColumn($this->getName());
 				}
 			}
 		}
@@ -654,11 +654,21 @@ class Table
 		return $this->tableType->getName() . '_';
 	}
 	
+	public function getName()
+	{
+		if($this->tableType !== null)
+		{
+			return $this->tableType->getName();
+		}
+	
+		return null;
+	}
+	
 	public function handleRequest(Request $request)
 	{
 		if($this->isBuild)
 		{
-			TableException::canNotHandleRequestAfterBild();
+			TableException::canNotHandleRequestAfterBild($this->getName());
 		}
 		
 		$this->request = $request;

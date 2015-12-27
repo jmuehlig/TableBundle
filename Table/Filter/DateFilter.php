@@ -52,7 +52,7 @@ class DateFilter extends AbstractFilter
 			return 'date_text_widget';
 		}
 		
-		TableException::filterWidgetNotFound($this->widget);
+		TableException::filterWidgetNotFound($this->container->get('jgm.table_context')->getCurrentTableName(), $this->widget);
 	}
 	
 	public function setValue(array $value)

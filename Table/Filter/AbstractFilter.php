@@ -106,7 +106,7 @@ abstract class AbstractFilter implements FilterInterface
 	/**
 	 * @var ContainerInterface
 	 */
-	protected $containeInterface;
+	protected $container;
 	
 	/**
 	 * Cache for all available filter expressions.
@@ -132,7 +132,7 @@ abstract class AbstractFilter implements FilterInterface
 	
 	public function __construct(ContainerInterface $container)
 	{
-		$this->containeInterface = $container;
+		$this->container = $container;
 		$this->columnExpressions = array();
 	}
 
@@ -364,7 +364,7 @@ abstract class AbstractFilter implements FilterInterface
 	{
 		if($this->allFilterExpressions === null)
 		{
-			$this->allFilterExpressions = $this->containeInterface->getParameter('jgm_table.filter_expressions');
+			$this->allFilterExpressions = $this->container->getParameter('jgm_table.filter_expressions');
 		}
 		
 		return $this->allFilterExpressions;

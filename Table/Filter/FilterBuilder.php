@@ -51,13 +51,13 @@ class FilterBuilder
 	{
 		if(array_key_exists($name, $this->filters))
 		{
-			TableException::duplicatedFilterName($name);
+			TableException::duplicatedFilterName($this->container->get('jgm.table_context')->getCurrentTableName(), $name);
 		}
 		
 		$type = strtolower($type);
 		if(!array_key_exists($type, $this->registeredFilters))
 		{
-			TableException::filterTypeNotAllowed($type, array_keys($this->registeredFilters));
+			TableException::filterTypeNotAllowed($this->container->get('jgm.table_context')->getCurrentTableName(), $type, array_keys($this->registeredFilters));
 		}
 		
 		$filter = new $this->registeredFilters[$type]($this->container);
@@ -65,7 +65,7 @@ class FilterBuilder
 		
 		if(!$filter instanceof FilterInterface)
 		{
-			TableException::filterClassNotImplementingInterface($filter);
+			TableException::filterClassNotImplementingInterface($this->container->get('jgm.table_context')->getCurrentTableName(), $filter);
 		}
 		
 		$filter->setName($name);

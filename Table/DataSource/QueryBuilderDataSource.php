@@ -78,7 +78,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 	{
 		if($this->queryBuilder === null)
 		{
-			TableException::noQueryBuilder();
+			TableException::noQueryBuilder($container->get('jgm.table_context')->getCurrentTableName());
 		}
 		
 		$queryBuilder = clone $this->queryBuilder;
@@ -110,7 +110,7 @@ class QueryBuilderDataSource implements DataSourceInterface
 	{
 		if($this->queryBuilder === null)
 		{
-			TableException::noQueryBuilder();
+			TableException::noQueryBuilder($container->get('jgm.table_context')->getCurrentTableName());
 		}
 		
 		$queryBuilder = clone $this->queryBuilder;

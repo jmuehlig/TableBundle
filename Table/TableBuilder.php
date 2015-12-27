@@ -76,13 +76,13 @@ class TableBuilder
 	{
 		if(array_key_exists($name, $this->columns))
 		{
-			TableException::duplicatedColumnName($name);
+			TableException::duplicatedColumnName($this->container->get('jgm.table_context')->getCurrentTableName(), $name);
 		}
 		
 		$type = strtolower($type);
 		if(!array_key_exists($type, $this->registeredColumns))
 		{
-			TableException::columnTypeNotAllowed($type);
+			TableException::columnTypeNotAllowed($this->container->get('jgm.table_context')->getCurrentTableName(), $type);
 		}
 		
 		// Check the columns access rights and delete option, if it exists.
