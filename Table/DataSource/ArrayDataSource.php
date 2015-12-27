@@ -213,7 +213,7 @@ class ArrayDataSource implements DataSourceInterface
 			/* @var $filter FilterInterface */
 			
 			$filterValue = $filter->getValue();
-			if($filterValue === null || $filterValue === "")
+			if($filter->isActive() !== true)
 			{
 				continue;
 			}

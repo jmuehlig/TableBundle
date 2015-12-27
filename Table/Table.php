@@ -29,6 +29,7 @@ use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptionsResolver;
 use JGM\TableBundle\Table\Pagination\Type\PaginationTypeInterface;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Type\AbstractTableType;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -84,6 +85,13 @@ class Table
 	 * @var RouterInterface
 	 */
 	private $router;
+	
+	/**
+	 * Logger.
+	 * 
+	 * @var LoggerInterface
+	 */
+	private $logger;
 	
 	/**
 	 * Table type.
@@ -166,7 +174,7 @@ class Table
 	 * @param RouterInterface $router		Router.
 	 * @param boolean $usePrefix			Should the table use a prefix for filter, pagenination and order?
 	 */
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix = false)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger, $usePrefix = false)
 	{
 		// Save the parameters: Symfonys container, curent request,
 		// url router and doctrines entityManager
@@ -174,6 +182,7 @@ class Table
 		$this->entityManager = $entityManager;
 		$this->request = $request;
 		$this->router = $router;
+		$this->logger = $logger;
 		$this->usePrefix = $usePrefix;
 		
 		// Set up rows, filters and optionsResolver
@@ -183,6 +192,9 @@ class Table
 	
 	public function create(AbstractTableType $tableType, array $options = array())
 	{
+		$this->logger->debug(sprintf("Start creating table, described by table type '%s'", get_class($tableType)));
+		$this->container->get('jgm.table_context')->registerTable($this);
+		
 		$this->options = $options;
 		
 		$this->tableBuilder = new TableBuilder($this->container);
@@ -196,6 +208,9 @@ class Table
 		
 		$this->tableType->setContainer($this->container);
 		$this->tableType->setEntityManager($this->entityManager);
+		
+		$this->container->get('jgm.table_context')->unregisterTable($this);
+		$this->logger->debug(sprintf("Finished creating table, described by table type '%s'", get_class($tableType)));
 		
 		return $this;
 	}
@@ -252,9 +267,12 @@ class Table
 	 */
 	public function createView($loadData = true)
 	{
+		$this->logger->debug(sprintf("Start creating view, described by table type '%s'", get_class($this->tableType)));
+		$this->container->get('jgm.table_context')->registerTable($this);
+		
 		$this->buildTable($loadData);
 		
-		return new TableView(
+		$view = new TableView(
 			$this->tableType->getName(),
 			$this->tableBuilder->getColumns(),
 			$this->rows,
@@ -268,6 +286,11 @@ class Table
 			$this->totalPages,
 			$this->totalItems
 		);
+		
+		$this->container->get('jgm.table_context')->unregisterTable($this);
+		$this->logger->debug(sprintf("Finished creating view, described by table type '%s'", get_class($this->tableType)));
+		
+		return $view;
 	}
 	
 	/**

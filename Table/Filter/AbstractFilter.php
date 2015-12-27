@@ -208,7 +208,7 @@ abstract class AbstractFilter implements FilterInterface
 	 */
 	public function getValue($mode = FilterInterface::FOR_FILTERING)
 	{
-		if(($this->value === null || empty($this->value)) && $this->defaultValue !== null)
+		if($this->isActive() === false && $this->defaultValue !== null)
 		{
 			return $this->defaultValue;
 		}
@@ -368,5 +368,10 @@ abstract class AbstractFilter implements FilterInterface
 		}
 		
 		return $this->allFilterExpressions;
+	}
+	
+	public function isActive()
+	{
+		return $this->value !== null && !empty($this->value);
 	}
 }
