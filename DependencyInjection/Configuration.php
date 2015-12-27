@@ -49,6 +49,9 @@ class Configuration implements ConfigurationInterface
 				
 				->arrayNode('default_options')
 					->children()
+						->scalarNode('template')
+							->defaultValue('JGMTableBundle::blocks.html.twig')
+						->end()
 						->scalarNode('empty_value')
 							->defaultValue('No data found.')
 						->end()

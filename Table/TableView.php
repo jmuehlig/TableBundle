@@ -134,9 +134,17 @@ class TableView
 	 */
 	protected $totalItems;
 	
+	/**
+	 * Name of the template, which
+	 * contains the table-blocks.
+	 * 
+	 * @var string
+	 */
+	protected $templateName;
+	
 	public function __construct($name, array $columns, array $rows,
 		array $filters, $pagination, $order, $filter, $emptyValue, array $attributes,
-		array $headAttributes, $totalPages, $totalItems
+		array $headAttributes, $totalPages, $totalItems, $templateName
 	)
 	{
 		// Set up the class vars.
@@ -152,6 +160,7 @@ class TableView
 		$this->headAttributes	= $headAttributes;
 		$this->totalPages		= $totalPages;
 		$this->totalItems		= $totalItems;
+		$this->templateName		= $templateName;
 	}
 	
 	// Begin of getters for the class vars.
@@ -235,5 +244,10 @@ class TableView
 	public function getTotalItems()
 	{
 		return $this->totalItems;
+	}
+	
+	public function getTemplateName()
+	{
+		return $this->templateName;
 	}
 }

@@ -28,6 +28,7 @@ class TableOptionsResolver extends OptionsResolver
 		$globalDefaults = $container->getParameter('jgm_table.default_options');
 		
 		$this->setDefaults(array(
+			'template' => $globalDefaults['template'],
 			'empty_value' => $globalDefaults['empty_value'],
 			'attr' => $globalDefaults['attr'],
 			'head_attr' => $globalDefaults['head_attr'],
@@ -37,7 +38,13 @@ class TableOptionsResolver extends OptionsResolver
 			'use_order' => $globalDefaults['use_order']
 		));
 		
+		$this->setAllowedTypes('template', 'string');
+		$this->setAllowedTypes('empty_value', array('string', 'null'));
 		$this->setAllowedTypes('attr', 'array');
 		$this->setAllowedTypes('head_attr', 'array');
+		$this->setAllowedTypes('hide_empty_columns', 'boolean');
+		$this->setAllowedTypes('use_filter', 'boolean');
+		$this->setAllowedTypes('use_pagination', 'boolean');
+		$this->setAllowedTypes('use_order', 'boolean');
 	}
 }

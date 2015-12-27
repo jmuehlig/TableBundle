@@ -37,6 +37,13 @@ class OrderOptionsResolver extends OptionsResolver
 			'class_asc' => $globalDefaults['class_asc'],
 			'class_desc' => $globalDefaults['class_desc']
 		));
+		
+		$this->setAllowedTypes('param_direction', 'string');
+		$this->setAllowedTypes('param_column', 'string');
+		$this->setAllowedTypes('empty_direction', 'string');
+		$this->setAllowedTypes('empty_column', array('string', 'null'));
+		$this->setAllowedTypes('class_asc', array('string', 'null'));
+		$this->setAllowedTypes('class_desc', array('string', 'null'));
 	}
 	
 	/**

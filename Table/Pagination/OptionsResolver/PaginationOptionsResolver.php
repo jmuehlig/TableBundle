@@ -41,6 +41,17 @@ class PaginationOptionsResolver extends OptionsResolver
 			'next_label' => $globalDefaults['next_label'],
 			'max_pages' => $globalDefaults['max_pages']
 		));
+		
+		$this->setAllowedTypes('param', 'string');
+		$this->setAllowedTypes('rows_per_page', 'integer');
+		$this->setAllowedTypes('show_empty', 'boolean');
+		$this->setAllowedTypes('ul_class', array('string', 'null'));
+		$this->setAllowedTypes('li_class', array('string', 'null'));
+		$this->setAllowedTypes('li_class_active', array('string', 'null'));
+		$this->setAllowedTypes('li_class_disabled', array('string', 'null'));
+		$this->setAllowedTypes('prev_label', 'string');
+		$this->setAllowedTypes('next_label', 'string');
+		$this->setAllowedTypes('max_pages', array('string', 'null'));
 	}
 	
 	/**
