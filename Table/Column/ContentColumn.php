@@ -57,7 +57,7 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 		
 		if($contentGrabber === null)
 		{
-			TableException::noContentDefined($this->getName());
+			TableException::noContentDefined($this->container->get('jgm.table_context')->getCurrentTableName(), $this->getName());
 		}
 		else if($contentGrabber instanceof ContentGrabberInterface)
 		{
@@ -69,7 +69,7 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 		}
 		else
 		{
-			TableException::noContentDefined($this->getName());
+			TableException::noContentDefined($this->container->get('jgm.table_context')->getCurrentTableName(), $this->getName());
 		}
 	}
 

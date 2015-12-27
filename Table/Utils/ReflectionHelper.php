@@ -47,7 +47,7 @@ class ReflectionHelper
 			}
 		}
 		
-		TableException::noSuchPorpertyOnEntity($property, $entity);
+		TableException::noSuchPropertyOnEntity(null, $property, $entity);
 	}
 	
 	/**

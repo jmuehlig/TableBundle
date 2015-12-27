@@ -64,6 +64,17 @@ class TableContext
 		return null;
 	}
 	
+	public function getCurrentTableName()
+	{
+		$table = $this->getCurrentTable();
+		if($table === null)
+		{
+			return null;
+		}
+		
+		return $table->getName();
+	}
+	
 	/**
 	 * Returns True, if any table is handled.
 	 * 

@@ -49,7 +49,7 @@ class EntityFilter extends AbstractValuedFilter
 	{
 		if($this->entity !== null)
 		{
-			$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
+			$repository = $this->container->get('doctrine')->getRepository($this->entity);
 			/* @var $repository EntityRepository */
 
 			$values = array();
