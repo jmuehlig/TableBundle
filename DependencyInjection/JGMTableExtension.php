@@ -80,26 +80,3 @@ class JGMTableExtension extends Extension
 		return 'jgm_table';
 	}
 }
-
-function replace(array $array1, array $array2)
-{
-	print_r($array2);
-	foreach($array1 as $key => $value)
-	{
-		if(array_key_exists($key, $array2))
-		{
-			if(is_array($array1[$key]) && is_array($array2[$key]))
-			{
-				$value = replace($array1[$key], $array2[$key]);
-			}
-			else
-			{
-				$value = $array2[$key];
-			}
-			
-			$array1[$key] = $value;
-		}
-	}
-	
-	return $array1;
-}

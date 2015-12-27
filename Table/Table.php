@@ -284,7 +284,8 @@ class Table
 			$this->options['attr'],
 			$this->options['head_attr'],
 			$this->totalPages,
-			$this->totalItems
+			$this->totalItems,
+			$this->options['template']
 		);
 		
 		$this->container->get('jgm.table_context')->unregisterTable($this);

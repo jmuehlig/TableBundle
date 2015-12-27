@@ -34,6 +34,11 @@ class FilterOptionsResolver extends OptionsResolver
 			'submit_attr' => $globalDefaults['submit_attr'],
 			'reset_attr' => $globalDefaults['reset_attr']
 		));
+		
+		$this->setAllowedTypes('submit_label', 'string');
+		$this->setAllowedTypes('reset_label', 'string');
+		$this->setAllowedTypes('submit_attr', 'array');
+		$this->setAllowedTypes('reset_attr', 'array');
 	}
 	
 	/**

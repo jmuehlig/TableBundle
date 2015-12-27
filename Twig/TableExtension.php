@@ -33,7 +33,7 @@ use Twig_Template;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntimeInterface
+class TableExtension extends Twig_Extension
 {
 	/**
 	 * @var RendererInterface
@@ -68,44 +68,34 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 		return 'table';
 	}
 	
-	public function initRuntime(Twig_Environment $environment) 
+	protected function init(TableView $tableView, Twig_Environment $environment) 
 	{
-		$this->template = $environment->loadTemplate('JGMTableBundle::blocks.html.twig');
-	}
-	
-	private function getRenderer(TableView $view = null)
-	{
-		if($this->tableRenderer === null)
-		{
-			if($view === null)
-			{
-				return null;
-			}
-			
-			$this->tableRenderer = $view->getTableRenderer();
-		}
+		$this->tableView = $tableView;
 		
-		return $this->tableRenderer;
+		if($this->template === null || $this->template->getTemplateName() !== $tableView->getTemplateName())
+		{
+			$this->template = $environment->loadTemplate($tableView->getTemplateName());
+		}
 	}
 	
 	public function getFunctions()
 	{
 		return array(
 			// Table rendering.
-			new Twig_SimpleFunction ('table', array($this, 'getTableContent'), array('is_safe' => array('html'))),
-			new Twig_SimpleFunction ('table_begin', array($this, 'getTableBeginContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('table', array($this, 'getTableContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
+			new Twig_SimpleFunction ('table_begin', array($this, 'getTableBeginContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
 			new Twig_SimpleFunction ('table_head', array($this, 'getTableHeadContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('table_body', array($this, 'getTableBodyContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('table_end', array($this, 'getTableEndContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('table_pagination', array($this, 'getTablePaginationContent'), array('is_safe' => array('html'))),
 			
 			// Filter rendering.
-			new Twig_SimpleFunction ('filter', array($this, 'getFilterContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter', array($this, 'getFilterContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
 			new Twig_SimpleFunction ('filter_label', array($this, 'getFilterLabelContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('filter_widget', array($this, 'getFilterWidgetContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('filter_row', array($this, 'getFilterRowContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('filter_rows', array($this, 'getFilterRowsContent'), array('is_safe' => array('html'))),
-			new Twig_SimpleFunction ('filter_begin', array($this, 'getFilterBeginContent'), array('is_safe' => array('html'))),
+			new Twig_SimpleFunction ('filter_begin', array($this, 'getFilterBeginContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
 			new Twig_SimpleFunction ('filter_submit_button', array($this, 'getFilterSubmitButtonContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('filter_reset_link', array($this, 'getFilterResetLinkContent'), array('is_safe' => array('html'))),
 			new Twig_SimpleFunction ('filter_end', array($this, 'getFilterEndContent'), array('is_safe' => array('html'))),
@@ -117,18 +107,18 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 		);
 	}
 	
-	public function getTableContent(TableView $tableView)
+	public function getTableContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$this->tableView = $tableView;
+		$this->init($tableView, $environment);
 		
 		return $this->template->renderBlock('table', array(
 			'view' => $tableView,
 		));
 	}
 	
-	public function getTableBeginContent(TableView $tableView)
+	public function getTableBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$this->tableView = $tableView;
+		$this->init($tableView, $environment);
 
 		return $this->template->renderBlock('table_begin', array(
 			'name' => $tableView->getName(),
@@ -145,7 +135,7 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 		
 		// Fill it with sortable parameter names.
 		$sortable = $tableView->getOrder();
-		if($sortable != null)
+		if($sortable !== null)
 		{
 			$paramterNames['column'] = $sortable->getParamColumnName();
 			$paramterNames['direction'] = $sortable->getParamDirectionName();
@@ -153,7 +143,7 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 		
 		// Fill it with the pagination parameter name.
 		$pagination = $tableView->getPagination();
-		if($pagination != null)
+		if($pagination !== null)
 		{
 			$paramterNames['page'] = $pagination->getParameterName();
 		}
@@ -211,15 +201,19 @@ class TableExtension extends Twig_Extension implements Twig_Extension_InitRuntim
 		));
 	}
 	
-	public function getFilterContent(TableView $tableView)
+	public function getFilterContent(Twig_Environment $environment, TableView $tableView)
 	{
+		$this->init($tableView, $environment);
+		
 		return $this->template->renderBlock('filter', array(
 				'view' => $tableView
 		));
 	}
 	
-	public function getFilterBeginContent(TableView $tableView)
+	public function getFilterBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
+		$this->init($tableView, $environment);
+		
 		return $this->template->renderBlock('filter_begin', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
 			'tableName' => $tableView->getName()
