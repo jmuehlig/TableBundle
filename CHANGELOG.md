@@ -1,6 +1,15 @@
 Changelog
 ===========
 
+v1.2
+===
+* New: Profiler Component! Called tables and their duration of building, fetching data and rendering can be viewed at the symfony toolbar and the profiler.
+* New: Create tables without table type from controller, by calling the new table factory.
+* New: Added parameter for table options, passed to TableFactory::createTable, when creating a table from table type.
+* New: Added method Table::handleRequest for passing manipulated requests to tables.
+* New: Added option **template** for declare the name of the template, the table is rendered by. This options gives you more control for creating own templates.
+* Removed deprecation calls from options resolver, called in filter and table component.
+
 v1.1
 ===
 * The filter options can now set from twig template by passing a second parameter to **filter_widget**, **filter_row** and **filter_label** methods.
