@@ -11,6 +11,7 @@
 
 namespace JGM\TableBundle\Twig;
 
+use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
@@ -22,7 +23,6 @@ use JGM\TableBundle\Table\Utils\UrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig_Environment;
 use Twig_Extension;
-use Twig_Extension_InitRuntimeInterface;
 use Twig_SimpleFunction;
 use Twig_Template;
 
@@ -51,6 +51,11 @@ class TableExtension extends Twig_Extension
 	protected $urlHelper;
 	
 	/**
+	 * @var TableStopwatchService
+	 */
+	protected $stopwatchService;
+	
+	/**
 	 * Current rendererd table view.
 	 * 
 	 * @var TableView 
@@ -58,9 +63,10 @@ class TableExtension extends Twig_Extension
 	protected $tableView;
 
 
-	public function __construct(ContainerInterface $container)
+	public function __construct(ContainerInterface $container, TableStopwatchService $stopwatchService)
 	{
 		$this->urlHelper = $container->get('jgm.url_helper');
+		$this->stopwatchService = $stopwatchService;
 	}
 	
 	public function getName()
@@ -118,6 +124,8 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::EVENT_RENDER_TABLE);
+		
 		$this->init($tableView, $environment);
 
 		return $this->template->renderBlock('table_begin', array(
@@ -172,11 +180,17 @@ class TableExtension extends Twig_Extension
 	{
 		$this->tableView = $tableView;
 		
-		return $this->template->renderBlock('table_end', array());
+		$content = $this->template->renderBlock('table_end', array());
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::EVENT_RENDER_TABLE);
+		
+		return $content;
 	}
 	
 	public function getTablePaginationContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::EVENT_RENDER_PAGINATION);
+		
 		$this->tableView = $tableView;
 		
 		$pagination = $tableView->getPagination();
@@ -191,7 +205,7 @@ class TableExtension extends Twig_Extension
 		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $pagination->getMaxPages());
 		/* @var $strategy StrategyInterface */ 
 
-		return $this->template->renderBlock('table_pagination', array(
+		$content = $this->template->renderBlock('table_pagination', array(
 			'currentPage' => $pagination->getCurrentPage(),
 			'prevLabel' => $pagination->getPreviousLabel(),
 			'nextLabel' => $pagination->getNextLabel(),
@@ -199,6 +213,10 @@ class TableExtension extends Twig_Extension
 			'classes' => $pagination->getClasses(),
 			'pages' => $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages())
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::EVENT_RENDER_PAGINATION);
+		
+		return $content;
 	}
 	
 	public function getFilterContent(Twig_Environment $environment, TableView $tableView)
@@ -212,6 +230,8 @@ class TableExtension extends Twig_Extension
 	
 	public function getFilterBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::EVENT_RENDER_FILTER);
+		
 		$this->init($tableView, $environment);
 		
 		return $this->template->renderBlock('filter_begin', array(
@@ -301,9 +321,13 @@ class TableExtension extends Twig_Extension
 	
 	public function getFilterEndContent(TableView $tableView)
 	{
-		return $this->template->renderBlock('filter_end', array(
+		$content = $this->template->renderBlock('filter_end', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView)
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::EVENT_RENDER_FILTER);
+		
+		return $content;
 	}
 	
 	public function getUrl(array $params)

@@ -1,15 +1,9 @@
 services:
     jgm.table.twig:
         class: JGM\TableBundle\Twig\TableExtension
-        arguments: ["@service_container"]
+        arguments: ["@service_container", "@jgm.table_stopwatch"]
         tags:
             - { name: twig.extension }
-    jgm.table:
-        class: JGM\TableBundle\Table\TableFactory
-        scope: request
-        arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router","@logger"]
-        tags:
-            - { name: jgm.table, channel: jgm }
     jgm.url_helper:
         class: JGM\TableBundle\Table\Utils\UrlHelper
         arguments: ["@request_stack","@router"]
@@ -17,6 +11,16 @@ services:
         class: JGM\TableBundle\DependencyInjection\Service\TableContext
     jgm.table_collector:
         class: JGM\TableBundle\DataCollector\TableCollector
+        arguments: ["@jgm.table_stopwatch"]
         public: false
         tags:
             - { name: data_collector, template: 'JGMTableBundle:DataCollector:table_collector', id: 'jgm.table_collector' }
+    jgm.table_stopwatch:
+        class: JGM\TableBundle\DependencyInjection\Service\TableStopwatchService
+        arguments: ["%kernel.debug%"]
+    jgm.table:
+        class: JGM\TableBundle\Table\TableFactory
+        scope: request
+        arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router","@logger","@jgm.table_stopwatch"]
+        tags:
+            - { name: jgm.table, channel: jgm }

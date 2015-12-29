@@ -12,6 +12,7 @@
 namespace JGM\TableBundle\Table;
 
 use Doctrine\ORM\EntityManager;
+use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -63,6 +64,11 @@ class TableFactory
 	private $logger;
 	
 	/**
+	 * @var TableStopwatchService
+	 */
+	private $stopwatchService;
+	
+	/**
 	 * Are there multiple instances of tables
 	 * on this view?
 	 * 
@@ -70,13 +76,14 @@ class TableFactory
 	 */
 	private $isMulti = false;
 	
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger, TableStopwatchService $stopwatchService)
 	{
 		$this->container = $container;
 		$this->entityManager = $entityManager;
 		$this->request = $request;
 		$this->router = $router;
 		$this->logger = $logger;
+		$this->stopwatchService = $stopwatchService;
 	}
 	
 	/**
@@ -88,7 +95,7 @@ class TableFactory
 	 */
 	public function createTable(AbstractTableType $tableType, array $options = array())
 	{
-		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti);
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti, $this->stopwatchService);
 		
 		$this->isMulti = true;
 		
@@ -99,14 +106,14 @@ class TableFactory
 	 * Creats a table builder, which is used to create
 	 * tables without implementing a table type.
 	 * 
-	 * @param string $name	Name of the table.
+	 * @param string $name		Name of the table.
 	 * @param array $options	Options of the table.
 	 * 
 	 * @return AnonymousTableBuilder
 	 */
 	public function getTableBuilder($name, array $options = array())
 	{
-		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti);
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti, $this->stopwatchService);
 		
 		$this->isMulti = true;
 		

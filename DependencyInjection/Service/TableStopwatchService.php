@@ -107,7 +107,7 @@ class TableStopwatchService
 	 * 
 	 * @return int
 	 */
-	public function getDuration()
+	public function getSumDuration()
 	{
 		$duration = 0;
 		foreach($this->events as $events)
@@ -127,7 +127,7 @@ class TableStopwatchService
 	 * 
 	 * @return int
 	 */
-	public function getMemory()
+	public function getSumMemory()
 	{
 		$memory = 0;
 		foreach($this->events as $events)
@@ -140,5 +140,51 @@ class TableStopwatchService
 		}
 		
 		return $memory;
+	}
+	
+	/**
+	 * Returns the amount of tables.
+	 * 
+	 * @return int
+	 */
+	public function getCountTables()
+	{
+		return count($this->events);
+	}
+	
+	public function getStopwatchesData()
+	{
+		$data = array();
+		foreach($this->events as $tableName => $events)
+		{
+			$tableData = array();
+			
+			$tableData['data'] =	$this->getDuration($events, self::EVENT_FETCH_DATA);
+			
+			$tableData['build'] =	$this->getDuration($events, self::EVENT_BUILD_VIEW) +
+									$this->getDuration($events, self::EVENT_CREATE) -
+									$tableData['data'];
+			
+			
+			$tableData['view'] =	$this->getDuration($events, self::EVENT_RENDER_FILTER) + 
+									$this->getDuration($events, self::EVENT_RENDER_TABLE) + 
+									$this->getDuration($events, self::EVENT_RENDER_PAGINATION);
+			
+			$tableData['sum'] =		$tableData['data'] + $tableData['build'] + $tableData['view'];
+			
+			$data[$tableName] = $tableData;
+		}
+		
+		return $data;
+	}
+	
+	protected function getDuration($events, $index)
+	{
+		if(array_key_exists($index, $events) === false || $events[$index] instanceof StopwatchEvent !== true)
+		{
+			return 0;
+		}
+		
+		return $events[$index]->getDuration();
 	}
 }
