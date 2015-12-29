@@ -40,7 +40,7 @@ class DateFilter extends AbstractFilter
 		));
 		
 		$optionsResolver->setAllowedValues('widget', array('text'));
-		$optionsResolver->setAllowedValues('type', array('string', 'date'));
+		$optionsResolver->setAllowedValues('type', array('text', 'date'));
 	}
 
 	public function getWidgetBlockName() 
