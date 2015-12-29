@@ -29,10 +29,8 @@ class ValuedFilter extends AbstractValuedFilter
 		$optionsResolver->setDefaults(array(
 			'values' => array()
 		));
-		
-		$optionsResolver->setAllowedTypes(array(
-			'values' => 'array'
-		));
+	
+		$optionsResolver->setAllowedTypes('values', 'array');
 	}
 	
 	public function getValues()

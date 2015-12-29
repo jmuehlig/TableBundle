@@ -39,10 +39,8 @@ class DateFilter extends AbstractFilter
 			//'days' => range(1,31)
 		));
 		
-		$optionsResolver->setAllowedValues(array(
-			'widget' => array('text'),
-			'type' => array('text', 'date')
-		));
+		$optionsResolver->setAllowedValues('widget', array('text'));
+		$optionsResolver->setAllowedValues('type', array('string', 'date'));
 	}
 
 	public function getWidgetBlockName() 

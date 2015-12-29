@@ -36,10 +36,8 @@ class EntityFilter extends AbstractValuedFilter
 			'entities' => array()
 		));
 		
-		$optionsResolver->setAllowedTypes(array(
-			'order_by' => 'array',
-			'find_by' => 'array',
-		));
+		$optionsResolver->setAllowedTypes('order_by', 'array');
+		$optionsResolver->setAllowedTypes('find_by', 'array');
 	}
 
 	/**
