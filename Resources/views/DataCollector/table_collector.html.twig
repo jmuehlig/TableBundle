@@ -1,0 +1,47 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ include('JGMTableBundle:DataCollector:icon.html.twig') }}
+		<span class="sf-toolbar-value sf-toolbar-status ">0</span>
+		<span class="sf-toolbar-value">in 0.00 ms</span>
+    {% endset %}
+
+    {% set text %}
+		<div class="sf-toolbar-info-piece">
+            <b>Tables</b>
+            <span>0</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Time to build</b>
+            <span>0.00 ms</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+{% endblock %}
+
+{% block head %}
+    {# Optional. Here you can link to or define your own CSS and JS contents. #}
+    {# Use {{ parent() }} to extend the default styles instead of overriding them. #}
+{% endblock %}
+
+{% block menu %}
+    {# This left-hand menu appears when using the full-screen profiler. #}
+    <span class="label">
+        <span class="icon"><img src="..." alt=""/></span>
+        <strong>Request</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {# Optional, for showing the most details. #}
+    <h2>Acceptable Content Types</h2>
+    <table>
+        <tr>
+            <th>Content Type</th>
+        </tr>
+
+    </table>
+{% endblock %}

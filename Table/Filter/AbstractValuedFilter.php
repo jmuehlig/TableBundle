@@ -46,17 +46,13 @@ abstract class AbstractValuedFilter extends AbstractFilter
 			'li_active_attr' => array()
 		));
 
-		$optionsResolver->setAllowedValues(array(
-			'widget' => $this->getAvailableWidgets(),
-		));
+		$optionsResolver->setAllowedValues('widget', $this->getAvailableWidgets());
 		
-		$optionsResolver->setAllowedValues(array(
-//			'li_attr' => 'array',
-//			'li_active_attr' => 'array',
-//			'widget' => 'string',
-//			'reset_pos' => 'integer',
-//			'reset_label' => 'string'
-		));
+		$optionsResolver->setAllowedTypes('li_attr', array('array', null));
+		$optionsResolver->setAllowedTypes('li_active_attr', array('array', null));
+		$optionsResolver->setAllowedTypes('widget', 'string');
+		$optionsResolver->setAllowedTypes('reset_pos', array('integer', null));
+		$optionsResolver->setAllowedTypes('reset_label', array('string', null));
 	}
 	
 	/**

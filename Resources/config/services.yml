@@ -7,9 +7,16 @@ services:
     jgm.table:
         class: JGM\TableBundle\Table\TableFactory
         scope: request
-        arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router", "@logger"]
+        arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router","@logger"]
+        tags:
+            - { name: jgm.table, channel: jgm }
     jgm.url_helper:
         class: JGM\TableBundle\Table\Utils\UrlHelper
         arguments: ["@request_stack","@router"]
     jgm.table_context:
         class: JGM\TableBundle\DependencyInjection\Service\TableContext
+    jgm.table_collector:
+        class: JGM\TableBundle\DataCollector\TableCollector
+        public: false
+        tags:
+            - { name: data_collector, template: 'JGMTableBundle:DataCollector:table_collector', id: 'jgm.table_collector' }
