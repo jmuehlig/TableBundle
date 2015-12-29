@@ -13,6 +13,7 @@ namespace JGM\TableBundle\Table;
 
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
+use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\DataSource\DataSourceInterface;
 use JGM\TableBundle\Table\Filter\FilterBuilder;
@@ -94,6 +95,11 @@ class Table
 	private $logger;
 	
 	/**
+	 * @var TableStopwatchService
+	 */
+	private $stopwatchService;
+	
+	/**
 	 * Table type.
 	 * 
 	 * @var AbstractTableType 
@@ -168,13 +174,14 @@ class Table
 	/**
 	 * Creates a new instance of an table.
 	 * 
-	 * @param ContainerInterface $container	Container.
-	 * @param EntityManager $entityManager	Entity Manager.
-	 * @param Request $request				Current request.
-	 * @param RouterInterface $router		Router.
-	 * @param boolean $usePrefix			Should the table use a prefix for filter, pagenination and order?
+	 * @param ContainerInterface $container				Container.
+	 * @param EntityManager $entityManager				Entity Manager.
+	 * @param Request $request							Current request.
+	 * @param RouterInterface $router					Router.
+	 * @param boolean $usePrefix						Should the table use a prefix for filter, pagenination and order?
+	 * @param TableStopwatchService $stopwatchService	Stopwatch-Service.
 	 */
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger, $usePrefix = false)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger, $usePrefix = false, TableStopwatchService $stopwatchService = null)
 	{
 		// Save the parameters: Symfonys container, curent request,
 		// url router and doctrines entityManager
@@ -184,6 +191,7 @@ class Table
 		$this->router = $router;
 		$this->logger = $logger;
 		$this->usePrefix = $usePrefix;
+		$this->stopwatchService = $stopwatchService;
 		
 		// Set up rows, filters and optionsResolver
 		// for the table type.
@@ -192,7 +200,9 @@ class Table
 	
 	public function create(AbstractTableType $tableType, array $options = array())
 	{
+		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::EVENT_CREATE);
 		$this->logger->debug(sprintf("Start creating table, described by table type '%s'", get_class($tableType)));
+		
 		$this->container->get('jgm.table_context')->registerTable($this);
 		
 		$this->options = $options;
@@ -211,6 +221,8 @@ class Table
 		
 		$this->container->get('jgm.table_context')->unregisterTable($this);
 		$this->logger->debug(sprintf("Finished creating table, described by table type '%s'", get_class($tableType)));
+		
+		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::EVENT_CREATE);
 		
 		return $this;
 	}
@@ -267,7 +279,10 @@ class Table
 	 */
 	public function createView($loadData = true)
 	{
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
+		
 		$this->logger->debug(sprintf("Start creating view, described by table type '%s'", get_class($this->tableType)));
+		
 		$this->container->get('jgm.table_context')->registerTable($this);
 		
 		$this->buildTable($loadData);
@@ -289,7 +304,10 @@ class Table
 		);
 		
 		$this->container->get('jgm.table_context')->unregisterTable($this);
+		
 		$this->logger->debug(sprintf("Finished creating view, described by table type '%s'", get_class($this->tableType)));
+		
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
 		
 		return $view;
 	}
@@ -380,6 +398,9 @@ class Table
 		{
 			return;
 		}
+		
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_FETCH_DATA);
+		
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
 		// For example, the counter should start at 11, if 
@@ -409,6 +430,8 @@ class Table
 		}
 
 		$this->isDataLoaded = true;
+		
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::EVENT_FETCH_DATA);
 	}
 	
 	/**

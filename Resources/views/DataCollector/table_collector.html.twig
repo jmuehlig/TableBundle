@@ -2,20 +2,25 @@
 
 {% block toolbar %}
     {% set icon %}
-        {{ include('JGMTableBundle:DataCollector:icon.html.twig') }}
-		<span class="sf-toolbar-value sf-toolbar-status ">0</span>
-		<span class="sf-toolbar-value">in 0.00 ms</span>
+        <span class="icon">{{ include('JGMTableBundle:DataCollector:icon.html.twig') }}</span>
+		<span class="sf-toolbar-value sf-toolbar-status">{{ collector.count }}</span>
+		<span class="sf-toolbar-value">in {{ collector.duration }} ms</span>
     {% endset %}
 
     {% set text %}
 		<div class="sf-toolbar-info-piece">
             <b>Tables</b>
-            <span>0</span>
+            <span class="sf-toolbar-value sf-toolbar-status">{{ collector.count }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
-            <b>Time to build</b>
-            <span>0.00 ms</span>
+            <b>Build Time</b>
+            <span>{{ collector.duration }} ms</span>
+        </div>
+		
+		<div class="sf-toolbar-info-piece">
+            <b>Memory Usage</b>
+            <span>{{ collector.memory / 1024 / 1024 }} MB</span>
         </div>
     {% endset %}
 
@@ -23,25 +28,38 @@
 {% endblock %}
 
 {% block head %}
-    {# Optional. Here you can link to or define your own CSS and JS contents. #}
-    {# Use {{ parent() }} to extend the default styles instead of overriding them. #}
+    {{ parent() }}
 {% endblock %}
 
 {% block menu %}
-    {# This left-hand menu appears when using the full-screen profiler. #}
     <span class="label">
-        <span class="icon"><img src="..." alt=""/></span>
-        <strong>Request</strong>
+        <span class="icon">
+			{{ include('JGMTableBundle:DataCollector:icon.html.twig') }}
+		</span>
+        <strong>Tables</strong>
+		<span class="count"><span>{{ collector.count }}</span></span>
     </span>
 {% endblock %}
 
 {% block panel %}
-    {# Optional, for showing the most details. #}
-    <h2>Acceptable Content Types</h2>
+    <h2>Tables</h2>
     <table>
         <tr>
-            <th>Content Type</th>
+            <th>Name of TableType</th>
+			<th>Build Time</th>
+			<th>Fetch data Time</th>
+			<th>Render Time</th>
+			<th>Sum</th>
         </tr>
-
+		
+		{% for name,data in collector.stopwatches %}
+			<tr>
+				<td>{{ name }}</td>
+				<td>{{ data.build }} ms</td>
+				<td>{{ data.data }} ms</td>
+				<td>{{ data.view }} ms</td>
+				<td>{{ data.sum }} ms</td>
+			</tr>
+		{% endfor %}
     </table>
 {% endblock %}
