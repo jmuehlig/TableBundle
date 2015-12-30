@@ -33,7 +33,7 @@ class Controller extends SymfonyController
 	 */
 	public function createTable(AbstractTableType $tableType, array $options = array())
 	{
-		return $this->get('jgm.table')->createTable($tableType, $options);
+		return $this->get('jgm.table_factory')->createTable($tableType, $options);
 	}
 	
 	/**
@@ -47,6 +47,6 @@ class Controller extends SymfonyController
 	 */
 	public function getTableBuilder($name, array $options = array())
 	{
-		return $this->get('jgm.table')->getTableBuilder($name, $options);
+		return $this->get('jgm.table_factory')->getTableBuilder($name, $options);
 	}
 }

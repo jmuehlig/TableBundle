@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace JGM\TableBundle\Table;
+namespace JGM\TableBundle\DependencyInjection\Service;
 
 use Doctrine\ORM\EntityManager;
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
+use JGM\TableBundle\Table\Table;
+use JGM\TableBundle\Table\TableTypeBuilder;
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,12 +23,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 
 /**
- * TableFactory for creating tables from controller.
+ * Service TableFactory for creating tables from controller.
  * 
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.0
  */
-class TableFactory
+class TableFactoryService
 {	
 	/**
 	 * Container.
@@ -109,14 +111,14 @@ class TableFactory
 	 * @param string $name		Name of the table.
 	 * @param array $options	Options of the table.
 	 * 
-	 * @return AnonymousTableBuilder
+	 * @return TableTypeBuilder
 	 */
-	public function getTableBuilder($name, array $options = array())
+	public function getTableTypeBuilder($name, array $options = array())
 	{
 		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti, $this->stopwatchService);
 		
 		$this->isMulti = true;
 		
-		return new AnonymousTableBuilder($name, $options, $table);
+		return new TableTypeBuilder($name, $options, $table);
 	}
 }

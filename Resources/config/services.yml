@@ -18,9 +18,10 @@ services:
     jgm.table_stopwatch:
         class: JGM\TableBundle\DependencyInjection\Service\TableStopwatchService
         arguments: ["%kernel.debug%"]
-    jgm.table:
-        class: JGM\TableBundle\Table\TableFactory
+    jgm.table_factory:
+        class: JGM\TableBundle\DependencyInjection\Service\TableFactoryService
         scope: request
         arguments: ["@service_container","@doctrine.orm.entity_manager","@request","@router","@logger","@jgm.table_stopwatch"]
         tags:
             - { name: jgm.table, channel: jgm }
+    jgm.table: '@jgm.table_factory'
