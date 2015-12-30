@@ -172,6 +172,11 @@ class Table
 	private $usePrefix;
 	
 	/**
+	 * @var TableView
+	 */
+	private $view;
+	
+	/**
 	 * Creates a new instance of an table.
 	 * 
 	 * @param ContainerInterface $container				Container.
@@ -203,7 +208,6 @@ class Table
 		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::EVENT_CREATE);
 		$this->logger->debug(sprintf("Start creating table, described by table type '%s'", get_class($tableType)));
 		
-		$this->container->get('jgm.table_context')->registerTable($this);
 		
 		$this->options = $options;
 		
@@ -211,6 +215,7 @@ class Table
 		$this->tableType = $tableType;
 		$this->dataSource = $tableType->getDataSource($this->container);
 		
+		$this->container->get('jgm.table_context')->registerTable($this);
 		if($this->isFilterProvider())
 		{
 			$this->filterBuilder = new FilterBuilder($this->container);
@@ -287,7 +292,7 @@ class Table
 		
 		$this->buildTable($loadData);
 		
-		$view = new TableView(
+		$this->view = new TableView(
 			$this->tableType->getName(),
 			$this->tableBuilder->getColumns(),
 			$this->rows,
@@ -309,7 +314,7 @@ class Table
 		
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
 		
-		return $view;
+		return $this->view;
 	}
 	
 	/**
@@ -696,5 +701,10 @@ class Table
 		}
 		
 		$this->request = $request;
+	}
+	
+	public function getTableView()
+	{
+		return $this->view;
 	}
 }
