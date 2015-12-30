@@ -17,9 +17,17 @@ class TableContext
 	 */
 	protected $tableStack;
 	
+	/**
+	 * List of all registered tables.
+	 * 
+	 * @var array 
+	 */
+	protected $registeredTables;
+	
 	public function __construct()
 	{
 		$this->tableStack = array();
+		$this->registeredTables = array();
 	}
 	
 	/**
@@ -30,6 +38,7 @@ class TableContext
 	public function registerTable(Table $table)
 	{
 		$this->tableStack[] = $table;
+		$this->registeredTables[$table->getName()] = $table;
 	}
 	
 	/**
@@ -83,5 +92,16 @@ class TableContext
 	public function hasTable()
 	{
 		return count($this->tableStack) > 0;
+	}
+	
+	/**
+	 * Returns a list of all registered tables,
+	 * also those tables, who áre unregistered.
+	 * 
+	 * @return array
+	 */
+	public function getAllRegisteredTables()
+	{
+		return $this->registeredTables;
 	}
 }

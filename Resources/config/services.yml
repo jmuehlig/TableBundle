@@ -11,7 +11,7 @@ services:
         class: JGM\TableBundle\DependencyInjection\Service\TableContext
     jgm.table_collector:
         class: JGM\TableBundle\DataCollector\TableCollector
-        arguments: ["@jgm.table_stopwatch"]
+        arguments: ["@jgm.table_context","@jgm.table_stopwatch"]
         public: false
         tags:
             - { name: data_collector, template: 'JGMTableBundle:DataCollector:table_collector', id: 'jgm.table_collector' }
