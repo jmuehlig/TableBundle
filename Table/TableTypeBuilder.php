@@ -224,7 +224,7 @@ class TableTypeBuilder extends AbstractTableType implements PaginationTypeInterf
 	 */
 	public function getTable()
 	{
-		return $this->table->create($this, $this->options);
+		return $this->table->create($this, $this->tableOptions);
 	}
 
 	public function getDataSource(ContainerInterface $container)
