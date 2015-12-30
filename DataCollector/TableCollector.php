@@ -2,6 +2,15 @@
 
 namespace JGM\TableBundle\DataCollector;
 
+/*
+ * This file is part of the TableBundle.
+ *
+ * (c) Jan Mühlig <mail@janmuehlig.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Exception;
 use JGM\TableBundle\DependencyInjection\Service\TableContext;
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
@@ -15,9 +24,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
- * Description of TableCollector
+ * Collector for collecting information of the table bundle
+ * and the builded tables.
+ * Information will be displayed at the debug toolbar and web profiler.
  *
- * @author Jan
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.2
  */
 class TableCollector extends DataCollector
 {

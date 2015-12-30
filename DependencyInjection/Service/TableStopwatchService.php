@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the TableBundle.
+ *
+ * (c) Jan Mühlig <mail@janmuehlig.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace JGM\TableBundle\DependencyInjection\Service;
 
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -109,37 +118,17 @@ class TableStopwatchService
 	 */
 	public function getSumDuration()
 	{
-		$duration = 0;
+		$duration = 0.0;
 		foreach($this->events as $events)
 		{
-			foreach($events as $event)
-			{
-				/* @var $event StopwatchEvent */
-				$duration += $event->getDuration();
-			}
+			$duration +=	$this->getDuration($events, self::EVENT_BUILD_VIEW) +
+							$this->getDuration($events, self::EVENT_CREATE) +
+							$this->getDuration($events, self::EVENT_RENDER_FILTER) + 
+							$this->getDuration($events, self::EVENT_RENDER_TABLE) + 
+							$this->getDuration($events, self::EVENT_RENDER_PAGINATION);
 		}
 		
 		return $duration;
-	}
-	
-	/**
-	 * Calcualtes the memory for all stopped stopwatches.
-	 * 
-	 * @return int
-	 */
-	public function getSumMemory()
-	{
-		$memory = 0;
-		foreach($this->events as $events)
-		{
-			foreach($events as $event)
-			{
-				/* @var $event StopwatchEvent */
-				$memory += $event->getMemory();
-			}
-		}
-		
-		return $memory;
 	}
 	
 	/**
