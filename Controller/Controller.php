@@ -11,8 +11,8 @@
 
 namespace JGM\TableBundle\Controller;
 
-use JGM\TableBundle\Table\AnonymousTableBuilder;
 use JGM\TableBundle\Table\Table;
+use JGM\TableBundle\Table\TableTypeBuilder;
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
 
@@ -37,16 +37,16 @@ class Controller extends SymfonyController
 	}
 	
 	/**
-	 * Creats a table builder, which is used to create
+	 * Creats a table type builder, which is used to create
 	 * tables without implementing a table type.
 	 * 
 	 * @param string $name	Name of the table.
 	 * @param array $options	Options of the table.
 	 * 
-	 * @return AnonymousTableBuilder
+	 * @return TableTypeBuilder
 	 */
-	public function getTableBuilder($name, array $options = array())
+	public function createTableTypeBuilder($name, array $options = array())
 	{
-		return $this->get('jgm.table_factory')->getTableBuilder($name, $options);
+		return $this->get('jgm.table_factory')->createTableTypeBuilder($name, $options);
 	}
 }

@@ -113,7 +113,7 @@ class TableFactoryService
 	 * 
 	 * @return TableTypeBuilder
 	 */
-	public function getTableTypeBuilder($name, array $options = array())
+	public function createTableTypeBuilder($name, array $options = array())
 	{
 		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti, $this->stopwatchService);
 		
