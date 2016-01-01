@@ -147,7 +147,7 @@ class TableBuilder
 	 */
 	private function isAccessGranted($accessOption)
 	{
-		$securityContext = $this->container->get('security.context');
+		$securityContext = $this->container->get('security.authorization_checker');
 		/* @var $securityContext SecurityContextInterface */
 
 		// If we found an array or string, it may be a role or a list of them.

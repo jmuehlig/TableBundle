@@ -11,6 +11,7 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
+use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -47,7 +48,7 @@ class FilterBuilder
 		$this->container = $container;
 	}
 	
-	public function add($type, $name, $options)
+	public function add($type, $name, array $options = array())
 	{
 		if(array_key_exists($name, $this->filters))
 		{
@@ -65,7 +66,10 @@ class FilterBuilder
 		
 		if(!$filter instanceof FilterInterface)
 		{
-			TableException::filterClassNotImplementingInterface($this->container->get('jgm.table_context')->getCurrentTableName(), $filter);
+			TableException::filterClassNotImplementingInterface(
+				$this->container->get('jgm.table_context')->getCurrentTableName(), 
+				$filter
+			);
 		}
 		
 		$filter->setName($name);

@@ -34,14 +34,14 @@ interface DataSourceInterface
 	 * @param Pagination|null					$pagination	Container with all pagination options, null if pagination is not supported.
 	 * @param SortableOptionsContainer|null		$sortable	Container with all sorting options, null if sorting is not supported.
 	 * 
-	 * @return array							Array with data for the table.
+	 * @return array
 	 */
 	public function getData(
 		ContainerInterface $container,
 		array $columns,
 		array $filters = null,
 		Pagination $pagination = null,
-		Order $sortable = null
+		Order $order = null
 	);
 	
 	/**
@@ -51,7 +51,7 @@ interface DataSourceInterface
 	 * @param array								$columns	Array with all columns of the table.
 	 * @param array|null						$filters	Array with all filters of the table, null if filters are not supported.
 	 * 
-	 * @return array							Array with data for the table.
+	 * @return int
 	 */
 	public function getCountItems(
 		ContainerInterface $container,
