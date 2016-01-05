@@ -80,6 +80,10 @@ class TableTypeBuilder extends AbstractTableType implements PaginationTypeInterf
 		$this->filterOptions = array();
 		$this->orderOptions = array();
 		$this->paginationOptions = array();
+		
+		$this->tableOptions['use_filter'] = false;
+		$this->tableOptions['use_order'] = false;
+		$this->tableOptions['use_pagination'] = false;
 	}
 	
 	/**

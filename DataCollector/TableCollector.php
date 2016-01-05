@@ -71,6 +71,11 @@ class TableCollector extends DataCollector
 		{
 			/* @var $table Table */
 			
+			if($table->getTableView() === null)
+			{
+				continue;
+			}
+			
 			$view = array();
 			
 			// Collect Table options.
