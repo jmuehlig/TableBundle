@@ -4,7 +4,7 @@ Changelog
 v1.2
 ===
 * New: Profiler Component! Called tables and their duration of building, fetching data and rendering can be viewed at the symfony toolbar and the profiler. Further will details about the table (options and columns), the components (filter, filter options, pagination options and order options) be displayed at the profiler view. 
-* New: Create tables without table type from controller, by calling the new table factory.
+* New: Create tables without table type from controller, by calling the new table type builder.
 * New: Added parameter for table options, passed to TableFactory::createTable, when creating a table from table type.
 * New: Added method Table::handleRequest for passing manipulated requests to tables.
 * New: Added option **template** for declare the name of the template, the table is rendered by. This options gives you more control for creating own templates.
