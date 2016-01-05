@@ -37,7 +37,7 @@
     "target-dir" : "JGM/TableBundle",
     "extra" : {
     	"branch-alias" : {
-            "dev-master" : "1.2"
+            "dev-master" : "1.2-dev"
         }
     }
 }
