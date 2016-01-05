@@ -216,7 +216,7 @@ class Table
 		$this->dataSource = $tableType->getDataSource($this->container);
 		
 		$this->container->get('jgm.table_context')->registerTable($this);
-		if($this->isFilterProvider())
+		if($this->tableType instanceof FilterTypeInterface)
 		{
 			$this->filterBuilder = new FilterBuilder($this->container);
 		}
@@ -331,6 +331,9 @@ class Table
 		
 		// Build the type (adding all columns).
 		$this->tableType->buildTable($this->tableBuilder);
+		
+		// Resolve all options, defined in the table type.
+		$this->resolveOptions($loadData);
 
 		// Build the filters, if the table type implements 
 		// the FilterInterface
@@ -346,9 +349,6 @@ class Table
 				}
 			}
 		}
-		
-		// Resolve all options, defined in the table type.
-		$this->resolveOptions($loadData);
 		
 		$this->isPreparedForBuild = true;
 	}
@@ -665,17 +665,17 @@ class Table
 	
 	private function isPaginationProvider()
 	{
-		return $this->tableType instanceof PaginationTypeInterface;
+		return $this->tableType instanceof PaginationTypeInterface && $this->options['use_pagination'];
 	}
 	
 	private function isOrderProvider()
 	{
-		return $this->tableType instanceof OrderTypeInterface;
+		return $this->tableType instanceof OrderTypeInterface && $this->options['use_order'];
 	}
 	
 	private function isFilterProvider()
 	{
-		return $this->tableType instanceof FilterTypeInterface;
+		return $this->tableType instanceof FilterTypeInterface && $this->options['use_filter'];
 	}
 	
 	private function getPrefix()
