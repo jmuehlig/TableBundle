@@ -1,6 +1,10 @@
 Changelog
 ===========
 
+v1.2.1
+===
+* Bugfix: Support for EntityDataSource::__contruct with entity and callback as parameters, without alias (alias added in 1.2).
+
 v1.2
 ===
 * New: Profiler Component! Called tables and their duration of building, fetching data and rendering can be viewed at the symfony toolbar and the profiler. Further will details about the table (options and columns), the components (filter, filter options, pagination options and order options) be displayed at the profiler view. 
