@@ -49,7 +49,7 @@ class EntityDataSource extends QueryBuilderDataSource
 	
 	public function __construct($entity, $aliasOrCallback = 't', $callbackOrAlias = null)
 	{
-		// TODO: Remove deprecated constructor with entity and callback, without alias.
+		// TODO: Remove deprecated constructor with entity and callback, without alias at v1.4.
 		parent::__construct(null);
 		
 		$this->entity = $entity;
@@ -57,7 +57,7 @@ class EntityDataSource extends QueryBuilderDataSource
 		if(is_callable($aliasOrCallback))
 		{
 			 @trigger_error(
-				'The signatur ($entity,$callback) of the EntityDataSource Constructor is deprecated sind v1.2 and will be removed in 1.4. Use ($entity,$alias,$callback).',
+				'The signatur ($entity,$callback) of the EntityDataSource Constructor is deprecated since v1.2 and will be removed in 1.4. Use ($entity,$alias,$callback).',
 				E_USER_DEPRECATED
 			);
 			

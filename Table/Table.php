@@ -284,13 +284,22 @@ class Table
 	 */
 	public function createView($loadData = true)
 	{
+		// TODO: Remove parameter $loadData at v1.4.
+		if($loadData !== true)
+		{
+			 @trigger_error(
+				'The signatur ($loadData) of Table::createView is deprecated since v1.2 and will be removed in 1.4. Use table option named "load_data".',
+				E_USER_DEPRECATED
+			);
+		}
+		
 		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
 		
 		$this->logger->debug(sprintf("Start creating view, described by table type '%s'", get_class($this->tableType)));
 		
 		$this->container->get('jgm.table_context')->registerTable($this);
 		
-		$this->buildTable($loadData);
+		$this->buildTable($loadData && $this->options['load_data']);
 		
 		$this->view = new TableView(
 			$this->tableType->getName(),
