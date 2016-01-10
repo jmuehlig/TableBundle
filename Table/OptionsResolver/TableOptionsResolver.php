@@ -35,7 +35,8 @@ class TableOptionsResolver extends OptionsResolver
 			'hide_empty_columns' => $globalDefaults['hide_empty_columns'],
 			'use_filter' => $globalDefaults['use_filter'],
 			'use_pagination' => $globalDefaults['use_pagination'],
-			'use_order' => $globalDefaults['use_order']
+			'use_order' => $globalDefaults['use_order'],
+			'load_data' => $globalDefaults['load_data']
 		));
 		
 		$this->setAllowedTypes('template', 'string');
@@ -46,5 +47,6 @@ class TableOptionsResolver extends OptionsResolver
 		$this->setAllowedTypes('use_filter', 'boolean');
 		$this->setAllowedTypes('use_pagination', 'boolean');
 		$this->setAllowedTypes('use_order', 'boolean');
+		$this->setAllowedTypes('load_data', 'boolean');
 	}
 }
