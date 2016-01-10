@@ -121,14 +121,15 @@ class TableStopwatchService
 	
 	public function getDuration($tableName = null, $category = null)
 	{
-//		echo "<pre>";
-//		print_r($this->events);
-//		echo "</pre>";
+		$events = array();
 		if($tableName !== null)
 		{
 			if($category !== null)
 			{
-				$events = $this->events[$tableName][$category];
+				if(array_key_exists($category, $this->events[$tableName]))
+				{
+					$events = $this->events[$tableName][$category];
+				}
 			}
 			else
 			{
@@ -162,26 +163,6 @@ class TableStopwatchService
 	}
 	
 	/**
-	 * Calcualtes the duration for all stopped stopwatches.
-	 * 
-	 * @return int
-	 */
-	public function getSumDuration()
-	{
-		$duration = 0.0;
-		foreach($this->events as $events)
-		{
-			$duration +=	$this->getDuration($events, self::EVENT_BUILD_VIEW) +
-							$this->getDuration($events, self::EVENT_CREATE) +
-							$this->getDuration($events, self::EVENT_RENDER_FILTER) + 
-							$this->getDuration($events, self::EVENT_RENDER_TABLE) + 
-							$this->getDuration($events, self::EVENT_RENDER_PAGINATION);
-		}
-		
-		return $duration;
-	}
-	
-	/**
 	 * Returns the amount of tables.
 	 * 
 	 * @return int
@@ -191,39 +172,26 @@ class TableStopwatchService
 		return count($this->events);
 	}
 	
+	public function getStoppedTables()
+	{
+		return array_keys($this->events);
+	}
+	
 	public function getStopwatchesData()
 	{
 		$data = array();
-		foreach($this->events as $tableName => $events)
+		foreach($this->getStoppedTables() as $tableName)
 		{
 			$tableData = array();
-			
-			$tableData['data'] =	$this->getDuration($events, self::EVENT_FETCH_DATA);
-			
-			$tableData['build'] =	$this->getDuration($events, self::EVENT_BUILD_VIEW) +
-									$this->getDuration($events, self::EVENT_CREATE) -
-									$tableData['data'];
-			
-			
-			$tableData['view'] =	$this->getDuration($events, self::EVENT_RENDER_FILTER) + 
-									$this->getDuration($events, self::EVENT_RENDER_TABLE) + 
-									$this->getDuration($events, self::EVENT_RENDER_PAGINATION);
-			
-			$tableData['sum'] =		$tableData['data'] + $tableData['build'] + $tableData['view'];
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_CREATE);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_BUILD_VIEW);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_RENDER_TABLE);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_RENDER_FILTER);
+			$tableData[] = $tableData[0] + $tableData[1] + $tableData[2] + $tableData[3];
 			
 			$data[$tableName] = $tableData;
 		}
-		
+
 		return $data;
 	}
-//	
-//	protected function getDuration($events, $index)
-//	{
-//		if(array_key_exists($index, $events) === false || $events[$index] instanceof StopwatchEvent !== true)
-//		{
-//			return 0;
-//		}
-//		
-//		return $events[$index]->getDuration();
-//	}
 }
