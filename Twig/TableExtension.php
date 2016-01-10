@@ -124,18 +124,24 @@ class TableExtension extends Twig_Extension
 	
 	public function getTableBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::EVENT_RENDER_TABLE);
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
 		$this->init($tableView, $environment);
 
-		return $this->template->renderBlock('table_begin', array(
+		$content = $this->template->renderBlock('table_begin', array(
 			'name' => $tableView->getName(),
 			'attributes' => $tableView->getAttributes()
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
+		return $content;
 	}
 	
 	public function getTableHeadContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
 		$this->tableView = $tableView;
 		
 		// Create the route parameter names for each sortable column.
@@ -156,40 +162,52 @@ class TableExtension extends Twig_Extension
 			$paramterNames['page'] = $pagination->getParameterName();
 		}
 		
-		return $this->template->renderBlock('table_head', array(
+		$content = $this->template->renderBlock('table_head', array(
 			'columns' => $tableView->getColumns(),
 			'is_sortable' => $tableView->getOrder() != null,
 			'parameterNames' => $paramterNames,
 			'sort' => $sortable,
 			'pagination' => $pagination
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
+		return $content;
 	}
 	
 	public function getTableBodyContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
 		$this->tableView = $tableView;
 		
-		return $this->template->renderBlock('table_body', array(
+		$content = $this->template->renderBlock('table_body', array(
 			'columns' => $tableView->getColumns(),
 			'rows' => $tableView->getRows(),
 			'emptyValue' => $tableView->getEmptyValue()
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
+		return $content;
 	}
 	
 	public function getTableEndContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
 		$this->tableView = $tableView;
 		
 		$content = $this->template->renderBlock('table_end', array());
 		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::EVENT_RENDER_TABLE);
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
 		return $content;
 	}
 	
 	public function getTablePaginationContent(TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::EVENT_RENDER_PAGINATION);
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
 		$this->tableView = $tableView;
 		
@@ -214,7 +232,7 @@ class TableExtension extends Twig_Extension
 			'pages' => $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages())
 		));
 		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::EVENT_RENDER_PAGINATION);
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
 		return $content;
 	}
@@ -230,28 +248,44 @@ class TableExtension extends Twig_Extension
 	
 	public function getFilterBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::EVENT_RENDER_FILTER);
-		
 		$this->init($tableView, $environment);
 		
-		return $this->template->renderBlock('filter_begin', array(
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		$content = $this->template->renderBlock('filter_begin', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
 			'tableName' => $tableView->getName()
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		return $content;
 	}
 	
 	public function getFilterWidgetContent(FilterInterface $filter)
 	{
-		return $this->template->renderBlock('filter_widget', array(
+		$this->stopwatchService->start($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		$content = $this->template->renderBlock('filter_widget', array(
 			'filter' => $filter
 		));
+		
+		$this->stopwatchService->stop($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		return $content;
 	}
 	
 	public function getFilterLabelContent(FilterInterface $filter)
 	{
-		return $this->template->renderBlock('filter_label', array(
+		$this->stopwatchService->start($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		$content = $this->template->renderBlock('filter_label', array(
 			'filter' => $filter
 		));
+		
+		$this->stopwatchService->stop($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		return $content;
 	}
 	
 	public function getFilterRowContent(FilterInterface $filter)
@@ -284,21 +318,29 @@ class TableExtension extends Twig_Extension
 	
 	public function getFilterSubmitButtonContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
 		$filterOptions = $tableView->getFilter();
 		if($filterOptions === null)
 		{
 			return;
 		}
 		
-		return $this->template->renderBlock('filter_submit_button', array(
+		$content = $this->template->renderBlock('filter_submit_button', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
 			'submitLabel' => $filterOptions->getSubmitLabel(),
 			'attributes' => $filterOptions->getSubmitAttributes()
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		return $content;
 	}
 	
 	public function getFilterResetLinkContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
 		$filterOptions = $tableView->getFilter();
 		if($filterOptions === null)
 		{
@@ -311,21 +353,27 @@ class TableExtension extends Twig_Extension
 			$filterParams[$filter->getName()] = null;
 		}
 		
-		return $this->template->renderBlock('filter_reset_link', array(
+		$content = $this->template->renderBlock('filter_reset_link', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
 			'resetLabel' => $filterOptions->getResetLabel(),
 			'attributes' => $filterOptions->getResetAttributes(),
 			'resetUrl' => $this->urlHelper->getUrlForParameters($filterParams)
 		));
+		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
+		return $content;
 	}
 	
 	public function getFilterEndContent(TableView $tableView)
 	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		
 		$content = $this->template->renderBlock('filter_end', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView)
 		));
 		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::EVENT_RENDER_FILTER);
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}
@@ -387,17 +435,15 @@ class TableExtension extends Twig_Extension
 	
 	protected function getFilterNeedsFormEnviroment(TableView $tableView)
 	{
-		$needsFormEnviroment = false;
 		foreach($tableView->getFilters() as $filter)
 		{
 			/* @var $filter FilterInterface */
 			if($filter->needsFormEnviroment())
 			{
-				$needsFormEnviroment = true;
-				break;
+				return true;
 			}
 		}
 		
-		return $needsFormEnviroment;
+		return false;
 	}
 }

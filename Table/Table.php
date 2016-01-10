@@ -205,7 +205,7 @@ class Table
 	
 	public function create(AbstractTableType $tableType, array $options = array())
 	{
-		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::EVENT_CREATE);
+		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::CATEGORY_CREATE);
 		$this->logger->debug(sprintf("Start creating table, described by table type '%s'", get_class($tableType)));
 		
 		
@@ -227,7 +227,7 @@ class Table
 		$this->container->get('jgm.table_context')->unregisterTable($this);
 		$this->logger->debug(sprintf("Finished creating table, described by table type '%s'", get_class($tableType)));
 		
-		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::EVENT_CREATE);
+		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::CATEGORY_CREATE);
 		
 		return $this;
 	}
@@ -284,7 +284,7 @@ class Table
 	 */
 	public function createView($loadData = true)
 	{
-		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 		
 		// TODO: Remove parameter $loadData at v1.4.
 		if($loadData !== true)
@@ -321,7 +321,7 @@ class Table
 		
 		$this->logger->debug(sprintf("Finished creating view, described by table type '%s'", get_class($this->tableType)));
 		
-		$this->stopwatchService->stop($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 		
 		return $this->view;
 	}
@@ -413,8 +413,6 @@ class Table
 			return;
 		}
 		
-		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_FETCH_DATA);
-		
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
 		// For example, the counter should start at 11, if 
@@ -444,8 +442,6 @@ class Table
 		}
 
 		$this->isDataLoaded = true;
-		
-		$this->stopwatchService->stop($this->getName(), TableStopwatchService::EVENT_FETCH_DATA);
 	}
 	
 	/**
