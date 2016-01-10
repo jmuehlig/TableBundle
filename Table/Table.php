@@ -284,6 +284,8 @@ class Table
 	 */
 	public function createView($loadData = true)
 	{
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
+		
 		// TODO: Remove parameter $loadData at v1.4.
 		if($loadData !== true)
 		{
@@ -293,13 +295,11 @@ class Table
 			);
 		}
 		
-		$this->stopwatchService->start($this->getName(), TableStopwatchService::EVENT_BUILD_VIEW);
-		
 		$this->logger->debug(sprintf("Start creating view, described by table type '%s'", get_class($this->tableType)));
 		
 		$this->container->get('jgm.table_context')->registerTable($this);
 		
-		$this->buildTable($loadData && $this->options['load_data']);
+		$this->buildTable($loadData);
 		
 		$this->view = new TableView(
 			$this->tableType->getName(),
@@ -378,7 +378,7 @@ class Table
 		
 		$this->prepareTableForBuild($loadData);
 		
-		if($loadData === true)
+		if(($loadData && $this->options['load_data']) === true)
 		{
 			$this->loadData();
 		}
@@ -482,7 +482,7 @@ class Table
 			$this->filter = $this->resolveFilterOptions();
 		}
 		
-		if($loadData === true)
+		if($loadData === true && $this->options['load_data'] === true)
 		{
 			// Read total items.
 			$this->totalItems = $this->dataSource->getCountItems(
