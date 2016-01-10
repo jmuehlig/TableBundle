@@ -12,9 +12,18 @@
             <b>Tables</b>
             <span class="sf-toolbar-value sf-toolbar-status">{{ collector.count }}</span>
         </div>
-
-        <div class="sf-toolbar-info-piece">
-            <b>Build Time</b>
+		
+		{% if collector.tableTimes|length > 1 %}
+		{% for tableName, tableData in collector.tableTimes %}
+		<div class="sf-toolbar-info-piece">
+            <b>Table {{ tableName}} </b>
+            <span>{{ tableData.4 }} ms</span>
+        </div>
+		{% endfor %}
+		{% endif %}
+		
+		<div class="sf-toolbar-info-piece">
+            <b>{% if collector.tableTimes|length > 1 %}All Tables{% else %}Time{% endif %}</b>
             <span>{{ collector.duration }} ms</span>
         </div>
 		
@@ -46,23 +55,25 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>Table Stopwatches</h2>
+    <h2>Table Times</h2>
     <table>
         <tr>
             <th>Name of TableType</th>
-			<th>Build Time</th>
-			<th>Fetch data Time</th>
-			<th>Render Time</th>
+			<th>Creation</th>
+			<th>Build View</th>
+			<th>Render Table</th>
+			<th>Render Filter</th>
 			<th>Sum</th>
         </tr>
 		
-		{% for name,data in collector.stopwatches %}
+		{% for name,data in collector.tableTimes %}
 			<tr>
 				<td>{{ name }}</td>
-				<td>{{ data.build }} ms</td>
-				<td>{{ data.data }} ms</td>
-				<td>{{ data.view }} ms</td>
-				<td>{{ data.sum }} ms</td>
+				<td>{{ data.0 }} ms</td>
+				<td>{{ data.1 }} ms</td>
+				<td>{{ data.2 }} ms</td>
+				<td>{{ data.3 }} ms</td>
+				<td>{{ data.4 }} ms</td>
 			</tr>
 		{% else %}
 			<tr>
