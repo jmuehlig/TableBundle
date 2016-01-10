@@ -54,8 +54,8 @@ class TableCollector extends DataCollector
 	{
 		
 		$this->data['count'] = count($this->tableContext->getAllRegisteredTables());
-		$this->data['duration'] = $this->stopwatchService->getSumDuration();
-		$this->data['stopwatches'] = $this->stopwatchService->getStopwatchesData();
+		$this->data['duration'] = $this->stopwatchService->getDuration();
+		$this->data['stopwatches'] = array(); //$this->stopwatchService->getStopwatchesData();
 		
 		if($exception instanceof TableException)
 		{

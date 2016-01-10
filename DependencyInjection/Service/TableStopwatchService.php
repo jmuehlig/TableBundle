@@ -22,12 +22,10 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class TableStopwatchService
 {
-	const EVENT_CREATE = 'creating';
-	const EVENT_BUILD_VIEW = 'build-view';
-	const EVENT_FETCH_DATA = 'fetch-data';
-	const EVENT_RENDER_TABLE = 'render-table';
-	const EVENT_RENDER_PAGINATION = 'render-pagination';
-	const EVENT_RENDER_FILTER = 'render-table';
+	const CATEGORY_CREATE = 'create';
+	const CATEGORY_BUILD_VIEW = 'build-view';
+	const CATEGORY_RENDER_TABLE = 'render-table';
+	const CATEGORY_RENDER_FILTER = 'render-filter';
 	
 	/**
 	 * @var boolean
@@ -43,6 +41,11 @@ class TableStopwatchService
 	 * @var array
 	 */
 	protected $events;
+
+	/**
+	 * @var array
+	 */
+	protected $durations;
 	
 	public function __construct($isDebug)
 	{
@@ -52,12 +55,12 @@ class TableStopwatchService
 	}
 	
 	/**
-	 * Starts the stopwatch for an event of a table.
+	 * Starts the stopwatch for a category of a tables build state.
 	 * 
 	 * @param string $tableName	Name of the table.
-	 * @param string $event		Name of the event.
+	 * @param string $category	Name of the category.
 	 */
-	public function start($tableName, $event)
+	public function start($tableName, $category)
 	{
 		if($this->isDebug === true)
 		{
@@ -66,31 +69,36 @@ class TableStopwatchService
 				$this->stopwatches[$tableName] = new Stopwatch();
 			}
 			
-			$this->stopwatches[$tableName]->start($event);
+			$this->stopwatches[$tableName]->start($category);
 		}
 	}
 	
 	/**
-	 * Stops the table for an event of a table.
+	 * Stops the table for a category of a tables build state.
 	 * 
 	 * @param string $tableName	Name of the table.
-	 * @param string $event		Name of the event.
+	 * @param string $category	Name of the category.
 	 */
-	public function stop($tableName, $event)
+	public function stop($tableName, $category)
 	{
 		if($this->isDebug === true)
 		{
 			$stopwatch = $this->getStopwatch($tableName);
 			/* @var $stopwatch Stopwatch */
 			
-			if($stopwatch !== null && $stopwatch->isStarted($event))
+			if($stopwatch !== null && $stopwatch->isStarted($category))
 			{
 				if(array_key_exists($tableName, $this->events) === false)
 				{
 					$this->events[$tableName] = array();
 				}
 				
-				$this->events[$tableName][$event] = $stopwatch->stop($event);
+				if(array_key_exists($category, $this->events[$tableName]) === false)
+				{
+					$this->events[$tableName][$category] = array();
+				}
+				
+				$this->events[$tableName][$category][] = $stopwatch->stop($category);
 			}
 		}
 	}
@@ -109,6 +117,48 @@ class TableStopwatchService
 		}
 		
 		return $this->stopwatches[$tableName];
+	}
+	
+	public function getDuration($tableName = null, $category = null)
+	{
+//		echo "<pre>";
+//		print_r($this->events);
+//		echo "</pre>";
+		if($tableName !== null)
+		{
+			if($category !== null)
+			{
+				$events = $this->events[$tableName][$category];
+			}
+			else
+			{
+				$events = array();
+				foreach($this->events[$tableName] as $categoryEvents)
+				{
+					$events = array_merge($events, $categoryEvents);
+				}
+			}
+		}
+		else
+		{
+			$events = array();
+			foreach($this->events as $categories)
+			{
+				foreach($categories as $categoryEvents)
+				{
+					$events = array_merge($events, $categoryEvents);
+				}
+			}
+		}
+		
+		$duration = 0.0;
+		foreach($events as $event)
+		{
+			/* @var $event StopwatchEvent */
+			$duration += $event->getDuration();
+		}
+		
+		return $duration;
 	}
 	
 	/**
@@ -166,14 +216,14 @@ class TableStopwatchService
 		
 		return $data;
 	}
-	
-	protected function getDuration($events, $index)
-	{
-		if(array_key_exists($index, $events) === false || $events[$index] instanceof StopwatchEvent !== true)
-		{
-			return 0;
-		}
-		
-		return $events[$index]->getDuration();
-	}
+//	
+//	protected function getDuration($events, $index)
+//	{
+//		if(array_key_exists($index, $events) === false || $events[$index] instanceof StopwatchEvent !== true)
+//		{
+//			return 0;
+//		}
+//		
+//		return $events[$index]->getDuration();
+//	}
 }
