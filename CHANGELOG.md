@@ -1,6 +1,11 @@
 Changelog
 ===========
 
+v1.2.2
+===
+* Improvements for the WebProfiler: Finer measurement of render times (for table and for filters).
+* Bugfix: Table did not set filter values.
+
 v1.2.1
 ===
 * Bugfix: Support for EntityDataSource::__contruct with entity and callback as parameters, without alias (alias added in 1.2).
