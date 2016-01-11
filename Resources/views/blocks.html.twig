@@ -223,7 +223,7 @@
 <select name="{{ filter.name }}" id="{{ filter.name }}"{{ block('attributes') }}>
 	<option value="{{ filter.defaultValue }}" selected="selected">{{ filter.resetLabel }}</option>
 {% for value,label in values %}
-	<option value="{{ value }}"{% if value is same as(filter.value) %} selected="selected"{% endif %}>{{ label }}</option>
+	<option value="{{ value }}"{% if value|trim is same as(filter.value) %} selected="selected"{% endif %}>{{ label }}</option>
 {% endfor %}
 </select>
 {% endspaceless %}
