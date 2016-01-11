@@ -342,8 +342,8 @@ class Table
 		$this->tableType->buildTable($this->tableBuilder);
 		
 		// Resolve all options, defined in the table type.
-		$this->resolveOptions($loadData);
-
+		$this->resolveOptions();
+		
 		// Build the filters, if the table type implements 
 		// the FilterInterface
 		if($this->isFilterProvider())
@@ -357,7 +357,24 @@ class Table
 					$filter->setName(sprintf("%s%s", $this->getPrefix(), $filter->getName()));
 				}
 			}
+			
+			// Sets value of all filters.
+			foreach($this->getFilters() as $filter)
+			{
+				/* @var $filter FilterInterface */
+
+				$values = array();
+
+				foreach($filter->getParameterNames() as $parameterName)
+				{
+					$values[$parameterName] = trim((string) $this->request->query->get($parameterName, ''));
+				}
+
+				$filter->setValue($values);
+			}
 		}
+		
+		$this->loadTotalItems($loadData);
 		
 		$this->isPreparedForBuild = true;
 	}
@@ -445,15 +462,13 @@ class Table
 	}
 	
 	/**
-	 * Resolves the table type options by defining some
+	 * Resolves the table options by defining some
 	 * default options and passing the resolver to the
 	 * table type.
 	 * 
 	 * Options are stored in the $options class var.
-	 * 
-	 * @param boolean $loadData	Load data?
 	 */
-	protected function resolveOptions($loadData)
+	protected function resolveOptions()
 	{
 		// Resolve Options of the table.
 		$optionsResolver = new TableOptionsResolver($this->container);
@@ -477,7 +492,19 @@ class Table
 		{
 			$this->filter = $this->resolveFilterOptions();
 		}
-		
+	}
+	
+	/**
+	 * Loads the number of total items and configures
+	 * the current page and total pages of the pagination 
+	 * component.
+	 * 
+	 * @param boolean $loadData
+	 * 
+	 * @throws NotFoundHttpException	If the given current page is unavailable.
+	 */
+	protected function loadTotalItems($loadData = true)
+	{
 		if($loadData === true && $this->options['load_data'] === true)
 		{
 			// Read total items.
@@ -603,22 +630,7 @@ class Table
 
 		// Set up the options container.
 		$filterOptions = $filterOptionsResolver->toFilter();
-		
-		// Sets value of all filters.
-		foreach($this->getFilters() as $filter)
-		{
-			/* @var $filter FilterInterface */
-			
-			$values = array();
-			
-			foreach($filter->getParameterNames() as $parameterName)
-			{
-				$values[$parameterName] = trim((string) $this->request->query->get($parameterName, ''));
-			}
-			
-			$filter->setValue($values);
-		}
-		
+
 		return $filterOptions;
 	}
 	
@@ -664,7 +676,7 @@ class Table
 		{
 			return array();
 		}
-		
+
 		return $this->filterBuilder->getFilters();
 	}
 	

@@ -17,7 +17,7 @@
 		{% for tableName, tableData in collector.tableTimes %}
 		<div class="sf-toolbar-info-piece">
             <b>Table {{ tableName}} </b>
-            <span>{{ tableData.4 }} ms</span>
+            <span{% if tableData.4 > 1000 %} class="sf-toolbar-status sf-toolbar-status-yellow"{% endif %}>{{ tableData.4 }} ms</span>
         </div>
 		{% endfor %}
 		{% endif %}
