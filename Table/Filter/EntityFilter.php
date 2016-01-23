@@ -65,14 +65,4 @@ class EntityFilter extends AbstractValuedFilter
 		
 		return array();
 	}
-//	
-//	public function getValue()
-//	{
-//		$id = parent::getValue();
-//		
-//		$repository = $this->containeInterface->get('doctrine')->getRepository($this->entity);
-//		/* @var $repository EntityRepository */
-//		
-//		return $repository->findOneBy(array('id' => $id));
-//	}
 }

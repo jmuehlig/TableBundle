@@ -131,7 +131,8 @@ abstract class AbstractColumn implements ColumnInterface
 		
 		$properties = explode(".", $columnName);
 		$value = $row->get($properties[0]);
-		for($i = 1; $i < count($properties); $i++)
+		$countProperties = count($properties);
+		for($i = 1; $i < $countProperties; $i++)
 		{
 			if($value === null)
 			{

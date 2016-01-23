@@ -164,7 +164,7 @@ class TableExtension extends Twig_Extension
 		
 		$content = $this->template->renderBlock('table_head', array(
 			'columns' => $tableView->getColumns(),
-			'is_sortable' => $tableView->getOrder() != null,
+			'is_sortable' => $tableView->getOrder() !== null,
 			'parameterNames' => $paramterNames,
 			'sort' => $sortable,
 			'pagination' => $pagination

@@ -31,7 +31,7 @@ class Controller extends SymfonyController
 	 * @param AbstractTableType $tableType	TableType.
 	 * @return	Table
 	 */
-	public function createTable(AbstractTableType $tableType, array $options = array())
+	protected function createTable(AbstractTableType $tableType, array $options = array())
 	{
 		return $this->get('jgm.table_factory')->createTable($tableType, $options);
 	}
@@ -40,12 +40,14 @@ class Controller extends SymfonyController
 	 * Creats a table type builder, which is used to create
 	 * tables without implementing a table type.
 	 * 
+	 * @since	1.2
+	 * 
 	 * @param string $name	Name of the table.
 	 * @param array $options	Options of the table.
 	 * 
 	 * @return TableTypeBuilder
 	 */
-	public function createTableTypeBuilder($name, array $options = array())
+	protected function createTableTypeBuilder($name, array $options = array())
 	{
 		return $this->get('jgm.table_factory')->createTableTypeBuilder($name, $options);
 	}
