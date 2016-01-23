@@ -19,6 +19,7 @@ use JGM\TableBundle\Table\Type\AbstractTableType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 
@@ -78,11 +79,11 @@ class TableFactoryService
 	 */
 	private $isMulti = false;
 	
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger, TableStopwatchService $stopwatchService)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, RequestStack $requestStack, RouterInterface $router, LoggerInterface $logger, TableStopwatchService $stopwatchService)
 	{
 		$this->container = $container;
 		$this->entityManager = $entityManager;
-		$this->request = $request;
+		$this->request = $requestStack->getCurrentRequest();
 		$this->router = $router;
 		$this->logger = $logger;
 		$this->stopwatchService = $stopwatchService;
