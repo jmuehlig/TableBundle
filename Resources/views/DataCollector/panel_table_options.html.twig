@@ -1,0 +1,23 @@
+<tr>
+	<th>Table options</th>
+	<td>
+		<table>
+			<tr>
+				<th>Template name</th>
+				<td>{{ tableView.table_options.template_name }}</td>
+			</tr>
+			<tr>
+				<th>Empty value</th>
+				<td>{{ tableView.table_options.empty_value }}</td>
+			</tr>
+			<tr>
+				<th>Head Attributes</th>
+				<td>{{ tableView.table_options.attributes|join(', ')|default('-') }}</td>
+			</tr>
+			<tr>
+				<th>Attributes</th>
+				<td>{{ tableView.table_options.attributes|join(', ')|default('-') }}</td>
+			</tr>
+		</table>
+	</td>
+</tr>

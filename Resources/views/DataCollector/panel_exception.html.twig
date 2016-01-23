@@ -1,0 +1,6 @@
+<h2>Exception</h2>
+{% if collector.exception is null %}
+	<p>No Table Exception has been thrown.</p>
+{% else %}
+	<p>{{ collection.exception.message }}</p>
+{% endif %}

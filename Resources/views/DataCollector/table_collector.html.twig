@@ -2,7 +2,7 @@
 
 {% block toolbar %}
     {% set icon %}
-        <span class="icon">{{ include('JGMTableBundle:DataCollector:icon.html.twig') }}</span>
+        <span class="icon">{{ include('JGMTableBundle:DataCollector:icon.svg.twig') }}</span>
 		<span class="sf-toolbar-value sf-toolbar-status{% if not collector.exception is null %} sf-toolbar-status-red{% elseif collector.duration > 1000 %} sf-toolbar-status-yellow{% endif %}">{{ collector.count }}</span>
 		<span class="sf-toolbar-value">in {{ collector.duration }} ms</span>
     {% endset %}
@@ -47,7 +47,7 @@
 {% block menu %}
     <span class="label">
         <span class="icon">
-			{{ include('JGMTableBundle:DataCollector:icon.html.twig') }}
+			{{ include('JGMTableBundle:DataCollector:icon.svg.twig') }}
 		</span>
         <strong>Tables</strong>
 		<span class="count"><span>{{ collector.count }}</span></span>
@@ -55,225 +55,31 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>Table Times</h2>
-    <table>
-        <tr>
-            <th>Name of TableType</th>
-			<th>Creation</th>
-			<th>Build View</th>
-			<th>Render Table</th>
-			<th>Render Filter</th>
-			<th>Sum</th>
-        </tr>
-		
-		{% for name,data in collector.tableTimes %}
-			<tr>
-				<td>{{ name }}</td>
-				<td>{{ data.0 }} ms</td>
-				<td>{{ data.1 }} ms</td>
-				<td>{{ data.2 }} ms</td>
-				<td>{{ data.3 }} ms</td>
-				<td>{{ data.4 }} ms</td>
-			</tr>
-		{% else %}
-			<tr>
-				<td colspan="5">No tables defined.</td>
-			</tr>
-		{% endfor %}
-    </table>
-	
-	<h2>Exception</h2>
-	{% if collector.exception is null %}
-		<p>No Table Exception has been thrown.</p>
-	{% else %}
-		<p>{{ collection.exception.message }}</p>
-	{% endif %}
+    {{ include('JGMTableBundle:DataCollector:panel_times.html.twig') }}
+	{{ include('JGMTableBundle:DataCollector:panel_exception.html.twig') }}
 	
 	{% if collector.tables|length > 0 %}
 		<h2>Table Details</h2>
 		{% for name,tableView in collector.tables %}
 			<h3>{{ name }}</h3>
 			<table>
-				<tr>
-					<th>Table options</th>
-					<td>
-						<table>
-							<tr>
-								<th>Template name</th>
-								<td>{{ tableView.table_options.template_name }}</td>
-							</tr>
-							<tr>
-								<th>Empty value</th>
-								<td>{{ tableView.table_options.empty_value }}</td>
-							</tr>
-							<tr>
-								<th>Head Attributes</th>
-								<td>{{ tableView.table_options.attributes|join(', ')|default('-') }}</td>
-							</tr>
-							<tr>
-								<th>Attributes</th>
-								<td>{{ tableView.table_options.attributes|join(', ')|default('-') }}</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<th>Columns</th>
-					<td>
-						<table>
-							<tr>
-								<th>Class</th>
-								<th>Name</th>
-								<th>Label</th>
-								<th>Head Attributes</th>
-								<th>Attributes</th>
-								<th>Sortable?</th>
-							</tr>
-						{% for column in tableView.columns %}
-							<tr>
-								<td><code>{{ column.class }}</code></td>
-								<td>{{ column.name }}</td>
-								<td>{{ column.label }}</td>
-								<td>{{ column.head_attributes|join(', ')|default('-') }}</td>
-								<td>{{ column.attributes|join(', ')|default('-') }}</td>
-								<td>{% if column.sortable %}Yes{% else %}No{% endif %}</td>
-							</tr>
-						{% endfor %}
-						</table>
-					</td>
-				</tr>
-				{% if tableView.filters|length > 0 %}
-					<tr>
-						<th>Filters</th>
-						<td>
-							<table>
-								<tr>
-									<th>Class</th>
-									<th>Name</th>
-									<th>Columns</th>
-									<th>Label</th>
-									<th>Attributes</th>
-									<th>Value</th>
-									<th>Active?</th>
-								</tr>
-							{% for filter in tableView.filters %}
-								<tr>
-									<td><code>{{ filter.class }}</code></td>
-									<td>{{ filter.name }}</td>
-									<td>{{ filter.columns|join(', ') }}</td>
-									<td>{{ filter.label }}</td>
-									<td>{{ filter.attributes|join(', ')|default('-') }}</td>
-									<td>{{ filter.value }}</td>
-									<td>{% if filter.active %}Yes{% else %}No{% endif %}</td>
-								</tr>
-							{% endfor %}
-							</table>
-						</td>
-					</tr>
-				{% endif %}
-				{% if tableView.filter_options is defined %}
-					<tr>
-						<th>Filter options</th>
-						<td>
-							<table>
-								<tr>
-									<th>Label of Submit-Button</th>
-									<td>{{ tableView.filter_options.submit_label }}</td>
-								</tr>
-								<tr>
-									<th>Attributes of Submit-Button</th>
-									<td>{{ tableView.filter_options.submit_attributes|join(', ') }}</td>
-								</tr>
-								<tr>
-									<th>Label of Reset-Link</th>
-									<td>{{ tableView.filter_options.reset_label }}</td>
-								</tr>
-								<tr>
-									<th>Attributes of Reset-Link</th>
-									<td>{{ tableView.filter_options.reset_attributes|join(', ') }}</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				{% endif %}
-				{% if tableView.pagination_options is defined %}
-					<tr>
-						<th>Pagination options</th>
-						<td>
-							<table>
-								<tr>
-									<th>GET Parameter name</th>
-									<td>{{ tableView.pagination_options.parameter_name }}</td>
-								</tr>
-								<tr>
-									<th>Current Page</th>
-									<td>{{ tableView.pagination_options.current_page }}</td>
-								</tr>
-								<tr>
-									<th>Items per row</th>
-									<td>{{ tableView.pagination_options.items_per_row }}</td>
-								</tr>
-								<tr>
-									<th>Maximal Pages, shown at the pagination</th>
-									<td>{% if tableView.pagination_options.max_pages is null %}all shown{% else %}{{ tableView.pagination_otpions.max_pages }}{% endif %}</td>
-								</tr>
-								<tr>
-									<th>CSS Classes</th>
-									<td>{{ tableView.pagination_options.css_classes|join(' ; ') }}</td>
-								</tr>
-								<tr>
-									<th>Label for 'Next page'-Button</th>
-									<td>{{ tableView.pagination_options.next_label }}</td>
-								</tr>
-								<tr>
-									<th>Label for 'Previous page'-Button</th>
-									<td>{{ tableView.pagination_options.prev_label }}</td>
-								</tr>
-								<tr>
-									<th>Show empty pagination (empty = only one page)?</th>
-									<td>{% if tableView.pagination_options.show_empty %}Yes{% else %}No{% endif %}</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				{% endif %}
-				{% if tableView.order_options is defined %}
-					<tr>
-						<th>Order options</th>
-						<td>
-							<table>
-								<tr>
-									<th>GET Column-Parameter name</th>
-									<td>{{ tableView.order_options.param_column }}</td>
-								</tr>
-								<tr>
-									<th>Empty column value</th>
-									<td>{{ tableView.order_options.empty_column }}</td>
-								</tr>
-								<tr>
-									<th>Current column value</th>
-									<td>{{ tableView.order_options.current_column }}</td>
-								</tr>
-								<tr>
-									<th>GET Direction-Parameter name</th>
-									<td>{{ tableView.order_options.param_direction }}</td>
-								</tr>
-								<tr>
-									<th>Empty direction value</th>
-									<td>{{ tableView.order_options.empty_direction }}</td>
-								</tr>
-								<tr>
-									<th>Current direction value</th>
-									<td>{{ tableView.order_options.current_direction }}</td>
-								</tr>
-								<tr>
-									<th>CSS Classes</th>
-									<td>{{ tableView.order_options.css_classes|join(', ') }}</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				{% endif %}
+				{# Columns #}
+				{{ include('JGMTableBundle:DataCollector:panel_table_columns.html.twig') }}
+
+				{# Table options #}
+				{{ include('JGMTableBundle:DataCollector:panel_table_options.html.twig') }}
+				
+				{# Filters #}
+				{{ include('JGMTableBundle:DataCollector:panel_table_filter.html.twig') }}
+				
+				{# Filter options #}
+				{{ include('JGMTableBundle:DataCollector:panel_table_filter_options.html.twig') }}
+				
+				{# Pagination options #}
+				{{ include('JGMTableBundle:DataCollector:panel_table_pagination_options.html.twig') }}
+				
+				{# Order options #}
+				{{ include('JGMTableBundle:DataCollector:panel_table_order_options.html.twig') }}
 			</table>
 		{% endfor %}
 	{% endif %}
