@@ -1,0 +1,37 @@
+{% if tableView.order_options is defined %}
+<tr>
+	<th>Order options</th>
+	<td>
+		<table>
+			<tr>
+				<th>GET Column-Parameter name</th>
+				<td>{{ tableView.order_options.param_column }}</td>
+			</tr>
+			<tr>
+				<th>Empty column value</th>
+				<td>{{ tableView.order_options.empty_column }}</td>
+			</tr>
+			<tr>
+				<th>Current column value</th>
+				<td>{{ tableView.order_options.current_column }}</td>
+			</tr>
+			<tr>
+				<th>GET Direction-Parameter name</th>
+				<td>{{ tableView.order_options.param_direction }}</td>
+			</tr>
+			<tr>
+				<th>Empty direction value</th>
+				<td>{{ tableView.order_options.empty_direction }}</td>
+			</tr>
+			<tr>
+				<th>Current direction value</th>
+				<td>{{ tableView.order_options.current_direction }}</td>
+			</tr>
+			<tr>
+				<th>CSS Classes</th>
+				<td>{{ tableView.order_options.css_classes|join(', ') }}</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+{% endif %}

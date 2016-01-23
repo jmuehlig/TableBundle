@@ -1,0 +1,26 @@
+<h2>Table Times</h2>
+<table>
+	<tr>
+		<th>Name of TableType</th>
+		<th>Creation</th>
+		<th>Build View</th>
+		<th>Render Table</th>
+		<th>Render Filter</th>
+		<th>Sum</th>
+	</tr>
+
+	{% for name,data in collector.tableTimes %}
+		<tr>
+			<td>{{ name }}</td>
+			<td>{{ data.0 }} ms</td>
+			<td>{{ data.1 }} ms</td>
+			<td>{{ data.2 }} ms</td>
+			<td>{{ data.3 }} ms</td>
+			<td>{{ data.4 }} ms</td>
+		</tr>
+	{% else %}
+		<tr>
+			<td colspan="5">No tables defined.</td>
+		</tr>
+	{% endfor %}
+</table>

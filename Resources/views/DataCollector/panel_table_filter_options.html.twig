@@ -1,0 +1,25 @@
+{% if tableView.filter_options is defined %}
+<tr>
+	<th>Filter options</th>
+	<td>
+		<table>
+			<tr>
+				<th>Label of Submit-Button</th>
+				<td>{{ tableView.filter_options.submit_label }}</td>
+			</tr>
+			<tr>
+				<th>Attributes of Submit-Button</th>
+				<td>{{ tableView.filter_options.submit_attributes|join(', ') }}</td>
+			</tr>
+			<tr>
+				<th>Label of Reset-Link</th>
+				<td>{{ tableView.filter_options.reset_label }}</td>
+			</tr>
+			<tr>
+				<th>Attributes of Reset-Link</th>
+				<td>{{ tableView.filter_options.reset_attributes|join(', ') }}</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+{% endif %}

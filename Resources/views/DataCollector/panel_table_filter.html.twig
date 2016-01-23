@@ -1,0 +1,29 @@
+{% if tableView.filters|length > 0 %}
+<tr>
+	<th>Filters</th>
+	<td>
+		<table>
+			<tr>
+				<th>Class</th>
+				<th>Name</th>
+				<th>Columns</th>
+				<th>Label</th>
+				<th>Attributes</th>
+				<th>Value</th>
+				<th>Active?</th>
+			</tr>
+		{% for filter in tableView.filters %}
+			<tr>
+				<td><code>{{ filter.class }}</code></td>
+				<td>{{ filter.name }}</td>
+				<td>{{ filter.columns|join(', ') }}</td>
+				<td>{{ filter.label }}</td>
+				<td>{{ filter.attributes|join(', ')|default('-') }}</td>
+				<td>{{ filter.value }}</td>
+				<td>{% if filter.active %}Yes{% else %}No{% endif %}</td>
+			</tr>
+		{% endfor %}
+		</table>
+	</td>
+</tr>
+{% endif %}
