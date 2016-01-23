@@ -10,7 +10,7 @@ Sometimes, you want to reuse your tables, too.
 Using the TableBundle will be the answer to your problems.
 It provides building tables including dynamic columns for displaying data from different sources (like entities from database or arrays).
 Additional the TableBundle supports mechanisms for dynamic filters, pagination and order.
-You don't have to core about the implementation, it's all automatic.
+You don't have to care about the implementation, it's all automatic.
 
 A unique feature is the automatic join, which allows you to access and also filter for joined columns of the given data (and their joined columns, and their...).
 
