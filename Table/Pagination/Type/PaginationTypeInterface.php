@@ -3,7 +3,6 @@
 namespace JGM\TableBundle\Table\Pagination\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * If a table type implements this interface, it marks the table

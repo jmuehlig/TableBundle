@@ -73,7 +73,7 @@ class UrlHelper
 		$url = $this->router->generate($routeName, $currentRouteParams);
 		
 		// Add the anchor, if given.
-		if($anchor != null)
+		if($anchor !== null)
 		{
 			$url .= sprintf("#%s", $anchor);
 		}

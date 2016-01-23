@@ -286,7 +286,6 @@ class Table
 	{
 		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 		
-		// TODO: Remove parameter $loadData at v1.4.
 		if($loadData !== true)
 		{
 			 @trigger_error(

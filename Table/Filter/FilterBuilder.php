@@ -11,7 +11,6 @@
 
 namespace JGM\TableBundle\Table\Filter;
 
-use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\TableException;
 use Symfony\Component\DependencyInjection\ContainerInterface;

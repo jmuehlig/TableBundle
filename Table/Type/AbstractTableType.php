@@ -12,12 +12,10 @@
 namespace JGM\TableBundle\Table\Type;
 
 use Doctrine\ORM\EntityManager;
-use InvalidArgumentException;
 use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\TableBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * The abstract table type which user defined table types based on.
