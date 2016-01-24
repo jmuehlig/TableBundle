@@ -25,7 +25,7 @@ use Twig_SimpleFunction;
  * @author	Jan Mühlig <mail@janmuehlig.de>
  * @since	1.3
  */
-class TableExtension extends AbstractTwigExtension
+class FilterExtension extends AbstractTwigExtension
 {
 	/**
 	 * Not every filter_* method, called from 

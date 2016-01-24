@@ -38,3 +38,8 @@ services:
         arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
         tags:
             - { name: twig.extension }
+    jgm.table.twig.filter:
+        class: JGM\TableBundle\Twig\FilterExtension
+        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
+        tags:
+            - { name: twig.extension }
