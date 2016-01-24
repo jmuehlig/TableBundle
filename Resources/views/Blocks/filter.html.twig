@@ -98,7 +98,7 @@
 {% else %}
 {% set attributes = filter.liAttr %}
 {% endif %}
-<li{{ attributes|format_attributes }}><a href="{{ get_url({ (filter.name) : itemValue }) }}">{{ itemLabel }}</a></li>
+<li{{ attributes|format_attributes }}><a href="{{ filter_url({ (filter.name) : itemValue }) }}">{{ itemLabel }}</a></li>
 {% endspaceless %}
 {% endblock %}
 

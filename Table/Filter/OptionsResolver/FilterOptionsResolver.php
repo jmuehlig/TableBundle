@@ -53,7 +53,7 @@ class FilterOptionsResolver extends OptionsResolver
 		$options = $this->resolve(array());
 		
 		return new Filter(
-			$options['templage'],
+			$options['template'],
 			$options['submit_label'], 
 			$options['submit_attr'],
 			$options['reset_label'],
