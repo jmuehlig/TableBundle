@@ -107,6 +107,15 @@ class TableException extends \Exception
 		throw new TableException($tableName, $message);
 	}
 	
+	public static function filterRenderingNotStarted($filterName = null)
+	{
+		$message = sprintf(
+			"Can not render the filter%s. Did you forgot to call 'filter_begin' at the template?", 
+			$filterName !== null ? " '" . $filterName . "'" : ""
+		);
+		throw new TableException($message);
+	}
+	
 	public static function operatorNotValid($operator, $validOperators)
 	{
 		$message = sprintf("The operator '%s' is not a valid filter operator. Use one of the following: '%s'.", $operator, implode(',', $validOperators));

@@ -1,0 +1,44 @@
+{% block table_pagination %}
+{% spaceless %}
+<ul{{ {'class': classes['ul']|join(' ')}|format_attributes }}>
+
+{# Left arrow #}
+{% if currentPage == 0 %}
+<li{{ {'class': classes['li']['disabled']|join(' ')}|format_attributes }}>
+	<a>{{ prevLabel|raw }}</a>
+</li>
+{% else %}
+<li{{ {'class': classes['li']['default']|join(' ')}|format_attributes }}>
+	<a href="{{ page_url(parameterName, currentPage) }}">{{ prevLabel|raw }}</a>
+</li>
+{% endif %}
+
+{# Pages #}
+{% for index,page in pages %}
+{% if page == currentPage %}
+{% set attributes = {'class': classes['li']['active']|join(' ')} %}
+{% else %}
+{% set attributes = {'class': classes['li']['default']|join(' ')} %}
+{% endif %}
+<li{{ attributes|format_attributes }}>
+	<a href="{{ page_url(parameterName, page+1) }}">{{ page+1 }}</a>
+</li>
+{% if index+1 < pages|length and pages[index+1]-page > 1 %}
+<li{{ {'class': classes['li']['disabled']|join(' ')}|format_attributes }}><a>...</a></li>
+{% endif %}
+{% endfor %}
+
+{# Right arrow #}
+{% if currentPage == totalPages-1 %}
+<li{{ {'class': classes['li']['disabled']|join(' ')}|format_attributes }}>
+	<a>{{ nextLabel|raw }}</a>
+</li>
+{% else %}
+<li{{ {'class': classes['li']['default']|join(' ')}|format_attributes }}>
+	<a href="{{ page_url(parameterName, currentPage+2) }}">{{ nextLabel|raw }}</a>
+</li>
+{% endif %}
+
+</ul>
+{% endspaceless %}
+{% endblock %}

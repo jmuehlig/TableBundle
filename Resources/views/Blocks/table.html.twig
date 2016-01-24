@@ -1,0 +1,53 @@
+{% block table %}
+{% spaceless %}
+{{ table_begin(view) }}
+{{ table_head(view) }}
+{{ table_body(view) }}
+{{ table_end(view) }}
+{% if not view.pagination is null %}
+{{ table_pagination(view) }}
+{% endif %}
+{% endspaceless %}
+{% endblock %}
+
+{% block table_begin %}
+{% spaceless %}
+<table id="{{ name }}"{{ attributes|format_attributes }}>
+{% endspaceless %}
+{% endblock %}
+
+{% block table_end %}
+{% spaceless %}
+</table>
+{% endspaceless %}
+{% endblock %}
+
+{% block table_head %}
+{% spaceless %}
+<thead>
+	<tr>
+		{% for column in columns %}
+		<th{{ column.headAttributes|format_attributes }}>{{ column.label }}</th>
+		{% endfor %}
+	</tr>
+</thead>
+{% endspaceless %}
+{% endblock %}
+
+{% block table_body %}
+{% spaceless %}
+<tbody>
+{% for row in rows %}
+<tr{{ row.attributes|format_attributes }}>
+	{% for column in columns %}
+	<td{{ column.attributes|format_attributes }}>{{ column.content(row)|raw }}</td>
+	{% endfor %}
+</tr>
+{% else %}
+<tr>
+	<td colspan="{{ columns|length }}">{{ emptyValue }}</td>
+</tr>
+{% endfor %}
+</tbody>
+{% endspaceless %}
+{% endblock %}

@@ -30,6 +30,7 @@ class PaginationOptionsResolver extends OptionsResolver
 		$globalDefaults = $container->getParameter('jgm_table.pagination_default_options');
 		
 		$this->setDefaults(array(
+			'template' => $globalDefaults['template'],
 			'param' => $globalDefaults['param'],
 			'rows_per_page' => $globalDefaults['rows_per_page'],
 			'show_empty' => $globalDefaults['show_empty'],
@@ -42,6 +43,7 @@ class PaginationOptionsResolver extends OptionsResolver
 			'max_pages' => $globalDefaults['max_pages']
 		));
 		
+		$this->setAllowedTypes('template', 'string');
 		$this->setAllowedTypes('param', 'string');
 		$this->setAllowedTypes('rows_per_page', 'integer');
 		$this->setAllowedTypes('show_empty', 'boolean');
@@ -89,6 +91,7 @@ class PaginationOptionsResolver extends OptionsResolver
 		}
 		
 		return new Pagination(
+			$pagination['template'],
 			$pagination['param'],
 			$pagination['rows_per_page'],
 			$pagination['show_empty'],

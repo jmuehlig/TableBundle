@@ -50,7 +50,7 @@ class Configuration implements ConfigurationInterface
 				->arrayNode('default_options')
 					->children()
 						->scalarNode('template')
-							->defaultValue('JGMTableBundle::blocks.html.twig')
+							->defaultValue('JGMTableBundle:Blocks:table.html.twig')
 						->end()
 						->scalarNode('empty_value')
 							->defaultValue('No data found.')
@@ -82,6 +82,9 @@ class Configuration implements ConfigurationInterface
 				
 				->arrayNode('filter_default_options')
 					->children()
+						->scalarNode('template')
+							->defaultValue('JGMTableBundle:Blocks:filter.html.twig')
+						->end()
 						->scalarNode('submit_label')
 							->defaultValue('Ok')
 						->end()
@@ -100,6 +103,9 @@ class Configuration implements ConfigurationInterface
 				
 				->arrayNode('pagination_default_options')
 					->children()
+						->scalarNode('template')
+							->defaultValue('JGMTableBundle:Blocks:pagination.html.twig')
+						->end()
 						->scalarNode('param')
 							->defaultValue('page')
 						->end()
@@ -136,6 +142,9 @@ class Configuration implements ConfigurationInterface
 				
 				->arrayNode('order_default_options')
 					->children()
+						->scalarNode('template')
+							->defaultValue('JGMTableBundle:Blocks:order.html.twig')
+						->end()
 						->scalarNode('param_direction')
 							->defaultValue('direction')
 						->end()

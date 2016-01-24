@@ -22,6 +22,11 @@ class Pagination
 	/**
 	 * @var string
 	 */
+	protected $template;
+	
+	/**
+	 * @var string
+	 */
 	protected $parameterName;
 	
 	/**
@@ -60,9 +65,10 @@ class Pagination
 	protected $maxPages;
 
 
-	public function __construct($parameterName, $itemPerRow, $showEmpty, array $classes, 
-								$previousLabel, $nextLabel, $maxPages)
+	public function __construct($template, $parameterName, $itemPerRow, $showEmpty,
+								 array $classes, $previousLabel, $nextLabel, $maxPages)
 	{
+		$this->template = $template;
 		$this->parameterName = $parameterName;
 		$this->itemsPerRow = $itemPerRow;
 		$this->showEmpty = $showEmpty;
@@ -70,6 +76,11 @@ class Pagination
 		$this->previousLabel = $previousLabel;
 		$this->nextLabel = $nextLabel;
 		$this->maxPages = $maxPages;
+	}
+	
+	public function getTemplate()
+	{
+		return $this->template;
 	}
 	
 	public function getParameterName()

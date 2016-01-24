@@ -30,6 +30,7 @@ class OrderOptionsResolver extends OptionsResolver
 		$globalDefaults = $container->getParameter('jgm_table.order_default_options');
 		
 		$this->setDefaults(array(
+			'template' => $globalDefaults['template'],
 			'param_direction' => $globalDefaults['param_direction'],
 			'param_column' => $globalDefaults['param_column'],
 			'empty_direction' => $globalDefaults['empty_direction'],
@@ -38,6 +39,7 @@ class OrderOptionsResolver extends OptionsResolver
 			'class_desc' => $globalDefaults['class_desc']
 		));
 		
+		$this->setAllowedTypes('template', 'string');
 		$this->setAllowedTypes('param_direction', 'string');
 		$this->setAllowedTypes('param_column', 'string');
 		$this->setAllowedTypes('empty_direction', 'string');
@@ -57,6 +59,7 @@ class OrderOptionsResolver extends OptionsResolver
 		$order = $this->resolve(array());
 		
 		return new Order(
+			$order['template'],
 			$order['param_direction'],
 			$order['param_column'],
 			$order['empty_direction'],

@@ -22,6 +22,11 @@ class Filter
 	/**
 	 * @var string
 	 */
+	protected $template;
+	
+	/**
+	 * @var string
+	 */
 	protected $submitLabel;
 	
 	/**
@@ -39,12 +44,18 @@ class Filter
 	 */
 	protected $resetAttributes;
 	
-	public function __construct($submitLabel, array $submitAttributes, $resetLabel, array $resetAttributes)
+	public function __construct($template, $submitLabel, array $submitAttributes, $resetLabel, array $resetAttributes)
 	{
+		$this->template = $template;
 		$this->submitLabel = $submitLabel;
 		$this->submitAttributes = $submitAttributes;
 		$this->resetLabel = $resetLabel;
 		$this->resetAttributes = $resetAttributes;
+	}
+	
+	public function getTemplate()
+	{
+		return $this->template;
 	}
 	
 	public function getSubmitLabel()

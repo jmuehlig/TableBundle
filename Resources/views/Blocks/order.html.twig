@@ -1,0 +1,20 @@
+{% block table_head %}
+{% spaceless %}
+<thead>
+	<tr>
+		{% for column in columns %}
+		<th{{ column.headAttributes|format_attributes }}>
+			{% if column.isSortable %}
+			<a href="{{ order_url(parameters.columnName, column.name, parameters.direction, currentDirection, currentColumnName, parameters.pagination) }}">{{ column.label }}</a>
+			{% if currentColumnName == column.name %}
+			<span class="{{ classes[currentDirection] }}"></span>
+			{% endif %}
+			{% else %}
+			{{ column.label }}
+			{% endif %}
+		</th>
+		{% endfor %}
+	</tr>
+</thead>
+{% endspaceless %}
+{% endblock %}
