@@ -29,12 +29,14 @@ class FilterOptionsResolver extends OptionsResolver
 		$globalDefaults = $container->getParameter('jgm_table.filter_default_options');
 		
 		$this->setDefaults(array(
+			'template' => $globalDefaults['template'],
 			'submit_label' => $globalDefaults['submit_label'],
 			'reset_label' => $globalDefaults['reset_label'],
 			'submit_attr' => $globalDefaults['submit_attr'],
 			'reset_attr' => $globalDefaults['reset_attr']
 		));
 		
+		$this->setAllowedTypes('template', 'string');
 		$this->setAllowedTypes('submit_label', 'string');
 		$this->setAllowedTypes('reset_label', 'string');
 		$this->setAllowedTypes('submit_attr', 'array');
@@ -51,6 +53,7 @@ class FilterOptionsResolver extends OptionsResolver
 		$options = $this->resolve(array());
 		
 		return new Filter(
+			$options['templage'],
 			$options['submit_label'], 
 			$options['submit_attr'],
 			$options['reset_label'],

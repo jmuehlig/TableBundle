@@ -25,6 +25,11 @@ class Order
 	/**
 	 * @var string
 	 */
+	protected $template;
+	
+	/**
+	 * @var string
+	 */
 	protected $paramDirectionName;
 	
 	/**
@@ -57,13 +62,19 @@ class Order
 	 */
 	protected $classes;
 	
-	public function __construct($paramDirectionName, $paramColumnName, $emptyDirection, $emptyColumn, array $classes)
+	public function __construct($template, $paramDirectionName, $paramColumnName, $emptyDirection, $emptyColumn, array $classes)
 	{
+		$this->template = $template;
 		$this->paramDirectionName = $paramDirectionName;
 		$this->paramColumnName = $paramColumnName;
 		$this->emptyDirection = $emptyDirection;
 		$this->emptyColumnName = $emptyColumn;
 		$this->classes = $classes;
+	}
+	
+	public function getTemplate()
+	{
+		return $this->template;
 	}
 	
 	public function getParamDirectionName()

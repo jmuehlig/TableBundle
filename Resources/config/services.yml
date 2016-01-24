@@ -1,9 +1,4 @@
 services:
-    jgm.table.twig:
-        class: JGM\TableBundle\Twig\TableExtension
-        arguments: ["@service_container", "@jgm.table_stopwatch"]
-        tags:
-            - { name: twig.extension }
     jgm.url_helper:
         class: JGM\TableBundle\Table\Utils\UrlHelper
         arguments: ["@request_stack","@router"]
@@ -24,3 +19,22 @@ services:
         tags:
             - { name: jgm.table, channel: jgm }
     jgm.table: '@jgm.table_factory'
+    jgm.table.twig.attributes_formater:
+        class: JGM\TableBundle\Twig\AttributesFormaterExtension
+        tags:
+            - { name: twig.extension }
+    jgm.table.twig:
+        class: JGM\TableBundle\Twig\TableExtension
+        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
+        tags:
+            - { name: twig.extension }
+    jgm.table.twig.order:
+        class: JGM\TableBundle\Twig\OrderExtension
+        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
+        tags:
+            - { name: twig.extension }
+    jgm.table.twig.pagination:
+        class: JGM\TableBundle\Twig\PaginationExtension
+        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
+        tags:
+            - { name: twig.extension }
