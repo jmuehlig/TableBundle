@@ -141,4 +141,14 @@ class TableException extends \Exception
 	{
 		throw new TableException($tableName, "Can not handle request after build the table.");
 	}
+
+	/**
+	 * @param $tableName
+	 * @throws TableException
+	 */
+	public static function noQuery($tableName)
+	{
+		$message = 'You have to pass a PropelQueryClass into the DataSource.';
+		throw new TableException($tableName, $message);
+	}
 }
