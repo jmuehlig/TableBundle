@@ -50,6 +50,9 @@ class UrlHelper
 	 */
 	public function getUrlForParameters(array $replacedParameters = array(), $anchor = null)
 	{
+		if(null === $this->request) {
+			return '';
+		}
 		$routeName = $this->request->get('_route');
 		$currentRouteParams = array_merge(
 			$this->request->attributes->get('_route_params'),
