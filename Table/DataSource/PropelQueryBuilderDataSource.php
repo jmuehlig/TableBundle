@@ -133,7 +133,34 @@ class PropelQueryBuilderDataSource implements DataSourceInterface
     protected function applyOrder(Order $order, $query)
     {
         if ($order !== null) {
+            $useCount = 0;
+            if(strpos($order->getCurrentColumnName(),'.') !== false) {
+                $explodedOrder = explode('.',$order->getCurrentColumnName());
+                for($i = 0; $i < sizeof($explodedOrder)-1;$i++) {
+                    $use = 'use'.ucfirst($explodedOrder[$i]).'Query';
+                    $query = $query->$use();
+                    $useCount++;
+                }
+            }
             $query = $query->orderBy($order->getCurrentColumnName(), strtoupper($order->getCurrentDirection()));
+            for($i = 0; $i < $useCount; $i++) {
+                $query = $query->endUse();
+            }
+        }
+        return $query;if ($order !== null) {
+            $useCount = 0;
+            if(strpos($order->getCurrentColumnName(),'.') !== false) {
+                $explodedOrder = explode('.',$order->getCurrentColumnName());
+                for($i = 0; $i < sizeof($explodedOrder)-1;$i++) {
+                    $use = 'use'.ucfirst($explodedOrder[$i]).'Query';
+                    $query = $query->$use();
+                    $useCount++;
+                }
+            }
+            $query = $query->orderBy($order->getCurrentColumnName(), strtoupper($order->getCurrentDirection()));
+            for($i = 0; $i < $useCount; $i++) {
+                $query = $query->endUse();
+            }
         }
         return $query;
     }
