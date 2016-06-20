@@ -45,6 +45,7 @@ class TableExtension extends AbstractTwigExtension
 			new Twig_SimpleFunction('table_head', array($this, 'getTableHeadContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
 			new Twig_SimpleFunction('table_body', array($this, 'getTableBodyContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
 			new Twig_SimpleFunction('table_end', array($this, 'getTableEndContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
+			new Twig_SimpleFunction('table_totalItems', array($this, 'getTableTotalItems')),
 		);
 	}
 	
@@ -138,4 +139,17 @@ class TableExtension extends AbstractTwigExtension
 		
 		return $content;
 	}
+	
+	/**
+        * @param TableView $tableView
+        * @return int
+        */
+       public function getTableTotalItems(TableView $tableView)
+        {
+           $totalItems = $tableView->getTotalItems();
+           if($totalItems == 1) {
+              return '1 Datensatz';
+           }
+           return $totalItems.' Datensätze';
+        }
 }
