@@ -34,14 +34,26 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getName()
 	{
-		return 'pagination';
+		return 'pagination_';
 	}
 	
 	public function getFunctions()
 	{
 		return array(
-			new Twig_SimpleFunction ('table_pagination', array($this, 'getTablePaginationContent'), array('is_safe' => array('html'), 'needs_environment' => true)),
-			new Twig_SimpleFunction ('page_url', array($this, 'getPageUrl')),
+			new Twig_SimpleFunction (
+				'table_pagination', 
+				array($this, 'getTablePaginationContent'), 
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
+				'table_pagination_option', 
+				array($this, 'getTablePaginationOptionContent'),
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
+				'page_url', 
+				array($this, 'getPageUrl')
+			),
 		);
 	}
 	
@@ -71,6 +83,47 @@ class PaginationExtension extends AbstractTwigExtension
 			'pages' => $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages())
 		));
 		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
+		return $content;
+	}
+	
+	public function getTablePaginationOptionContent(\Twig_Environment $environment, TableView $tableView)
+	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
+		$pagination = $tableView->getPagination();
+		
+		$optionValues = $pagination->getOptionValues();
+		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		{
+			return;
+		}
+		
+		if(!in_array($pagination->getItemsPerRow(), $optionValues))
+		{
+			$optionValues[] = $pagination->getItemsPerRow();
+		}
+		sort($optionValues);
+		
+		$label = $pagination->getOptionLabel();
+		if(empty($label))
+		{
+			$label = null;
+		}
+		
+		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$content = $template->renderBlock('table_pagination_option', array(
+			'tableName' => $tableView->getName(),
+			'values' => $optionValues,
+			'attributes' => $pagination->getOptionAttributes(),
+			'label' => $label,
+			'labelAttributes' => $pagination->getOptionLabelAttributes(),
+			'submitLabel' => $pagination->getOptionSubmitLabel(),
+			'submitAttributes' => $pagination->getOptionSubmitAttributes(),
+			'currentValue' => $pagination->getItemsPerRow()
+		));
+ 		
 		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
 		return $content;

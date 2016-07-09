@@ -42,3 +42,23 @@
 </ul>
 {% endspaceless %}
 {% endblock %}
+
+{% block table_pagination_option %}
+{% spaceless %}
+<form method="post" name="{{ tableName }}_option">
+	<input type="hidden" name="table_option_values_table_name" value="{{ tableName }}" />
+	
+	{% if label %}
+	<label for="{{ tableName }}_option_values"{{ labelAttributes|format_attributes }}>{{ label }}</label>
+	{% endif %}
+	
+	<select name="{{ tableName }}_option_values" id="{{ tableName }}_option_values"{{ attributes|format_attributes }}>
+		{% for value in values %}
+			<option{% if currentValue == value %} selected="selected"{% endif %}>{{ value }}</option>
+		{% endfor %}
+	</select>
+	
+	<input type="submit" name="submit_{{ tableName }}_option_values" value="{{ submitLabel }}"{{ submitAttributes|format_attributes }} />
+</form>
+{% endspaceless %}
+{% endblock %}

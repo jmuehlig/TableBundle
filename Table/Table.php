@@ -29,6 +29,8 @@ use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptionsResolver;
 use JGM\TableBundle\Table\Pagination\Type\PaginationTypeInterface;
 use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\Selection\Column\SelectionColumn;
+use JGM\TableBundle\Table\Selection\Type\SelectionTypeInterface;
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -112,6 +114,14 @@ class Table
 	 * @var array
 	 */
 	private $options;
+	
+	/**
+	 * List of columns, added to 
+	 * the table type.
+	 *  
+	 * @var array
+	 */
+	private $columns;
 	
 	/**
 	 * Array of all rows.
@@ -201,6 +211,7 @@ class Table
 		// Set up rows, filters and optionsResolver
 		// for the table type.
 		$this->rows = array();
+		$this->columns = array();
 	}
 	
 	public function create(AbstractTableType $tableType, array $options = array())
@@ -240,13 +251,12 @@ class Table
 	 */
 	public function getColumn($columnName)
 	{
-		$columns = $this->tableBuilder->getColumns();
-		if(!array_key_exists($columnName, $columns))
+		if(!array_key_exists($columnName, $this->columns))
 		{
 			TableException::noSuchColumn($this->getName(), $columnName);
 		}
 		
-		return $columns[$columnName];
+		return $this->columns[$columnName];
 	}
 	
 	/**
@@ -302,7 +312,7 @@ class Table
 		
 		$this->view = new TableView(
 			$this->tableType->getName(),
-			$this->tableBuilder->getColumns(),
+			$this->columns,
 			$this->rows,
 			$this->getFilters(),
 			$this->pagination,
@@ -339,6 +349,7 @@ class Table
 		
 		// Build the type (adding all columns).
 		$this->tableType->buildTable($this->tableBuilder);
+		$this->columns = $this->tableBuilder->getColumns();
 		
 		// Resolve all options, defined in the table type.
 		$this->resolveOptions();
@@ -373,6 +384,12 @@ class Table
 			}
 		}
 		
+		if($this->isSelectionProvider())
+		{
+			$selectionColumn = new SelectionColumn($this->getName());
+			array_unshift($this->columns, $selectionColumn);
+		}
+		
 		$this->loadTotalItems($loadData);
 		
 		$this->isPreparedForBuild = true;
@@ -401,7 +418,7 @@ class Table
 		
 		if($this->options['hide_empty_columns'] === true && $this->totalItems > 0)
 		{
-			foreach($this->tableBuilder->getColumns() as $name => $column)
+			foreach($this->columns as $name => $column)
 			{
 				/* @var $column ColumnInterface */
 
@@ -443,7 +460,7 @@ class Table
 		// Additional increment the counter for each row.
 		$data = $this->dataSource->getData(
 			$this->container,
-			$this->tableBuilder->getColumns(),
+			$this->columns,
 			$this->getFilters(),
 			$this->pagination, 
 			$this->order
@@ -509,7 +526,7 @@ class Table
 			// Read total items.
 			$this->totalItems = $this->dataSource->getCountItems(
 				$this->container,
-				$this->tableBuilder->getColumns(),
+				$this->columns,
 				$this->getFilters()
 			);
 
@@ -551,6 +568,23 @@ class Table
 			$pagination->setParameterName(sprintf("%s%s", $this->getPrefix(), $pagination->getParameterName()));
 		}
 		
+		$userItemsPerPage = null;
+		$itemsPerPageCookieName = sprintf("%s_items_per_page", $this->getName());
+		$itemsPerPagePostName = sprintf("%s_option_values", $this->getName());
+		if($this->request->isMethod('post') && $this->request->request->has($itemsPerPagePostName))
+		{
+			$userItemsPerPage = (int) $this->request->get($itemsPerPagePostName);
+		}
+		else if($this->request->cookies->has($itemsPerPageCookieName))
+		{
+			$userItemsPerPage = (int) $this->request->cookies->get($itemsPerPageCookieName);
+		}
+		
+		if(in_array($userItemsPerPage, $pagination->getOptionValues()))
+		{
+			$pagination->setItemsPerPage($userItemsPerPage);
+		}
+		
 		// Read current page.
 		$currentPage = max(0, ((int) $this->request->get( $pagination->getParameterName() )) - 1);
 		$pagination->setCurrentPage($currentPage);
@@ -584,7 +618,7 @@ class Table
 			else
 			{
 				// If no default column is defined, look for the first sortable.
-				foreach($this->tableBuilder->getColumns() as $tmpColumn)
+				foreach($this->columns as $tmpColumn)
 				{
 					/* @var $tmpColumn ColumnInterface */
 
@@ -662,7 +696,7 @@ class Table
 		
 		return $this->dataSource->getData(
 			$this->container,
-			$this->tableBuilder->getColumns(),
+			$this->columns,
 			$isFiltered ? $this->getFilters() : null,
 			null, 
 			$isOrdered ? $this->order : null
@@ -692,6 +726,11 @@ class Table
 	private function isFilterProvider()
 	{
 		return $this->tableType instanceof FilterTypeInterface && $this->options['use_filter'];
+	}
+	
+	private function isSelectionProvider()
+	{
+		return $this->tableType instanceof SelectionTypeInterface;
 	}
 	
 	private function getPrefix()

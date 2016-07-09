@@ -23,11 +23,6 @@ services:
         class: JGM\TableBundle\Twig\AttributesFormaterExtension
         tags:
             - { name: twig.extension }
-    jgm.table.twig:
-        class: JGM\TableBundle\Twig\TableExtension
-        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
-        tags:
-            - { name: twig.extension }
     jgm.table.twig.order:
         class: JGM\TableBundle\Twig\OrderExtension
         arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
@@ -38,8 +33,17 @@ services:
         arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
         tags:
             - { name: twig.extension }
+    jgm.table.twig:
+        class: JGM\TableBundle\Twig\TableExtension
+        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
+        tags:
+            - { name: twig.extension }
     jgm.table.twig.filter:
         class: JGM\TableBundle\Twig\FilterExtension
         arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
         tags:
             - { name: twig.extension }
+    jgm.table.response_listener:
+        class: JGM\TableBundle\DependencyInjection\Listener\ResponseListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }

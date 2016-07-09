@@ -28,7 +28,7 @@ class PaginationOptionsResolver extends OptionsResolver
 	function __construct(ContainerInterface $container) 
 	{
 		$globalDefaults = $container->getParameter('jgm_table.pagination_default_options');
-		
+
 		$this->setDefaults(array(
 			'template' => $globalDefaults['template'],
 			'param' => $globalDefaults['param'],
@@ -40,7 +40,14 @@ class PaginationOptionsResolver extends OptionsResolver
 			'li_class_disabled' => $globalDefaults['li_class_disabled'],
 			'prev_label' => $globalDefaults['prev_label'],
 			'next_label' => $globalDefaults['next_label'],
-			'max_pages' => $globalDefaults['max_pages']
+			'max_pages' => $globalDefaults['max_pages'],
+			
+			'option_values' => $globalDefaults['option_values'],
+			'option_attr' => $globalDefaults['option_attr'],
+			'option_label' => $globalDefaults['option_label'],
+			'option_label_attr' => $globalDefaults['option_label_attr'],
+			'option_submit_label' => $globalDefaults['option_submit_label'],
+			'option_submit_attr' => $globalDefaults['option_submit_attr']
 		));
 		
 		$this->setAllowedTypes('template', 'string');
@@ -54,6 +61,13 @@ class PaginationOptionsResolver extends OptionsResolver
 		$this->setAllowedTypes('prev_label', 'string');
 		$this->setAllowedTypes('next_label', 'string');
 		$this->setAllowedTypes('max_pages', array('string', 'null'));
+		
+		$this->setAllowedTypes('option_values', 'array');
+		$this->setAllowedTypes('option_attr', 'array');
+		$this->setAllowedTypes('option_label', array('string', 'null'));
+		$this->setAllowedTypes('option_label_attr', 'array');
+		$this->setAllowedTypes('option_submit_label', array('string', 'null'));
+		$this->setAllowedTypes('option_submit_attr', 'array');
 	}
 	
 	/**
@@ -98,7 +112,13 @@ class PaginationOptionsResolver extends OptionsResolver
 			$classes,
 			$pagination['prev_label'],
 			$pagination['next_label'],
-			$pagination['max_pages']
+			$pagination['max_pages'],
+			$pagination['option_values'],
+			$pagination['option_attr'],
+			$pagination['option_label'],
+			$pagination['option_label_attr'],
+			$pagination['option_submit_label'],
+			$pagination['option_submit_attr']
 		);
 	}
 }
