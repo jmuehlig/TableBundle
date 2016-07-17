@@ -36,7 +36,9 @@ class OrderOptionsResolver extends OptionsResolver
 			'empty_direction' => $globalDefaults['empty_direction'],
 			'empty_column' => $globalDefaults['empty_column'],
 			'class_asc' => $globalDefaults['class_asc'],
-			'class_desc' => $globalDefaults['class_desc']
+			'class_desc' => $globalDefaults['class_desc'],
+			'html_asc' => $globalDefaults['html_asc'],
+			'html_desc' => $globalDefaults['html_desc']
 		));
 		
 		$this->setAllowedTypes('template', 'string');
@@ -46,6 +48,8 @@ class OrderOptionsResolver extends OptionsResolver
 		$this->setAllowedTypes('empty_column', array('string', 'null'));
 		$this->setAllowedTypes('class_asc', array('string', 'null'));
 		$this->setAllowedTypes('class_desc', array('string', 'null'));
+		$this->setAllowedTypes('html_asc', array('string', 'null'));
+		$this->setAllowedTypes('html_desc', array('string', 'null'));
 	}
 	
 	/**
@@ -67,6 +71,10 @@ class OrderOptionsResolver extends OptionsResolver
 			array(
 				Order::DIRECTION_ASC => $order['class_asc'], 
 				Order::DIRECTION_DESC => $order['class_desc']
+			),
+			array(
+				Order::DIRECTION_ASC => $order['html_asc'], 
+				Order::DIRECTION_DESC => $order['html_desc']
 			)
 		);
 	}

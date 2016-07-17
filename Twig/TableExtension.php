@@ -100,6 +100,7 @@ class TableExtension extends AbstractTwigExtension
 			}
 			$viewParameters['parameters'] = $parameters;
 			$viewParameters['classes'] = $order->getClasses();
+			$viewParameters['orderHtml'] = $order->getHtml();
 			$viewParameters['currentDirection'] = $order->getCurrentDirection();
 			$viewParameters['currentColumnName'] = $order->getCurrentColumnName();
 		}

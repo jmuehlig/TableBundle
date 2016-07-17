@@ -62,7 +62,12 @@ class Order
 	 */
 	protected $classes;
 	
-	public function __construct($template, $paramDirectionName, $paramColumnName, $emptyDirection, $emptyColumn, array $classes)
+	/**
+	 * @var array
+	 */
+	protected $html;
+	
+	public function __construct($template, $paramDirectionName, $paramColumnName, $emptyDirection, $emptyColumn, array $classes, array $html)
 	{
 		$this->template = $template;
 		$this->paramDirectionName = $paramDirectionName;
@@ -70,6 +75,7 @@ class Order
 		$this->emptyDirection = $emptyDirection;
 		$this->emptyColumnName = $emptyColumn;
 		$this->classes = $classes;
+		$this->html = $html;
 	}
 	
 	public function getTemplate()
@@ -100,6 +106,11 @@ class Order
 	public function getClasses()
 	{
 		return $this->classes;
+	}
+	
+	public function getHtml()
+	{
+		return $this->html;
 	}
 	
 	public function getCurrentDirection()
