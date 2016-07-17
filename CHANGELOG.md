@@ -1,6 +1,10 @@
 Changelog
 ===========
 
+v1.2.3
+===
+* Bugfix on filter module: Boolean Filter `false` option is not working.
+
 v1.2.2
 ===
 * Improvements for the WebProfiler: Finer measurement of render times (for table and for filters).
