@@ -137,15 +137,11 @@ class TableException extends \Exception
 		throw new TableException(null, "Order is not provided. Please use the OrderTypeInterface to add these feature.");
 	}
 	
-	public static function canNotHandleRequestAfterBild($tableName)
+	public static function canNotHandleRequestAfterBuild($tableName)
 	{
 		throw new TableException($tableName, "Can not handle request after build the table.");
 	}
 
-	/**
-	 * @param $tableName
-	 * @throws TableException
-	 */
 	public static function noQuery($tableName)
 	{
 		$message = 'You have to pass a PropelQueryClass into the DataSource.';

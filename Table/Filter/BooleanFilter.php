@@ -39,14 +39,4 @@ class BooleanFilter extends AbstractValuedFilter
 			"0" => $this->false
 		);
 	}
-
-	/**
-	 * overwrites parent method, because empty($this->value) would lead to true, if 'false' is selected
-	 *
-	 * @return boolean
-	 */
-	public function isActive()
-	{
-		return is_numeric($this->value);
-	}
 }
