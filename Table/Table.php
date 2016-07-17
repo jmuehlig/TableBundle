@@ -377,7 +377,15 @@ class Table
 
 				foreach($filter->getParameterNames() as $parameterName)
 				{
-					$values[$parameterName] = trim((string) $this->request->query->get($parameterName, ''));
+					$requestParameterName = $parameterName;
+					/*
+                    * The Request replaces '.' with '_' in parameter names. So we have
+                	* to do the same replacement, otherwise the parameter and it's value will get lost.
+                    */
+					if(strpos($parameterName,'.') !== false) {
+						$requestParameterName = str_replace('.','_',$parameterName);
+					}
+					$values[$parameterName] = trim((string) $this->request->query->get($requestParameterName, ''));
 				}
 
 				$filter->setValue($values);

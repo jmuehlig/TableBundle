@@ -71,6 +71,7 @@ class ReflectionHelper
 			$propertyName = strtoupper($property[0]) . substr($property, 1);
 
 			$possibleGetter = array(
+				$propertyName,
 				'get' . $propertyName,
 				'has' . $propertyName,
 				'is' . $propertyName
@@ -78,8 +79,7 @@ class ReflectionHelper
 
 			foreach($possibleGetter as $getter)
 			{
-				$callable = array($entity, $getter);
-				if(is_callable($callable))
+				if(method_exists($entity,$getter))
 				{
 					self::$propertyGetterFunctionCache[$entityClassName][$property] = $getter;
 					break;
