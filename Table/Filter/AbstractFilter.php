@@ -372,6 +372,6 @@ abstract class AbstractFilter implements FilterInterface
 	
 	public function isActive()
 	{
-		return $this->value !== null && !empty($this->value);
+		return isset($this->value) && strlen($this->value) > 0;
 	}
 }
