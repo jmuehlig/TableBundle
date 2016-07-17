@@ -1,9 +1,15 @@
 Changelog
 ===========
+v1.3
+===
+* New: The TableBundle is now symfony3 compatible.
+* New: The used version is visible at the toolbar.
+* New: Support for [Propel ORM library](http://propelorm.org/) via `PropelQueryBuilderDataSource`. Thanks to purrucker!
+* New: Added options `html_asc` and `html_desc` to order component to create own html views for ordered columns.
 
 v1.2.3
 ===
-* Bugfix on filter module: Boolean Filter `false` option is not working.
+* Bugfix on filter component: Boolean Filter `false` option is not working.
 
 v1.2.2
 ===
