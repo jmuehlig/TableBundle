@@ -19,6 +19,7 @@ use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Table;
 use JGM\TableBundle\Table\TableException;
+use JGM\TableBundle\Version;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -52,10 +53,10 @@ class TableCollector extends DataCollector
 	
 	public function collect(Request $request, Response $response, Exception $exception = null)
 	{
-		
 		$this->data['count'] = count($this->tableContext->getAllRegisteredTables());
 		$this->data['duration'] = $this->stopwatchService->getDuration();
 		$this->data['table-times'] = $this->stopwatchService->getStopwatchesData();
+		
 		
 		if($exception instanceof TableException)
 		{
@@ -205,6 +206,11 @@ class TableCollector extends DataCollector
 		return $this->data['exception'];
 	}
 
+	public function getVersion()
+	{
+		return Version::getVersion();
+	}
+	
 	public function getName()
 	{
 		return 'jgm.table_collector';

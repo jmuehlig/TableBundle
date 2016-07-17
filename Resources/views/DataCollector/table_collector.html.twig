@@ -35,6 +35,11 @@
 			<span class="sf-toolbar-status sf-toolbar-status-red">Yes</span>
 			{% endif %}
         </div>
+		
+		<div class="sf-toolbar-info-piece">
+            <b>Version</b>
+			<span>{{ collector.version }}</span>
+        </div>
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
