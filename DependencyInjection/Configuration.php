@@ -209,7 +209,8 @@ class Configuration implements ConfigurationInterface
 			'number'	=> 'JGM\TableBundle\Table\Column\NumberColumn',
 			'text'		=> 'JGM\TableBundle\Table\Column\TextColumn',
 			'twig'		=> 'JGM\TableBundle\Table\Column\TwigColumn',
-			'url'		=> 'JGM\TableBundle\Table\Column\UrlColumn'
+			'url'		=> 'JGM\TableBundle\Table\Column\UrlColumn',
+			'selection'	=> 'JGM\TableBundle\Table\Selection\Column\SelectionColumn'
 		);
 	}
 	

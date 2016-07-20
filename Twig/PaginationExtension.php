@@ -51,6 +51,31 @@ class PaginationExtension extends AbstractTwigExtension
 				array('is_safe' => array('html'), 'needs_environment' => true)
 			),
 			new Twig_SimpleFunction (
+				'table_pagination_option_begin', 
+				array($this, 'getTablePaginationOptionBeginContent'),
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
+				'table_pagination_option_label', 
+				array($this, 'getTablePaginationOptionLabelContent'),
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
+				'table_pagination_option_input', 
+				array($this, 'getTablePaginationOptionInputContent'),
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
+				'table_pagination_option_button', 
+				array($this, 'getTablePaginationOptionButtonContent'),
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
+				'table_pagination_option_end', 
+				array($this, 'getTablePaginationOptionEndContent'),
+				array('is_safe' => array('html'), 'needs_environment' => true)
+			),
+			new Twig_SimpleFunction (
 				'page_url', 
 				array($this, 'getPageUrl')
 			),
@@ -100,12 +125,45 @@ class PaginationExtension extends AbstractTwigExtension
 			return;
 		}
 		
-		if(!in_array($pagination->getItemsPerRow(), $optionValues))
-		{
-			$optionValues[] = $pagination->getItemsPerRow();
-		}
-		sort($optionValues);
+		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$content = $template->renderBlock('table_pagination_option', array(
+			'tableView' => $tableView
+		));
+ 		
+		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
+		return $content;
+	}
+	
+	public function getTablePaginationOptionBeginContent(\Twig_Environment $environment, TableView $tableView)
+	{
+		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		
+		$pagination = $tableView->getPagination();
+		
+		$optionValues = $pagination->getOptionValues();
+		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		{
+			return;
+		}
+		
+		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$content = $template->renderBlock('table_pagination_option_begin', array(
+			'tableName' => $tableView->getName()
+		));
+ 		
+		return $content;
+	}
+	
+	public function getTablePaginationOptionLabelContent(\Twig_Environment $environment, TableView $tableView)
+	{
+		$pagination = $tableView->getPagination();
+		
+		$optionValues = $pagination->getOptionValues();
+		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		{
+			return;
+		}
 		$label = $pagination->getOptionLabel();
 		if(empty($label))
 		{
@@ -113,16 +171,74 @@ class PaginationExtension extends AbstractTwigExtension
 		}
 		
 		$template = $this->loadTemplate($environment, $pagination->getTemplate());
-		$content = $template->renderBlock('table_pagination_option', array(
+		$content = $template->renderBlock('table_pagination_option_label', array(
+			'tableName' => $tableView->getName(),
+			'label' => $label,
+			'labelAttributes' => $pagination->getOptionLabelAttributes(),
+		));
+ 		
+		return $content;
+	}
+	
+	public function getTablePaginationOptionInputContent(\Twig_Environment $environment, TableView $tableView)
+	{
+		$pagination = $tableView->getPagination();
+		
+		$optionValues = $pagination->getOptionValues();
+		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		{
+			return;
+		}
+		
+		if(!in_array($pagination->getItemsPerRow(), $optionValues))
+		{
+			$optionValues[] = $pagination->getItemsPerRow();
+		}
+		sort($optionValues);
+		
+		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$content = $template->renderBlock('table_pagination_option_input', array(
 			'tableName' => $tableView->getName(),
 			'values' => $optionValues,
 			'attributes' => $pagination->getOptionAttributes(),
-			'label' => $label,
-			'labelAttributes' => $pagination->getOptionLabelAttributes(),
-			'submitLabel' => $pagination->getOptionSubmitLabel(),
-			'submitAttributes' => $pagination->getOptionSubmitAttributes(),
 			'currentValue' => $pagination->getItemsPerRow()
 		));
+ 		
+		return $content;
+	}
+	
+	public function getTablePaginationOptionButtonContent(\Twig_Environment $environment, TableView $tableView)
+	{
+		$pagination = $tableView->getPagination();
+		
+		$optionValues = $pagination->getOptionValues();
+		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		{
+			return;
+		}
+		
+		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$content = $template->renderBlock('table_pagination_option_button', array(
+			'tableName' => $tableView->getName(),
+			'submitLabel' => $pagination->getOptionSubmitLabel(),
+			'submitAttributes' => $pagination->getOptionSubmitAttributes(),
+		));
+ 		
+		return $content;
+	}
+	
+	public function getTablePaginationOptionEndContent(\Twig_Environment $environment, TableView $tableView)
+	{
+		$pagination = $tableView->getPagination();
+		
+		$optionValues = $pagination->getOptionValues();
+		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		{
+			return;
+		}
+		
+		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$content = $template->renderBlock('table_pagination_option_end', array());
  		
 		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		

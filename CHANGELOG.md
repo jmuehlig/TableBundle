@@ -3,9 +3,10 @@ Changelog
 v1.3
 ===
 * New: The TableBundle is now symfony3 compatible.
-* New: The used version is visible at the toolbar.
-* New: Support for [Propel ORM library](http://propelorm.org/) via `PropelQueryBuilderDataSource`. Thanks to purrucker!
+* New: Support for [Propel ORM library](http://propelorm.org/) via `PropelQueryBuilderDataSource`. Thanks to [purrucker](https://github.com/purrucker)!
 * New: Added options `html_asc` and `html_desc` to order component to create own html views for ordered columns.
+* New: Added possibility to give the choice of lines per page to the user in form of a select input.
+* New: The used version is visible at the toolbar.
 
 v1.2.3
 ===
