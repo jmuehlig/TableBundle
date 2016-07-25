@@ -12,7 +12,10 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
+use JGM\TableBundle\Table\OptionsResolver\TableOptions;
 use JGM\TableBundle\Table\Order\Model\Order;
+use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptions;
+use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
 use JGM\TableBundle\Table\TableView;
 use JGM\TableBundle\Table\Utils\UrlHelper;
 use Twig_Environment;
@@ -50,21 +53,21 @@ class TableExtension extends AbstractTwigExtension
 	
 	public function getTableContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
+		$template = $this->loadTemplate($environment, $tableView->getTableOption(TableOptions::TEMPLATE));
 		
 		return $template->renderBlock('table', array(
 			'view' => $tableView,
-			'isPaginatable' => $tableView->getPagination() !== null
+			'isPaginatable' => $tableView->hasPagination()
 		));
 	}
 	
 	public function getTableBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
+		$template = $this->loadTemplate($environment, $tableView->getTableOption(TableOptions::TEMPLATE));
 		
 		$content = $template->renderBlock('table_begin', array(
 			'name' => $tableView->getName(),
-			'attributes' => $tableView->getAttributes(),
+			'attributes' => $tableView->getTableOption(TableOptions::ATTRIBUTES),
 			'isSelectable' => count($tableView->getSelectionButtons()) > 0
 		));
 		
@@ -73,30 +76,34 @@ class TableExtension extends AbstractTwigExtension
 	
 	public function getTableHeadContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$templateName = $tableView->getTemplateName();
+		$templateName = $tableView->getTableOption(TableOptions::TEMPLATE);
 		$viewParameters = array('columns' => $tableView->getColumns());
-		if($tableView->getOrder() !== null)
+		if($tableView->hasOrder() !== null)
 		{
-			$order = $tableView->getOrder();
-			/* @var $order Order */
-			$templateName = $tableView->getOrder()->getTemplate();
+			$templateName = $tableView->getOrderOption(OrderOptions::TEMPLATE);
 			$parameters = array(
-				'columnName' => $order->getParamColumnName(), 
-				'direction' => $order->getParamDirectionName(),
+				'columnName' => $tableView->getOrderOption(OrderOptions::PARAM_COLUMN), 
+				'direction' => $tableView->getOrderOption(OrderOptions::PARAM_DIRECTION),
 			);
-			if($tableView->getPagination() !== null)
+			if($tableView->hasPagination() !== null)
 			{
-				$parameters['pagination'] = $tableView->getPagination()->getParameterName();
+				$parameters['pagination'] = $tableView->getPaginationOption(PaginationOptions::PARAM);
 			}
 			else
 			{
 				$parameters['pagination'] = null;
 			}
 			$viewParameters['parameters'] = $parameters;
-			$viewParameters['classes'] = $order->getClasses();
-			$viewParameters['orderHtml'] = $order->getHtml();
-			$viewParameters['currentDirection'] = $order->getCurrentDirection();
-			$viewParameters['currentColumnName'] = $order->getCurrentColumnName();
+			$viewParameters['classes'] = array(
+				Order::DIRECTION_ASC => $tableView->getOrderOption(OrderOptions::CLASS_ASC),
+				Order::DIRECTION_DESC => $tableView->getOrderOption(OrderOptions::CLASS_DESC)
+			);
+			$viewParameters['orderHtml'] =  array(
+				Order::DIRECTION_ASC => $tableView->getOrderOption(OrderOptions::HTML_ASC),
+				Order::DIRECTION_DESC => $tableView->getOrderOption(OrderOptions::HTML_DESC)
+			);
+			$viewParameters['currentDirection'] = $tableView->getOrderOption(OrderOptions::CURRENT_DIRECTION);
+			$viewParameters['currentColumnName'] = $tableView->getOrderOption(OrderOptions::CURRENT_COLUMN);
 		}
 		
 		$template = $this->loadTemplate($environment, $templateName);
@@ -107,11 +114,11 @@ class TableExtension extends AbstractTwigExtension
 	
 	public function getTableBodyContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
+		$template = $this->loadTemplate($environment, $tableView->getTableOption(TableOptions::TEMPLATE));
 		$content = $template->renderBlock('table_body', array(
 			'columns' => $tableView->getColumns(),
 			'rows' => $tableView->getRows(),
-			'emptyValue' => $tableView->getEmptyValue()
+			'emptyValue' => $tableView->getTableOption(TableOptions::EMPTY_VALUE)
 		));
 		
 		return $content;
@@ -119,7 +126,7 @@ class TableExtension extends AbstractTwigExtension
 	
 	public function getTableEndContent(\Twig_Environment $environment, TableView $tableView, $renderSelectionButtons = true)
 	{
-		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
+		$template = $this->loadTemplate($environment, $tableView->getTableOption(TableOptions::TEMPLATE));
 		$content = $template->renderBlock('table_end', array(
 			'tableView' => $tableView,
 			'isSelectable' => count($tableView->getSelectionButtons()) > 0,

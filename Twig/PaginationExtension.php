@@ -12,10 +12,12 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
+use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
 use JGM\TableBundle\Table\TableView;
 use JGM\TableBundle\Table\Utils\UrlHelper;
+use Twig_Environment;
 use Twig_SimpleFunction;
 
 /**
@@ -82,44 +84,56 @@ class PaginationExtension extends AbstractTwigExtension
 		);
 	}
 	
-	public function getTablePaginationContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		if($pagination === null || ($tableView->getTotalPages() < 2 && $pagination->getShowEmpty() === false))
+		if(	$tableView->hasPagination() === false
+			|| (
+				$tableView->getPaginationOption(PaginationOptions::TOTAL_PAGES) < 2 
+				&& $tableView->getPaginationOption(PaginationOptions::SHOW_EMPTY) === false
+			)
+		)
 		{
 			return;
 		}
 		
 		// Get the page strategy.
-		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $pagination->getMaxPages());
+		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $tableView->getPaginationOption(PaginationOptions::MAX_PAGES));
 		/* @var $strategy StrategyInterface */ 
 
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination', array(
-			'currentPage' => $pagination->getCurrentPage(),
-			'prevLabel' => $pagination->getPreviousLabel(),
-			'nextLabel' => $pagination->getNextLabel(),
-			'totalPages' => $tableView->getTotalPages(),
-			'classes' => $pagination->getClasses(),
-			'parameterName' => $pagination->getParameterName(),
-			'pages' => $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages())
+			'currentPage' => $tableView->getPaginationOption(PaginationOptions::CURRENT_PAGE),
+			'prevLabel' => $tableView->getPaginationOption(PaginationOptions::PREV_LABEL),
+			'nextLabel' => $tableView->getPaginationOption(PaginationOptions::NEXT_LABEL),
+			'totalPages' => $tableView->getPaginationOption(PaginationOptions::TOTAL_PAGES),
+			'classes' => array(
+				'ul' => $tableView->getPaginationOption(PaginationOptions::UL_CLASS),
+				'li' => array(
+					'default' => $tableView->getPaginationOption(PaginationOptions::LI_CLASS),
+					'active' => $tableView->getPaginationOption(PaginationOptions::LI_CLASS_ACTIVE),
+					'disabled' => $tableView->getPaginationOption(PaginationOptions::LI_CLASS_DISABLED)
+				)
+			),
+			'parameterName' => $tableView->getPaginationOption(PaginationOptions::PARAM),
+			'pages' => $strategy->getPages(
+				$tableView->getPaginationOption(PaginationOptions::CURRENT_PAGE), 
+				$tableView->getPaginationOption(PaginationOptions::TOTAL_PAGES), 
+				$tableView->getPaginationOption(PaginationOptions::MAX_PAGES)
+			)
 		));
 		
 		return $content;
 	}
 	
-	public function getTablePaginationOptionContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationOptionContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		$optionValues = $pagination->getOptionValues();
-		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
+		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
 		
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination_option', array(
 			'tableView' => $tableView
 		));
@@ -127,17 +141,15 @@ class PaginationExtension extends AbstractTwigExtension
 		return $content;
 	}
 	
-	public function getTablePaginationOptionBeginContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationOptionBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		$optionValues = $pagination->getOptionValues();
-		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
+		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
 		
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination_option_begin', array(
 			'tableName' => $tableView->getName()
 		));
@@ -145,89 +157,82 @@ class PaginationExtension extends AbstractTwigExtension
 		return $content;
 	}
 	
-	public function getTablePaginationOptionLabelContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationOptionLabelContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		$optionValues = $pagination->getOptionValues();
-		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
+		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
-		$label = $pagination->getOptionLabel();
+		
+		$label = $tableView->getPaginationOption(PaginationOptions::OPTION_LABEL);
 		if(empty($label))
 		{
 			$label = null;
 		}
 		
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination_option_label', array(
 			'tableName' => $tableView->getName(),
 			'label' => $label,
-			'labelAttributes' => $pagination->getOptionLabelAttributes(),
+			'labelAttributes' => $tableView->getPaginationOption(PaginationOptions::OPTION_LABEL_ATTRIBUTES)
 		));
  		
 		return $content;
 	}
 	
-	public function getTablePaginationOptionInputContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationOptionInputContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		$optionValues = $pagination->getOptionValues();
-		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
+		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
 		
-		if(!in_array($pagination->getItemsPerRow(), $optionValues))
+		if(!in_array($tableView->getPaginationOption(PaginationOptions::ROWS_PER_PAGE), $optionValues))
 		{
-			$optionValues[] = $pagination->getItemsPerRow();
+			$optionValues[] = $tableView->getPaginationOption(PaginationOptions::ROWS_PER_PAGE);
+			sort($optionValues);
 		}
-		sort($optionValues);
 		
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination_option_input', array(
 			'tableName' => $tableView->getName(),
 			'values' => $optionValues,
-			'attributes' => $pagination->getOptionAttributes(),
-			'currentValue' => $pagination->getItemsPerRow()
+			'attributes' => $tableView->getPaginationOption(PaginationOptions::OPTION_ATTRIBUTES),
+			'currentValue' => $tableView->getPaginationOption(PaginationOptions::ROWS_PER_PAGE)
 		));
  		
 		return $content;
 	}
 	
-	public function getTablePaginationOptionButtonContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationOptionButtonContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		$optionValues = $pagination->getOptionValues();
-		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
+		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
 		
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination_option_button', array(
 			'tableName' => $tableView->getName(),
-			'submitLabel' => $pagination->getOptionSubmitLabel(),
-			'submitAttributes' => $pagination->getOptionSubmitAttributes(),
+			'submitLabel' => $tableView->getPaginationOption(PaginationOptions::OPTION_SUBMIT_LABEL),
+			'submitAttributes' => $tableView->getPaginationOption(PaginationOptions::OPTION_SUBMIT_ATTRIBUTES),
 		));
  		
 		return $content;
 	}
 	
-	public function getTablePaginationOptionEndContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTablePaginationOptionEndContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$pagination = $tableView->getPagination();
-		
-		$optionValues = $pagination->getOptionValues();
-		if($pagination === null || $optionValues == null || count($optionValues) < 2)
+		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
+		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
 		
-		$template = $this->loadTemplate($environment, $pagination->getTemplate());
+		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
 		$content = $template->renderBlock('table_pagination_option_end', array());
  		
 		return $content;
