@@ -11,11 +11,14 @@
 
 namespace JGM\TableBundle\Table\Order\Model;
 
+use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptions;
+
 /**
  * Container for the options of the order component.
  *
- * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0
+ * @author		Jan Mühlig <mail@janmuehlig.de>
+ * @since		1.0
+ * @deprecated	since 1.3, will be removed at 1.5
  */
 class Order
 {
@@ -23,123 +26,63 @@ class Order
 	const DIRECTION_DESC = 'desc';
 	
 	/**
-	 * @var string
-	 */
-	protected $template;
-	
-	/**
-	 * @var string
-	 */
-	protected $paramDirectionName;
-	
-	/**
-	 * @var string 
-	 */
-	protected $paramColumnName;
-	
-	/**
-	 * @var string
-	 */
-	protected $emptyDirection = self::DIRECTION_ASC;
-	
-	/**
-	 * @var string
-	 */
-	protected $emptyColumnName;
-	
-	/**
-	 * @var string
-	 */
-	protected $currentDirection;
-	
-	/**
-	 * @var string
-	 */
-	protected $currentColumnName;
-	
-	/**
 	 * @var array
 	 */
-	protected $classes;
+	private $options;
 	
-	/**
-	 * @var array
-	 */
-	protected $html;
-	
-	public function __construct($template, $paramDirectionName, $paramColumnName, $emptyDirection, $emptyColumn, array $classes, array $html)
+	public function __construct(array $options)
 	{
-		$this->template = $template;
-		$this->paramDirectionName = $paramDirectionName;
-		$this->paramColumnName = $paramColumnName;
-		$this->emptyDirection = $emptyDirection;
-		$this->emptyColumnName = $emptyColumn;
-		$this->classes = $classes;
-		$this->html = $html;
+		$this->options = $options;
 	}
 	
 	public function getTemplate()
 	{
-		return $this->template;
+		return $this->options[OrderOptions::TEMPLATE];
 	}
 	
 	public function getParamDirectionName()
 	{
-		return $this->paramDirectionName;
+		return $this->options[OrderOptions::PARAM_DIRECTION];
 	}
 
 	public function getParamColumnName()
 	{
-		return $this->paramColumnName;
+		return $this->options[OrderOptions::PARAM_COLUMN];
 	}
 	
 	public function getEmptyDirection() 
 	{
-		return $this->emptyDirection;
+		return $this->options[OrderOptions::EMPTY_DIRECTION];
 	}
 	
 	public function getEmptyColumnName()
 	{
-		return $this->emptyColumnName;
+		return $this->options[OrderOptions::EMPTY_COLUMN];
 	}
 
 	public function getClasses()
 	{
-		return $this->classes;
+		return array(
+			self::DIRECTION_ASC => $this->options[OrderOptions::CLASS_ASC],
+			self::DIRECTION_DESC => $this->options[OrderOptions::CLASS_DESC]
+		);
 	}
 	
 	public function getHtml()
 	{
-		return $this->html;
+		return array(
+			self::DIRECTION_ASC => $this->options[OrderOptions::HTML_ASC],
+			self::DIRECTION_DESC => $this->options[OrderOptions::HTML_DESC]
+		);
 	}
 	
 	public function getCurrentDirection()
 	{
-		return $this->currentDirection;
+		return $this->options[OrderOptions::CURRENT_DIRECTION];
 	}
 
 	public function getCurrentColumnName()
 	{
-		return $this->currentColumnName;
-	}
-	
-	public function setCurrentDirection($currentDirection) 
-	{
-		$this->currentDirection = $currentDirection;
-	}
-
-	public function setCurrentColumnName($currentColumnName) 
-	{
-		$this->currentColumnName = $currentColumnName;
-	}
-
-	public function setParamDirectionName($name)
-	{
-		$this->paramDirectionName = $name;
-	}
-
-	public function setParamColumnName($name)
-	{
-		$this->paramColumnName = $name;
+		return $this->options[OrderOptions::CURRENT_COLUMN];
 	}
 }

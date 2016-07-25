@@ -11,70 +11,49 @@
 
 namespace JGM\TableBundle\Table\Filter\Model;
 
+use JGM\TableBundle\Table\Filter\OptionsResolver\FilterOptions;
+
 /**
  * Container for options of the filter component.
  *
- * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0
+ * @author		Jan Mühlig <mail@janmuehlig.de>
+ * @since		1.0
+ * @deprecated	since version 1.3
  */
 class Filter
 {
 	/**
-	 * @var string
+	 * @var arary
 	 */
-	protected $template;
+	private $options;
 	
-	/**
-	 * @var string
-	 */
-	protected $submitLabel;
-	
-	/**
-	 * @var array
-	 */
-	protected $submitAttributes;
-	
-	/**
-	 * @var string
-	 */
-	protected $resetLabel;
-	
-	/**
-	 * @var array
-	 */
-	protected $resetAttributes;
-	
-	public function __construct($template, $submitLabel, array $submitAttributes, $resetLabel, array $resetAttributes)
+	public function __construct(array $options)
 	{
-		$this->template = $template;
-		$this->submitLabel = $submitLabel;
-		$this->submitAttributes = $submitAttributes;
-		$this->resetLabel = $resetLabel;
-		$this->resetAttributes = $resetAttributes;
+		$this->options = $options;
 	}
 	
 	public function getTemplate()
 	{
-		return $this->template;
+		return $this->options[FilterOptions::TEMPLATE];
 	}
 	
 	public function getSubmitLabel()
 	{
-		return $this->submitLabel;
+		return $this->options[FilterOptions::SUBMIT_LABEL];
 	}
 
 	public function getSubmitAttributes()
 	{
-		return $this->submitAttributes;
+		return $this->options[FilterOptions::SUBMIT_ATTRIBUTES];
 	}
 
 	public function getResetLabel()
 	{
-		return $this->resetLabel;
+		return $this->options[FilterOptions::RESET_LABEL];
 	}
 
 	public function getResetAttributes()
 	{
-		return $this->resetAttributes;
+		return $this->options[FilterOptions::RESET_ATTRIBUTES];
 	}
 }

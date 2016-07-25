@@ -13,23 +13,26 @@ namespace JGM\TableBundle\Table;
 
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
+use JGM\TableBundle\DependencyInjection\Service\TableContext;
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\DataSource\DataSourceInterface;
 use JGM\TableBundle\Table\Filter\FilterBuilder;
 use JGM\TableBundle\Table\Filter\FilterInterface;
-use JGM\TableBundle\Table\Filter\Model\Filter;
 use JGM\TableBundle\Table\Filter\OptionsResolver\FilterOptionsResolver;
 use JGM\TableBundle\Table\Filter\Type\FilterTypeInterface;
+use JGM\TableBundle\Table\OptionsResolver\TableOptions;
 use JGM\TableBundle\Table\OptionsResolver\TableOptionsResolver;
 use JGM\TableBundle\Table\Order\Model\Order;
+use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptions;
 use JGM\TableBundle\Table\Order\OptionsResolver\OrderOptionsResolver;
 use JGM\TableBundle\Table\Order\Type\OrderTypeInterface;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
+use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
 use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptionsResolver;
 use JGM\TableBundle\Table\Pagination\Type\PaginationTypeInterface;
 use JGM\TableBundle\Table\Row\Row;
-use JGM\TableBundle\Table\Selection\Column\SelectionColumn;
+use JGM\TableBundle\Table\Selection\SelectionButtonBuilder;
 use JGM\TableBundle\Table\Selection\Type\SelectionTypeInterface;
 use JGM\TableBundle\Table\Type\AbstractTableType;
 use Psr\Log\LoggerInterface;
@@ -62,6 +65,13 @@ class Table
 	protected $filterBuilder;
 	
 	/**
+	 * Builder for selection buttons.
+	 * 
+	 * @var SelectionButtonBuilder
+	 */
+	protected $selectionButtonBuilder;
+
+	/**
 	 * Container.
 	 * 
 	 * @var ContainerInterface
@@ -90,16 +100,14 @@ class Table
 	private $router;
 	
 	/**
-	 * Logger.
-	 * 
-	 * @var LoggerInterface
-	 */
-	private $logger;
-	
-	/**
 	 * @var TableStopwatchService
 	 */
 	private $stopwatchService;
+	
+	/**
+	 * @var TableContext 
+	 */
+	private $tableContext;
 	
 	/**
 	 * Table type.
@@ -131,54 +139,48 @@ class Table
 	private $rows;
 	
 	/**
-	 * Rehashed pagination information.
-	 * NULL, if pagination is disabled.
+	 * Array of filters.
 	 * 
-	 * @var Pagination 
+	 * @var array
 	 */
-	private $pagination;
-	
-	/**
-	 * Rehased order information.
-	 * NULL, if order is disabled.
-	 * 
-	 * @var Order
-	 */
-	private $order;
-	
-	/**
-	 * Rehashed filter information.
-	 * NULL, if filter is disabled.
-	 * 
-	 * @var Filter
-	 */
-	private $filter;
-	
-	/**
-	 * Number of total pages.
-	 * 
-	 * @var int
-	 */
-	private $totalPages = 1;
-	
-	/**
-	 * Number of total items.
-	 * 
-	 * @var int
-	 */
-	private $totalItems;
+	private $filters;
 	
 	/**
 	 * @var DataSourceInterface
 	 */
 	private $dataSource;
 	
+	/**
+	 * State of this table: is the table prepared 
+	 * for for huilding the table view?
+	 * 
+	 * @var boolean
+	 */
 	private $isPreparedForBuild = false;
 	
+	/**
+	 * State of this table: is the table 
+	 * already build?
+	 * 
+	 * @var boolean
+	 */
 	private $isBuild = false;
 	
+	/**
+	 * State of this table: is the data
+	 * already loaded?
+	 * 
+	 * @var boolean
+	 */
 	private $isDataLoaded = false;
 	
+	/**
+	 * Is a prefix for this
+	 * table necessary because of
+	 * a multi table response?
+	 * 
+	 * @var boolean
+	 */
 	private $usePrefix;
 	
 	/**
@@ -204,39 +206,43 @@ class Table
 		$this->entityManager = $entityManager;
 		$this->request = $request;
 		$this->router = $router;
-		$this->logger = $logger;
 		$this->usePrefix = $usePrefix;
 		$this->stopwatchService = $stopwatchService;
+		$this->tableContext = $container->get('jgm.table_context');
 		
 		// Set up rows, filters and optionsResolver
 		// for the table type.
+		$this->options = array();
 		$this->rows = array();
 		$this->columns = array();
+		$this->filters = array();
 	}
 	
 	public function create(AbstractTableType $tableType, array $options = array())
 	{
 		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::CATEGORY_CREATE);
-		$this->logger->debug(sprintf("Start creating table, described by table type '%s'", get_class($tableType)));
 		
-		
-		$this->options = $options;
+		$this->options['table'] = $options;
 		
 		$this->tableBuilder = new TableBuilder($this->container);
 		$this->tableType = $tableType;
 		$this->dataSource = $tableType->getDataSource($this->container);
 		
-		$this->container->get('jgm.table_context')->registerTable($this);
+		$this->tableContext->registerTable($this);
 		if($this->tableType instanceof FilterTypeInterface)
 		{
 			$this->filterBuilder = new FilterBuilder($this->container);
+		}
+		
+		if($this->tableType instanceof SelectionTypeInterface) 
+		{
+			$this->selectionButtonBuilder = new SelectionButtonBuilder();
 		}
 		
 		$this->tableType->setContainer($this->container);
 		$this->tableType->setEntityManager($this->entityManager);
 		
 		$this->container->get('jgm.table_context')->unregisterTable($this);
-		$this->logger->debug(sprintf("Finished creating table, described by table type '%s'", get_class($tableType)));
 		
 		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::CATEGORY_CREATE);
 		
@@ -260,34 +266,6 @@ class Table
 	}
 	
 	/**
-	 * Returns a filter identified by the name.
-	 * 
-	 * @param string $filterName Name of the column.
-	 * @return FilterInterface
-	 */
-	public function getFilter($filterName)
-	{
-		$filters = $this->getFilters();
-		if(!is_array($filters) || !array_key_exists($filterName, $filters))
-		{
-			TableException::noSuchFilter($this->getName(), $filterName);
-		}
-		
-		return $filters[$filterName];
-	}
-	
-	public function getRowAttributes(Row $row)
-	{
-		$attr = $this->tableType->getRowAttributes($row);
-		if(!is_array($attr))
-		{
-			return array();
-		}
-		
-		return $attr;
-	}
-	
-	/**
 	 * Creates a table renderer, rendering this table.
 	 * 
 	 * @return View of the table.
@@ -304,35 +282,46 @@ class Table
 			);
 		}
 		
-		$this->logger->debug(sprintf("Start creating view, described by table type '%s'", get_class($this->tableType)));
-		
-		$this->container->get('jgm.table_context')->registerTable($this);
-		
-		$this->buildTable($loadData);
-		
-		$this->view = new TableView(
-			$this->tableType->getName(),
-			$this->columns,
-			$this->rows,
-			$this->getFilters(),
-			$this->pagination,
-			$this->order,
-			$this->filter,
-			$this->options['empty_value'],
-			$this->options['attr'],
-			$this->options['head_attr'],
-			$this->totalPages,
-			$this->totalItems,
-			$this->options['template']
-		);
-		
-		$this->container->get('jgm.table_context')->unregisterTable($this);
-		
-		$this->logger->debug(sprintf("Finished creating view, described by table type '%s'", get_class($this->tableType)));
+		if($this->view === null)
+		{
+			$this->tableContext->registerTable($this);
+			$this->buildTable($loadData);
+			$this->view = new TableView(
+				$this->tableType->getName(),
+				$this->options,
+				$this->columns,
+				$this->rows,
+				$this->filters,
+				$this->getSelectionButtons()
+			);
+			$this->tableContext->unregisterTable($this);
+		}
 		
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 		
 		return $this->view;
+	}
+	
+	/**
+	 * Builds the table by processiong the tableBuilder
+	 * and fetching all rows.
+	 * Last are stored in the rows-array.
+	 * 
+	 * @param boolean $loadData	Load data?
+	 */
+	private function buildTable($loadData)
+	{	
+		$this->prepareTableForBuild($loadData);
+		
+		if(($loadData && $this->options['table'][TableOptions::LOAD_DATA]) === true)
+		{
+			$this->loadData();
+		}
+		
+		if($this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] === true && $this->totalItems > 0)
+		{
+			$this->hideEmptyColumns();
+		}
 	}
 	
 	/**
@@ -358,94 +347,17 @@ class Table
 		// the FilterInterface
 		if($this->isFilterProvider())
 		{
-			$this->tableType->buildFilter($this->filterBuilder);
-			if($this->usePrefix)
-			{
-				foreach($this->getFilters() as $filter)
-				{
-					/* @var $filter FilterInterface */
-					$filter->setName(sprintf("%s%s", $this->getPrefix(), $filter->getName()));
-				}
-			}
-			
-			// Sets value of all filters.
-			foreach($this->getFilters() as $filter)
-			{
-				/* @var $filter FilterInterface */
-
-				$values = array();
-
-				foreach($filter->getParameterNames() as $parameterName)
-				{
-					$requestParameterName = $parameterName;
-					/*
-                    * The Request replaces '.' with '_' in parameter names. So we have
-                	* to do the same replacement, otherwise the parameter and it's value will get lost.
-                    */
-					if(strpos($parameterName,'.') !== false)
-					{
-						$requestParameterName = str_replace('.','_',$parameterName);
-					}
-					$values[$parameterName] = trim((string) $this->request->query->get($requestParameterName, ''));
-				}
-
-				$filter->setValue($values);
-			}
+			$this->buildFilter();
 		}
 		
 		if($this->isSelectionProvider())
 		{
-			$selectionColumn = new SelectionColumn($this->getName());
-			array_unshift($this->columns, $selectionColumn);
+			$this->tableType->buildSelectionButtons($this->selectionButtonBuilder);
 		}
 		
 		$this->loadTotalItems($loadData);
 		
 		$this->isPreparedForBuild = true;
-	}
-	
-	/**
-	 * Builds the table by processiong the tableBuilder
-	 * and fetching all rows.
-	 * Last are stored in the rows-array.
-	 * 
-	 * @param boolean $loadData	Load data?
-	 */
-	private function buildTable($loadData)
-	{	
-		if($this->isBuild)
-		{
-			return;
-		}
-		
-		$this->prepareTableForBuild($loadData);
-		
-		if(($loadData && $this->options['load_data']) === true)
-		{
-			$this->loadData();
-		}
-		
-		if($this->options['hide_empty_columns'] === true && $this->totalItems > 0)
-		{
-			foreach($this->columns as $name => $column)
-			{
-				/* @var $column ColumnInterface */
-
-				foreach($this->rows as $row)
-				{
-					/* @var $row Row */
-					$content = $column->getContent($row);
-					if($content !== null && $content !== "")
-					{
-						continue 2;
-					}
-				}
-
-				$this->tableBuilder->removeColumn($name);
-			}
-		}
-		
-		$this->isBuild = true;
 	}
 	
 	protected function loadData()
@@ -460,20 +372,17 @@ class Table
 		// For example, the counter should start at 11, if 
 		// the table is on page 2 and uses 10 rows per page.
 		$count = 0;
-		if($this->pagination !== null)
+		if($this->isPaginationProvider())
 		{
-			$count = $this->pagination->getCurrentPage() * $this->pagination->getItemsPerRow();
+			$count = $this->options['pagination'][PaginationOptions::CURRENT_PAGE] 
+					 * $this->options['pagination'][PaginationOptions::ROWS_PER_PAGE]; 
 		}
 
 		// Store the data items as Row-Object in the $rows class var.
 		// Additional increment the counter for each row.
-		$data = $this->dataSource->getData(
-			$this->container,
-			$this->columns,
-			$this->getFilters(),
-			$this->pagination, 
-			$this->order
-		);
+		$order = $this->isOrderProvider() ? new Order($this->options['order']) : null;
+		$pagination = $this->isPaginationProvider() ? new Pagination($this->options['pagination']) : null;
+		$data = $this->dataSource->getData(	$this->container, $this->columns, $this->filters, $pagination, $order );
 
 		foreach($data as $dataRow)
 		{
@@ -495,27 +404,29 @@ class Table
 	 */
 	protected function resolveOptions()
 	{
+		$this->options = array();
+		
 		// Resolve Options of the table.
 		$optionsResolver = new TableOptionsResolver($this->container);
 		$this->tableType->configureOptions($optionsResolver);
-		$this->options = $optionsResolver->resolve($this->options);
+		$this->options['table'] = $optionsResolver->resolve();
 		
 		// Resolve options of pagination.
 		if($this->isPaginationProvider())
 		{
-			$this->pagination = $this->resolvePaginationOptions();
+			$this->options['pagination'] = $this->resolvePaginationOptions();
 		}
 		
 		// Resolve sortable options.
 		if($this->isOrderProvider())
 		{
-			$this->order = $this->resolveOrderOptions();
+			$this->options['order'] = $this->resolveOrderOptions();
 		}
 		
 		// Resole filter options.
 		if($this->isFilterProvider())
 		{
-			$this->filter = $this->resolveFilterOptions();
+			$this->options['filter'] = $this->resolveFilterOptions();
 		}
 	}
 	
@@ -530,25 +441,30 @@ class Table
 	 */
 	protected function loadTotalItems($loadData = true)
 	{
-		if($loadData === true && $this->options['load_data'] === true)
+		if($loadData === true && $this->options['table'][TableOptions::LOAD_DATA] === true)
 		{
 			// Read total items.
-			$this->totalItems = $this->dataSource->getCountItems(
+			$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->dataSource->getCountItems(
 				$this->container,
 				$this->columns,
-				$this->getFilters()
+				$this->filters
 			);
 
 			// Read total pages.
-			if($this->pagination !== null)
+			if($this->isPaginationProvider())
 			{
-				$countPages = ceil($this->totalItems / $this->pagination->getItemsPerRow());
-				if(	$this->pagination->getCurrentPage() < 0 || $this->pagination->getCurrentPage() > $countPages)
+				$countPages = ceil(
+					$this->options['table'][TableOptions::TOTAL_ITEMS] 
+					/ $this->options['pagination'][PaginationOptions::ROWS_PER_PAGE]
+				);
+				
+				if(	$this->options['pagination'][PaginationOptions::CURRENT_PAGE] < 0 
+					|| $this->options['pagination'][PaginationOptions::CURRENT_PAGE] > $countPages)
 				{
 					throw new NotFoundHttpException();
 				}
 
-				$this->totalPages = $countPages < 1 ? 1 : $countPages;
+				$this->options['pagination'][PaginationOptions::TOTAL_PAGES] = min($countPages, 1);
 			}
 		}
 	}
@@ -571,10 +487,10 @@ class Table
 		$this->tableType->configurePaginationOptions($paginationOptionsResolver);
 		
 		// Setup options container.
-		$pagination = $paginationOptionsResolver->toPagination();
+		$pagination = $paginationOptionsResolver->resolve();
 		if($this->usePrefix)
 		{
-			$pagination->setParameterName(sprintf("%s%s", $this->getPrefix(), $pagination->getParameterName()));
+			$pagination[PaginationOptions::PARAM] = sprintf("%s%s", $this->getPrefix(), PaginationOptions::PARAM);
 		}
 		
 		$userItemsPerPage = null;
@@ -589,14 +505,16 @@ class Table
 			$userItemsPerPage = (int) $this->request->cookies->get($itemsPerPageCookieName);
 		}
 		
-		if(in_array($userItemsPerPage, $pagination->getOptionValues()))
+		if(in_array($userItemsPerPage, $pagination[PaginationOptions::OPTION_VALUES]))
 		{
-			$pagination->setItemsPerPage($userItemsPerPage);
+			$pagination[PaginationOptions::ROWS_PER_PAGE] = $userItemsPerPage;
 		}
 		
 		// Read current page.
-		$currentPage = max(0, ((int) $this->request->get( $pagination->getParameterName() )) - 1);
-		$pagination->setCurrentPage($currentPage);
+		$pagination[PaginationOptions::CURRENT_PAGE] = max(
+			0, 
+			((int) $this->request->get( $pagination[PaginationOptions::PARAM] )) - 1
+		);
 		
 		return $pagination;		
 	}
@@ -606,23 +524,24 @@ class Table
 		// Configure the options resolver for the order options.
 		$sortableOptionsResolver = new OrderOptionsResolver($this->container);
 		$this->tableType->configureOrderOptions($sortableOptionsResolver);
-		$order = $sortableOptionsResolver->toOrder();
+		
+		$order = $sortableOptionsResolver->resolve();
 		if($this->usePrefix)
 		{
-			$order->setParamColumnName(sprintf("%s%s", $this->getPrefix(), $order->getParamColumnName()));
-			$order->setParamDirectionName(sprintf("%s%s", $this->getPrefix(), $order->getParamDirectionName()));
+			$order[OrderOptions::PARAM_COLUMN] = sprintf("%s%s", $this->getPrefix(), $order[OrderOptions::PARAM_COLUMN]);
+			$order[OrderOptions::PARAM_DIRECTION] = sprintf("%s%s", $this->getPrefix(), $order[OrderOptions::PARAM_DIRECTION]);
 		}
 		
 		// Read the column and direction from $request-object.
-		$column = $this->request->get( $order->getParamColumnName() );
-		$direction = $this->request->get( $order->getParamDirectionName() );
+		$column = $this->request->get( $order[OrderOptions::PARAM_COLUMN] );
+		$direction = $this->request->get( $order[OrderOptions::PARAM_DIRECTION] );
 
 		// Find column and direction if the are empty.
 		if($column === null)
 		{
-			if($order->getEmptyColumnName() !== null)
+			if($order[OrderOptions::EMPTY_COLUMN] !== null)
 			{
-				$column = $order->getEmptyColumnName();
+				$column = $order[OrderOptions::EMPTY_COLUMN];
 			}
 			else
 			{
@@ -644,13 +563,13 @@ class Table
 				}
 			}
 		}
-		$order->setCurrentColumnName($column);
+		$order[OrderOptions::CURRENT_COLUMN] = $column;
 
 		if($direction === null)
 		{
-			$direction = $order->getEmptyDirection();
+			$direction = $order[OrderOptions::EMPTY_DIRECTION];
 		}
-		$order->setCurrentDirection($direction);
+		$order[OrderOptions::CURRENT_DIRECTION] = $direction;
 		
 		// Require a sortable column, otherwise redirect to 404.
 		$sortedColumn = $this->getColumn($column);
@@ -671,9 +590,7 @@ class Table
 		$this->tableType->configureFilterButtonOptions($filterOptionsResolver);
 
 		// Set up the options container.
-		$filterOptions = $filterOptionsResolver->toFilter();
-
-		return $filterOptions;
+		return $filterOptionsResolver->resolve();
 	}
 	
 	public function getContainer()
@@ -706,35 +623,35 @@ class Table
 		return $this->dataSource->getData(
 			$this->container,
 			$this->columns,
-			$isFiltered ? $this->getFilters() : null,
+			$isFiltered ? $this->filters : null,
 			null, 
-			$isOrdered ? $this->order : null
+			$isOrdered ? new Order($this->options['order']) : null
 		);
 	}
 	
-	private function getFilters()
+	private function getSelectionButtons()
 	{
-		if($this->filterBuilder === null)
+		if($this->selectionButtonBuilder == null)
 		{
 			return array();
 		}
-
-		return $this->filterBuilder->getFilters();
+		
+		return $this->selectionButtonBuilder->getButtons();
 	}
 	
 	private function isPaginationProvider()
 	{
-		return $this->tableType instanceof PaginationTypeInterface && $this->options['use_pagination'];
+		return $this->tableType instanceof PaginationTypeInterface && $this->options['table'][TableOptions::USE_PAGINATION];
 	}
 	
 	private function isOrderProvider()
 	{
-		return $this->tableType instanceof OrderTypeInterface && $this->options['use_order'];
+		return $this->tableType instanceof OrderTypeInterface && $this->options['table'][TableOptions::USE_ORDER];
 	}
 	
 	private function isFilterProvider()
 	{
-		return $this->tableType instanceof FilterTypeInterface && $this->options['use_filter'];
+		return $this->tableType instanceof FilterTypeInterface && $this->options['table'][TableOptions::USE_FILTER];
 	}
 	
 	private function isSelectionProvider()
@@ -770,5 +687,63 @@ class Table
 	public function getTableView()
 	{
 		return $this->view;
+	}
+	
+	private function hideEmptyColumns()
+	{
+		foreach($this->columns as $name => $column)
+		{
+			/* @var $column ColumnInterface */
+
+			foreach($this->rows as $row)
+			{
+				/* @var $row Row */
+				$content = $column->getContent($row);
+				if($content !== null && $content !== "")
+				{
+					continue 2;
+				}
+			}
+
+			$this->tableBuilder->removeColumn($name);
+		}
+	}
+	
+	private function buildFilter()
+	{
+		$this->tableType->buildFilter($this->filterBuilder);
+		$this->filters = $this->filterBuilder->getFilters();
+		if($this->usePrefix)
+		{
+			foreach($this->filters as $filter)
+			{
+				/* @var $filter FilterInterface */
+				$filter->setName(sprintf("%s%s", $this->getPrefix(), $filter->getName()));
+			}
+		}
+
+		// Sets value of all filters.
+		foreach($this->filters as $filter)
+		{
+			/* @var $filter FilterInterface */
+
+			$values = array();
+
+			foreach($filter->getParameterNames() as $parameterName)
+			{
+				$requestParameterName = $parameterName;
+				/*
+				* The Request replaces '.' with '_' in parameter names. So we have
+				* to do the same replacement, otherwise the parameter and it's value will get lost.
+				*/
+				if(strpos($parameterName,'.') !== false)
+				{
+					$requestParameterName = str_replace('.','_',$parameterName);
+				}
+				$values[$parameterName] = trim((string) $this->request->query->get($requestParameterName, ''));
+			}
+
+			$filter->setValue($values);
+		}
 	}
 }

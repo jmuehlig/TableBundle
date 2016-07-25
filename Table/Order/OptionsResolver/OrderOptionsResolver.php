@@ -30,52 +30,25 @@ class OrderOptionsResolver extends OptionsResolver
 		$globalDefaults = $container->getParameter('jgm_table.order_default_options');
 		
 		$this->setDefaults(array(
-			'template' => $globalDefaults['template'],
-			'param_direction' => $globalDefaults['param_direction'],
-			'param_column' => $globalDefaults['param_column'],
-			'empty_direction' => $globalDefaults['empty_direction'],
-			'empty_column' => $globalDefaults['empty_column'],
-			'class_asc' => $globalDefaults['class_asc'],
-			'class_desc' => $globalDefaults['class_desc'],
-			'html_asc' => $globalDefaults['html_asc'],
-			'html_desc' => $globalDefaults['html_desc']
+			OrderOptions::TEMPLATE => $globalDefaults[OrderOptions::TEMPLATE],
+			OrderOptions::PARAM_DIRECTION => $globalDefaults[OrderOptions::PARAM_DIRECTION],
+			OrderOptions::PARAM_COLUMN => $globalDefaults[OrderOptions::PARAM_COLUMN],
+			OrderOptions::EMPTY_DIRECTION => $globalDefaults[OrderOptions::EMPTY_DIRECTION],
+			OrderOptions::EMPTY_COLUMN => $globalDefaults[OrderOptions::EMPTY_COLUMN],
+			OrderOptions::CLASS_ASC => $globalDefaults[OrderOptions::CLASS_ASC],
+			OrderOptions::CLASS_DESC => $globalDefaults[OrderOptions::CLASS_DESC],
+			OrderOptions::HTML_ASC => $globalDefaults[OrderOptions::HTML_ASC],
+			OrderOptions::HTML_DESC => $globalDefaults[OrderOptions::HTML_DESC]
 		));
 		
-		$this->setAllowedTypes('template', 'string');
-		$this->setAllowedTypes('param_direction', 'string');
-		$this->setAllowedTypes('param_column', 'string');
-		$this->setAllowedTypes('empty_direction', 'string');
-		$this->setAllowedTypes('empty_column', array('string', 'null'));
-		$this->setAllowedTypes('class_asc', array('string', 'null'));
-		$this->setAllowedTypes('class_desc', array('string', 'null'));
-		$this->setAllowedTypes('html_asc', array('string', 'null'));
-		$this->setAllowedTypes('html_desc', array('string', 'null'));
-	}
-	
-	/**
-	 * Creating an order model from
-	 * resolver.
-	 * 
-	 * @return Order
-	 */
-	public function toOrder()
-	{
-		$order = $this->resolve(array());
-		
-		return new Order(
-			$order['template'],
-			$order['param_direction'],
-			$order['param_column'],
-			$order['empty_direction'],
-			$order['empty_column'],
-			array(
-				Order::DIRECTION_ASC => $order['class_asc'], 
-				Order::DIRECTION_DESC => $order['class_desc']
-			),
-			array(
-				Order::DIRECTION_ASC => $order['html_asc'], 
-				Order::DIRECTION_DESC => $order['html_desc']
-			)
-		);
+		$this->setAllowedTypes(OrderOptions::TEMPLATE, 'string');
+		$this->setAllowedTypes(OrderOptions::PARAM_DIRECTION, 'string');
+		$this->setAllowedTypes(OrderOptions::PARAM_COLUMN, 'string');
+		$this->setAllowedTypes(OrderOptions::PARAM_DIRECTION, 'string');
+		$this->setAllowedTypes(OrderOptions::EMPTY_COLUMN, array('string', 'null'));
+		$this->setAllowedTypes(OrderOptions::CLASS_ASC, array('string', 'null'));
+		$this->setAllowedTypes(OrderOptions::CLASS_DESC, array('string', 'null'));
+		$this->setAllowedTypes(OrderOptions::HTML_ASC, array('string', 'null'));
+		$this->setAllowedTypes(OrderOptions::HTML_DESC, array('string', 'null'));
 	}
 }

@@ -28,25 +28,27 @@ class TableOptionsResolver extends OptionsResolver
 		$globalDefaults = $container->getParameter('jgm_table.default_options');
 		
 		$this->setDefaults(array(
-			'template' => $globalDefaults['template'],
-			'empty_value' => $globalDefaults['empty_value'],
-			'attr' => $globalDefaults['attr'],
-			'head_attr' => $globalDefaults['head_attr'],
-			'hide_empty_columns' => $globalDefaults['hide_empty_columns'],
-			'use_filter' => $globalDefaults['use_filter'],
-			'use_pagination' => $globalDefaults['use_pagination'],
-			'use_order' => $globalDefaults['use_order'],
-			'load_data' => $globalDefaults['load_data']
+			TableOptions::TEMPLATE => $globalDefaults[TableOptions::TEMPLATE],
+			TableOptions::EMPTY_VALUE => $globalDefaults[TableOptions::EMPTY_VALUE],
+			TableOptions::ATTRIBUTES => $globalDefaults[TableOptions::ATTRIBUTES],
+			TableOptions::HEAD_ATTRIBUTES => $globalDefaults[TableOptions::HEAD_ATTRIBUTES],
+			TableOptions::HIDE_EMPTY_COLUMNS => $globalDefaults[TableOptions::HIDE_EMPTY_COLUMNS],
+			TableOptions::USE_FILTER => $globalDefaults[TableOptions::USE_FILTER],
+			TableOptions::USE_PAGINATION => $globalDefaults[TableOptions::USE_PAGINATION],
+			TableOptions::USE_ORDER => $globalDefaults[TableOptions::USE_ORDER],
+			TableOptions::USE_SELECTION => $globalDefaults[TableOptions::USE_SELECTION],
+			TableOptions::LOAD_DATA => $globalDefaults[TableOptions::LOAD_DATA]
 		));
 		
-		$this->setAllowedTypes('template', 'string');
-		$this->setAllowedTypes('empty_value', array('string', 'null'));
-		$this->setAllowedTypes('attr', 'array');
-		$this->setAllowedTypes('head_attr', 'array');
-		$this->setAllowedTypes('hide_empty_columns', 'boolean');
-		$this->setAllowedTypes('use_filter', 'boolean');
-		$this->setAllowedTypes('use_pagination', 'boolean');
-		$this->setAllowedTypes('use_order', 'boolean');
-		$this->setAllowedTypes('load_data', 'boolean');
+		$this->setAllowedTypes(TableOptions::TEMPLATE, 'string');
+		$this->setAllowedTypes(TableOptions::EMPTY_VALUE, array('string', 'null'));
+		$this->setAllowedTypes(TableOptions::ATTRIBUTES, 'array');
+		$this->setAllowedTypes(TableOptions::HEAD_ATTRIBUTES, 'array');
+		$this->setAllowedTypes(TableOptions::HIDE_EMPTY_COLUMNS, 'boolean');
+		$this->setAllowedTypes(TableOptions::USE_FILTER, 'boolean');
+		$this->setAllowedTypes(TableOptions::USE_PAGINATION, 'boolean');
+		$this->setAllowedTypes(TableOptions::USE_ORDER, 'boolean');
+		$this->setAllowedTypes(TableOptions::USE_SELECTION, 'boolean');
+		$this->setAllowedTypes(TableOptions::LOAD_DATA, 'boolean');
 	}
 }

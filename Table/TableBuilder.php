@@ -29,6 +29,17 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class TableBuilder
 {
+	const OPTION_TEMPLATE = 'tempalte';
+	const OPTION_EMPTY_VALUE = 'empty_value';
+	const OPTION_ATTRIBUTES = 'attr';
+	const OPTION_HEADER_ATTRIBUTES = 'header_attributes';
+	const OPTION_HIDE_EMPTY_COLUMNS = 'hide_empty_columns';
+	const OPTION_USE_FILTER = 'use_filter';
+	const OPTION_USE_PAGINATION = 'use_pagination';
+	const OPTION_USE_ORDER = 'use_order';
+	const OPTION_USE_SELECTION = 'use_selection';
+	const OPTION_LOAD_DATA = 'load_data';
+	
 	/**
 	 * Container, will be distributed
 	 * to columns, if they implemented

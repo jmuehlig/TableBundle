@@ -1,0 +1,13 @@
+{% block selection_buttons %}
+{% spaceless %}
+{% for name, button in buttons %}
+	{{ selection_button(tableView, name) }}
+{% endfor %}
+{% endspaceless %}
+{% endblock %}
+	
+{% block selection_button %}
+{% spaceless %}
+<input type="submit" name="selection_submit_{{ button.name }}" value="{{ button.label }}"{{ button.attributes|format_attributes }} />
+{% endspaceless %}
+{% endblock %}

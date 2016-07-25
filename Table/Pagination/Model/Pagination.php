@@ -11,199 +11,106 @@
 
 namespace JGM\TableBundle\Table\Pagination\Model;
 
+use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
+
 /**
  * Model for pagination information.
  *
- * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0
+ * @author		Jan Mühlig <mail@janmuehlig.de>
+ * @since		1.0
+ * @deprecated	since 1.3, will be removed at 1.5
  */
 class Pagination 
 {
 	/**
-	 * @var string
-	 */
-	protected $template;
-	
-	/**
-	 * @var string
-	 */
-	protected $parameterName;
-	
-	/**
-	 * @var int 
-	 */
-	protected $itemsPerRow;
-	
-	/**
-	 * @var int
-	 */
-	protected $currentPage;
-	
-	/**
-	 * @var boolean
-	 */
-	protected $showEmpty;
-	
-	/**
 	 * @var array
 	 */
-	protected $classes;
+	private $options;
 	
-	/**
-	 * @var string
-	 */
-	protected $previousLabel;
-	
-	/**
-	 * @var string
-	 */
-	protected $nextLabel;
-	
-	/**
-	 * @var int
-	 */
-	protected $maxPages;
-	
-	/**
-	 *
-	 * @var array
-	 */
-	protected $optionValues;
-	
-	/**
-	 * @var array
-	 */
-	protected $optionAttributes;
-	
-	/**
-	 * @var string
-	 */
-	protected $optionLabel;
-	
-	/**
-	 * @var array
-	 */
-	protected $optionLabelAttributes;
-	
-	/**
-	 * @var string
-	 */
-	protected $optionSubmitLabel;
-	
-	/**
-	 * @var array
-	 */
-	protected $optionSubmitAttributes;
-	
-	public function __construct($template, $parameterName, $itemPerRow, $showEmpty,
-								array $classes, $previousLabel, $nextLabel, $maxPages,
-								array $optionValues, array $optionAttributes, $optionLabel,
-								array $optionLabelAttributes, $optionSubmitLabel, array $optionSubmitAttributes)
+	public function __construct(array $options)
 	{
-		$this->template = $template;
-		$this->parameterName = $parameterName;
-		$this->itemsPerRow = $itemPerRow;
-		$this->showEmpty = $showEmpty;
-		$this->classes = $classes;
-		$this->previousLabel = $previousLabel;
-		$this->nextLabel = $nextLabel;
-		$this->maxPages = $maxPages;
-		
-		$this->optionValues = $optionValues;
-		$this->optionAttributes = $optionAttributes;
-		$this->optionLabel = $optionLabel;
-		$this->optionLabelAttributes = $optionLabelAttributes;
-		$this->optionSubmitLabel = $optionSubmitLabel;
-		$this->optionSubmitAttributes = $optionSubmitAttributes;
+		$this->options = $options;
 	}
 	
 	public function getTemplate()
 	{
-		return $this->template;
+		return $this->options[PaginationOptions::TEMPLATE];
 	}
 	
 	public function getParameterName()
 	{
-		return $this->parameterName;
+		return $this->options[PaginationOptions::PARAM];
 	}
 
 	public function getItemsPerRow()
 	{
-		return $this->itemsPerRow;
+		return $this->options[PaginationOptions::ROWS_PER_PAGE];
 	}
 
 	public function getCurrentPage()
 	{
-		return $this->currentPage;
+		return $this->options[PaginationOptions::CURRENT_PAGE];
 	}
 	
 	public function getShowEmpty()
 	{
-		return $this->showEmpty;
+		return $this->options[PaginationOptions::SHOW_EMPTY];
 	}
 	
 	public function getClasses()
 	{
-		return $this->classes;
+		return array(
+			'ul' => $this->options[PaginationOptions::UL_CLASS],
+			'li' => array(
+				'default' => $this->options[PaginationOptions::LI_CLASS],
+				'active' => $this->options[PaginationOptions::LI_CLASS_ACTIVE],
+				'disabled' => $this->options[PaginationOptions::LI_CLASS_DISABLED]
+			)
+		);
 	}
 	
 	public function getPreviousLabel()
 	{
-		return $this->previousLabel;
+		return $this->options[PaginationOptions::PREV_LABEL];
 	}
 
 	public function getNextLabel()
 	{
-		return $this->nextLabel;
+		return $this->options[PaginationOptions::NEXT_LABEL];
 	}
 	
 	public function getMaxPages()
 	{
-		return $this->maxPages;
+		return $this->options[PaginationOptions::MAX_PAGES];
 	}
 	
 	public function getOptionValues()
 	{
-		return $this->optionValues;
+		return $this->options[PaginationOptions::OPTION_VALUES];
 	}
 
 	public function getOptionAttributes()
 	{
-		return $this->optionAttributes;
+		return $this->options[PaginationOptions::OPTION_ATTRIBUTES];
 	}
 
 	public function getOptionLabel()
 	{
-		return $this->optionLabel;
+		return $this->options[PaginationOptions::OPTION_LABEL];
 	}
 
 	public function getOptionLabelAttributes()
 	{
-		return $this->optionLabelAttributes;
+		return $this->options[PaginationOptions::OPTION_LABEL_ATTRIBUTES];
 	}
 	
 	public function getOptionSubmitLabel()
 	{
-		return $this->optionSubmitLabel;
+		return $this->options[PaginationOptions::OPTION_SUBMIT_LABEL];
 	}
 
 	public function getOptionSubmitAttributes()
 	{
-		return $this->optionSubmitAttributes;
-	}
-
-	public function setCurrentPage($currentPage)
-	{
-		$this->currentPage = $currentPage;
-	}
-	
-	public function setParameterName($parameterName)
-	{
-		$this->parameterName = $parameterName;
-	}
-	
-	public function setItemsPerPage($itemsPerPage)
-	{
-		$this->itemsPerRow = $itemsPerPage;
+		return $this->options[PaginationOptions::OPTION_LABEL_ATTRIBUTES];
 	}
 }

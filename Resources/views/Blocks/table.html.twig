@@ -12,13 +12,26 @@
 
 {% block table_begin %}
 {% spaceless %}
+{% if isSelectable %}
+<form name="selection_{{ name }}" method="post">
+{% endif %}
 <table id="{{ name }}"{{ attributes|format_attributes }}>
 {% endspaceless %}
 {% endblock %}
 
 {% block table_end %}
 {% spaceless %}
+{% if isSelectable and renderSelectionButtons %}
+	<tfoot>
+		<tr>
+			<td colspan="{{ columnsLength }}">{{ selection_buttons(tableView) }}</td>
+		</tr>
+	</tfoot>
+{% endif %}
 </table>
+{% if isSelectable %}
+</form>
+{% endif %}
 {% endspaceless %}
 {% endblock %}
 

@@ -84,8 +84,6 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$pagination = $tableView->getPagination();
 		
 		if($pagination === null || ($tableView->getTotalPages() < 2 && $pagination->getShowEmpty() === false))
@@ -108,15 +106,11 @@ class PaginationExtension extends AbstractTwigExtension
 			'pages' => $strategy->getPages($pagination->getCurrentPage(), $tableView->getTotalPages(), $pagination->getMaxPages())
 		));
 		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		return $content;
 	}
 	
 	public function getTablePaginationOptionContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$pagination = $tableView->getPagination();
 		
 		$optionValues = $pagination->getOptionValues();
@@ -130,15 +124,11 @@ class PaginationExtension extends AbstractTwigExtension
 			'tableView' => $tableView
 		));
  		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		return $content;
 	}
 	
 	public function getTablePaginationOptionBeginContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$pagination = $tableView->getPagination();
 		
 		$optionValues = $pagination->getOptionValues();
@@ -240,8 +230,6 @@ class PaginationExtension extends AbstractTwigExtension
 		$template = $this->loadTemplate($environment, $pagination->getTemplate());
 		$content = $template->renderBlock('table_pagination_option_end', array());
  		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		return $content;
 	}
 	

@@ -60,24 +60,19 @@ class TableExtension extends AbstractTwigExtension
 	
 	public function getTableBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
 		
 		$content = $template->renderBlock('table_begin', array(
 			'name' => $tableView->getName(),
-			'attributes' => $tableView->getAttributes()
+			'attributes' => $tableView->getAttributes(),
+			'isSelectable' => count($tableView->getSelectionButtons()) > 0
 		));
-		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
 		
 		return $content;
 	}
 	
 	public function getTableHeadContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$templateName = $tableView->getTemplateName();
 		$viewParameters = array('columns' => $tableView->getColumns());
 		if($tableView->getOrder() !== null)
@@ -107,15 +102,11 @@ class TableExtension extends AbstractTwigExtension
 		$template = $this->loadTemplate($environment, $templateName);
 		$content = $template->renderBlock('table_head', $viewParameters);
 		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		return $content;
 	}
 	
 	public function getTableBodyContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
 		$content = $template->renderBlock('table_body', array(
 			'columns' => $tableView->getColumns(),
@@ -123,19 +114,18 @@ class TableExtension extends AbstractTwigExtension
 			'emptyValue' => $tableView->getEmptyValue()
 		));
 		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		return $content;
 	}
 	
-	public function getTableEndContent(\Twig_Environment $environment, TableView $tableView)
+	public function getTableEndContent(\Twig_Environment $environment, TableView $tableView, $renderSelectionButtons = true)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
-		
 		$template = $this->loadTemplate($environment, $tableView->getTemplateName());
-		$content = $template->renderBlock('table_end', array());
-		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_TABLE);
+		$content = $template->renderBlock('table_end', array(
+			'tableView' => $tableView,
+			'isSelectable' => count($tableView->getSelectionButtons()) > 0,
+			'columnsLength' => count($tableView->getColumns()),
+			'renderSelectionButtons' => $renderSelectionButtons
+		));
 		
 		return $content;
 	}

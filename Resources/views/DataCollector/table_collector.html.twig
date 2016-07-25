@@ -62,30 +62,4 @@
 {% block panel %}
     {{ include('JGMTableBundle:DataCollector:panel_times.html.twig') }}
 	{{ include('JGMTableBundle:DataCollector:panel_exception.html.twig') }}
-	
-	{% if collector.tables|length > 0 %}
-		<h2>Table Details</h2>
-		{% for name,tableView in collector.tables %}
-			<h3>{{ name }}</h3>
-			<table>
-				{# Columns #}
-				{{ include('JGMTableBundle:DataCollector:panel_table_columns.html.twig') }}
-
-				{# Table options #}
-				{{ include('JGMTableBundle:DataCollector:panel_table_options.html.twig') }}
-				
-				{# Filters #}
-				{{ include('JGMTableBundle:DataCollector:panel_table_filter.html.twig') }}
-				
-				{# Filter options #}
-				{{ include('JGMTableBundle:DataCollector:panel_table_filter_options.html.twig') }}
-				
-				{# Pagination options #}
-				{{ include('JGMTableBundle:DataCollector:panel_table_pagination_options.html.twig') }}
-				
-				{# Order options #}
-				{{ include('JGMTableBundle:DataCollector:panel_table_order_options.html.twig') }}
-			</table>
-		{% endfor %}
-	{% endif %}
 {% endblock %}

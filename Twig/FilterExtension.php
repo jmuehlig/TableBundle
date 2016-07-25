@@ -13,6 +13,7 @@ namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Filter\FilterInterface;
+use JGM\TableBundle\Table\Filter\OptionsResolver\FilterOptions;
 use JGM\TableBundle\Table\TableException;
 use JGM\TableBundle\Table\TableView;
 use JGM\TableBundle\Table\Utils\UrlHelper;
@@ -78,7 +79,10 @@ class FilterExtension extends AbstractTwigExtension
 	}
 	public function getFilterContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$template = $this->loadTemplate($environment, $tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
 		
 		return $template->renderBlock('filter', array(
 				'view' => $tableView
@@ -87,18 +91,17 @@ class FilterExtension extends AbstractTwigExtension
 	
 	public function getFilterBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
-		
 		$this->tableView = $tableView;
 		
-		$template = $this->loadTemplate($environment, $tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
 		
 		$content = $template->renderBlock('filter_begin', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
 			'tableName' => $tableView->getName()
 		));
-		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}
@@ -110,14 +113,14 @@ class FilterExtension extends AbstractTwigExtension
 			TableException::filterRenderingNotStarted($filter->getName());
 		}
 		
-		$this->stopwatchService->start($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		$template = $this->loadTemplate(
+			$environment, 
+			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
 		
-		$template = $this->loadTemplate($environment, $this->tableView->getFilter()->getTemplate());
 		$content = $template->renderBlock('filter_widget', array(
 			'filter' => $filter
 		));
-		
-		$this->stopwatchService->stop($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}
@@ -129,14 +132,14 @@ class FilterExtension extends AbstractTwigExtension
 			TableException::filterRenderingNotStarted($filter->getName());
 		}
 		
-		$this->stopwatchService->start($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
+		$template = $this->loadTemplate(
+			$environment,
+			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
 		
-		$template = $this->loadTemplate($environment, $this->tableView->getFilter()->getTemplate());
 		$content = $template->renderBlock('filter_label', array(
 			'filter' => $filter
 		));
-		
-		$this->stopwatchService->stop($this->tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}
@@ -148,7 +151,10 @@ class FilterExtension extends AbstractTwigExtension
 			TableException::filterRenderingNotStarted();
 		}
 		
-		$template = $this->loadTemplate($environment, $this->tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
 		
 		return $template->renderBlock('filter_row', array(
 			'filter' => $filter
@@ -162,7 +168,10 @@ class FilterExtension extends AbstractTwigExtension
 			TableException::filterRenderingNotStarted();
 		}
 		
-		$template = $this->loadTemplate($environment, $this->tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
 		
 		$filters = array();
 		if($tableViewOrFilterArray instanceof TableView)
@@ -185,32 +194,28 @@ class FilterExtension extends AbstractTwigExtension
 	
 	public function getFilterSubmitButtonContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
-		
-		$filterOptions = $tableView->getFilter();
-		if($filterOptions === null)
+		if($tableView->hasFilter() === false)
 		{
 			return;
 		}
 		
-		$template = $this->loadTemplate($environment, $tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
+		
 		$content = $template->renderBlock('filter_submit_button', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
-			'submitLabel' => $filterOptions->getSubmitLabel(),
-			'attributes' => $filterOptions->getSubmitAttributes()
+			'submitLabel' => $tableView->getFilterOption(FilterOptions::SUBMIT_LABEL),
+			'attributes' => $tableView->getFilterOption(FilterOptions::SUBMIT_ATTRIBUTES)
 		));
-		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}
 	
 	public function getFilterResetLinkContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
-		
-		$filterOptions = $tableView->getFilter();
-		if($filterOptions === null)
+		if($tableView->hasFilter() === false)
 		{
 			return;
 		}
@@ -221,31 +226,33 @@ class FilterExtension extends AbstractTwigExtension
 			$filterParams[$filter->getName()] = null;
 		}
 		
-		$template = $this->loadTemplate($environment, $tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
+		
 		$content = $template->renderBlock('filter_reset_link', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView),
-			'resetLabel' => $filterOptions->getResetLabel(),
-			'attributes' => $filterOptions->getResetAttributes(),
+			'resetLabel' => $tableView->getFilterOption(FilterOptions::RESET_LABEL),
+			'attributes' => $tableView->getFilterOption(FilterOptions::RESET_ATTRIBUTES),
 			'resetUrl' => $this->urlHelper->getUrlForParameters($filterParams)
 		));
-		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}
 	
 	public function getFilterEndContent(\Twig_Environment $environment, TableView $tableView)
 	{
-		$this->stopwatchService->start($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
-		
 		$this->tableView = null;
 		
-		$template = $this->loadTemplate($environment, $tableView->getFilter()->getTemplate());
+		$template = $this->loadTemplate(
+			$environment, 
+			$tableView->getFilterOption(FilterOptions::TEMPLATE)
+		);
+		
 		$content = $template->renderBlock('filter_end', array(
 			'needsFormEnviroment' => $this->getFilterNeedsFormEnviroment($tableView)
 		));
-		
-		$this->stopwatchService->stop($tableView->getName(), TableStopwatchService::CATEGORY_RENDER_FILTER);
 		
 		return $content;
 	}

@@ -13,8 +13,10 @@ namespace JGM\TableBundle\Table;
 
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\Model\Filter;
+use JGM\TableBundle\Table\OptionsResolver\TableOptions;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
+use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
 
 /**
  * TablieView
@@ -52,7 +54,7 @@ class TableView
 	protected $columns;
 	
 	/**
-	 * Filters if the table, represented
+	 * Filters represented
 	 * as array of Filter-Objects.
 	 * Only if the table type implementing
 	 * the FilterInterface.
@@ -60,110 +62,32 @@ class TableView
 	 * @var array 
 	 */
 	protected $filters;
+
+	/**
+	 * List of buttons for selection.
+	 * 
+	 * @var array
+	 */
+	protected $selectionButtons;
 	
 	/**
-	 * Options for the table pagination.
-	 * Only, if pagination is defined by
-	 * the table type.
+	 * List including all options.
 	 * 
-	 * @var Pagination
+	 * @var array
 	 */
-	protected $pagination;
-	
-	/**
-	 * Options for the table filters.
-	 * Only, if filter are defined by
-	 * the table type.
-	 * 
-	 * @var Filter 
-	 */
-	protected $filter;
-	
-	/**
-	 * Options for the table sorting.
-	 * Only, if sortable is defined by
-	 * the table type.
-	 * 
-	 * @var Order 
-	 */
-	protected $order;
-	
-	/**
-	 * The message, displayed if the rows-array
-	 * is empty.
-	 * 
-	 * @var string
-	 */
-	protected $emptyValue;	
-	
-	/**
-	 * Attributes for the table.
-	 * 
-	 * @var array 
-	 */
-	protected $attributes;
-	
-	/**
-	 * Attributes for the table head.
-	 * 
-	 * @var array 
-	 */
-	protected $headAttributes;
-	
-	/**
-	 * Attributes for the rows, filled by
-	 * the getRowAttributes-Method of the
-	 * table type.
-	 * 
-	 * @var array 
-	 */
-	protected $rowAttributes;
-	
-	/**
-	 * Number of total pages, 1 if pagination
-	 * is not available.
-	 * 
-	 * @var int
-	 */
-	protected $totalPages;
-	
-	/**
-	 * Number of total items.
-	 * 
-	 * @var int
-	 */
-	protected $totalItems;
-	
-	/**
-	 * Name of the template, which
-	 * contains the table-blocks.
-	 * 
-	 * @var string
-	 */
-	protected $templateName;
-	
-	public function __construct($name, array $columns, array $rows,
-		array $filters, $pagination, $order, $filter, $emptyValue, array $attributes,
-		array $headAttributes, $totalPages, $totalItems, $templateName
-	)
+	protected $options;
+
+	public function __construct($name, array $options, array $columns, array $rows,	array $filters, array $selectionButtons)
 	{
 		// Set up the class vars.
 		$this->name				= $name;
+		$this->options			= $options;
 		$this->columns			= $columns;
 		$this->rows				= $rows;
 		$this->filters			= $filters;
-		$this->pagination		= $pagination;
-		$this->order			= $order;
-		$this->filter			= $filter;
-		$this->emptyValue		= $emptyValue;
-		$this->attributes		= $attributes;
-		$this->headAttributes	= $headAttributes;
-		$this->totalPages		= $totalPages;
-		$this->totalItems		= $totalItems;
-		$this->templateName		= $templateName;
+		$this->selectionButtons = $selectionButtons;
 	}
 	
-	// Begin of getters for the class vars.
 	public function getName()
 	{
 		return $this->name;
@@ -183,20 +107,10 @@ class TableView
 	{
 		return $this->filters;
 	}
-
-	public function getPagination()
-	{
-		return $this->pagination;
-	}
-
-	public function getOrder()
-	{
-		return $this->order;
-	}
 	
-	public function getFilter()
+	public function getSelectionButtons()
 	{
-		return $this->filter;
+		return $this->selectionButtons;
 	}
 	
 	/**
@@ -220,34 +134,131 @@ class TableView
 		
 		return $filter;
 	}
+	
+	public function hasPagination()
+	{
+		return array_key_exists('pagination', $this->options);
+	}
+	
+	public function hasFilter()
+	{
+		return array_key_exists('filter', $this->options);
+	}
+	
+	public function hasOrder()
+	{
+		return array_key_exists('order', $this->options);
+	}
+	
+	public function getTableOption($optionName)
+	{
+		return $this->getOptions('table', $optionName);
+	}
+	
+	public function getPaginationOption($optionName)
+	{
+		return $this->getOptions('pagination', $optionName);
+	}
+	
+	public function getOrderOption($optionName)
+	{
+		return $this->getOptions('order', $optionName);
+	}
+	
+	public function getFilterOption($optionName)
+	{
+		return $this->getOptions('filter', $optionName);
+	}
+	
+	private function getOptions($module, $optionName)
+	{
+		return $this->options[$module][$optionName];
+	}
+	
+	/**
+	 * @deprecated since version 1.3
+	 */
+	public function getPagination()
+	{
+		if($this->hasPagination() === false)
+		{
+			return null;
+		}
+		
+		return new Pagination($this->options['pagination']);
+	}
 
+	/**
+	 * @deprecated since version 1.3
+	 */
+	public function getOrder()
+	{
+		if($this->hasOrder() === false)
+		{
+			return null;
+		}
+		
+		return new Order($this->options['order']);
+	}
+	
+	/**
+	 * @deprecated since version 1.3
+	 */
+	public function getFilter()
+	{
+		if($this->hasFilter() === false)
+		{
+			return null;
+		}
+		
+		return new Filter($this->options['filter']);
+	}
+	
+	/**
+	 * @deprecated since version 1.3
+	 */
 	public function getEmptyValue()
 	{
-		return $this->emptyValue;
+		return $this->getTableOption(TableOptions::EMPTY_VALUE);
 	}
 
+	/**
+	 * @deprecated since version 1.3
+	 */
 	public function getAttributes()
 	{
-		return $this->attributes;
+		return $this->getTableOption(TableOptions::ATTRIBUTES);
 	}
 	
+	/**
+	 * @deprecated since version 1.3
+	 */
 	public function getHeadAttributes()
 	{
-		return $this->headAttributes;
+		return $this->getTableOption(TableOptions::HEAD_ATTRIBUTES);
 	}
 	
+	/**
+	 * @deprecated since version 1.3
+	 */
 	public function getTotalPages()
 	{
-		return $this->totalPages;
+		return $this->getPaginationOption(PaginationOptions::TOTAL_PAGES);
 	}
 
+	/**
+	 * @deprecated since version 1.3
+	 */
 	public function getTotalItems()
 	{
-		return $this->totalItems;
+		return $this->getTableOption(TableOptions::TOTAL_ITEMS);
 	}
 	
+	/**
+	 * @deprecated since version 1.3
+	 */
 	public function getTemplateName()
 	{
-		return $this->templateName;
+		return $this->getTableOption(TableOptions::TEMPLATE);
 	}
 }

@@ -43,6 +43,11 @@ services:
         arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
         tags:
             - { name: twig.extension }
+    jgm.table.twig.selection:
+        class: JGM\TableBundle\Twig\SelectionExtension
+        arguments: ["@jgm.url_helper", "@jgm.table_stopwatch"]
+        tags:
+            - { name: twig.extension }
     jgm.table.response_listener:
         class: JGM\TableBundle\DependencyInjection\Listener\ResponseListener
         tags:
