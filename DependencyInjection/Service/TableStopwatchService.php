@@ -22,10 +22,13 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class TableStopwatchService
 {
-	const CATEGORY_CREATE = 'create';
-	const CATEGORY_BUILD_VIEW = 'build-view';
-	const CATEGORY_RENDER_TABLE = 'render-table';
-	const CATEGORY_RENDER_FILTER = 'render-filter';
+	const CATEGORY_INSTANTIATION = 0;
+	const CATEGORY_BUILD_TABLE = 1;
+	const CATEGORY_BUILD_FILTER = 2;
+	const CATEGORY_BUILD_VIEW = 3;
+	const CATEGORY_RESOLVE_OPTIONS = 4;
+	const CATEGORY_LOAD_DATA = 5;
+	const CATEGORY_HIDE_EMPTY_COLUMNS = 6;
 	
 	/**
 	 * @var boolean
@@ -183,11 +186,15 @@ class TableStopwatchService
 		foreach($this->getStoppedTables() as $tableName)
 		{
 			$tableData = array();
-			$tableData[] = $this->getDuration($tableName, self::CATEGORY_CREATE);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_INSTANTIATION);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_BUILD_TABLE);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_BUILD_FILTER);
 			$tableData[] = $this->getDuration($tableName, self::CATEGORY_BUILD_VIEW);
-			$tableData[] = $this->getDuration($tableName, self::CATEGORY_RENDER_TABLE);
-			$tableData[] = $this->getDuration($tableName, self::CATEGORY_RENDER_FILTER);
-			$tableData[] = $tableData[0] + $tableData[1] + $tableData[2] + $tableData[3];
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_RESOLVE_OPTIONS);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_LOAD_DATA);
+			$tableData[] = $this->getDuration($tableName, self::CATEGORY_HIDE_EMPTY_COLUMNS);
+			
+			$tableData[] = array_sum($tableData);
 			
 			$data[$tableName] = $tableData;
 		}

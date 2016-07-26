@@ -220,10 +220,9 @@ class Table
 	
 	public function create(AbstractTableType $tableType, array $options = array())
 	{
-		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::CATEGORY_CREATE);
-		
 		$this->options['table'] = $options;
 		
+		$this->stopwatchService->start($tableType->getName(), TableStopwatchService::CATEGORY_INSTANTIATION);
 		$this->tableBuilder = new TableBuilder($this->container);
 		$this->tableType = $tableType;
 		$this->dataSource = $tableType->getDataSource($this->container);
@@ -244,7 +243,7 @@ class Table
 		
 		$this->container->get('jgm.table_context')->unregisterTable($this);
 		
-		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::CATEGORY_CREATE);
+		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::CATEGORY_INSTANTIATION);
 		
 		return $this;
 	}
@@ -272,7 +271,6 @@ class Table
 	 */
 	public function createView($loadData = true)
 	{
-		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 		
 		if($loadData !== true)
 		{
@@ -286,6 +284,7 @@ class Table
 		{
 			$this->tableContext->registerTable($this);
 			$this->buildTable($loadData);
+			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 			$this->view = new TableView(
 				$this->tableType->getName(),
 				$this->options,
@@ -294,11 +293,9 @@ class Table
 				$this->filters,
 				$this->getSelectionButtons()
 			);
+			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 			$this->tableContext->unregisterTable($this);
 		}
-		
-		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
-		
 		return $this->view;
 	}
 	
@@ -315,12 +312,16 @@ class Table
 		
 		if(($loadData && $this->options['table'][TableOptions::LOAD_DATA]) === true)
 		{
+			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 			$this->loadData();
+			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		}
 		
 		if($this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] === true && $this->totalItems > 0)
 		{
+			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
 			$this->hideEmptyColumns();
+			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
 		}
 	}
 	
@@ -337,17 +338,23 @@ class Table
 		}
 		
 		// Build the type (adding all columns).
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_TABLE);
 		$this->tableType->buildTable($this->tableBuilder);
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_TABLE);
 		$this->columns = $this->tableBuilder->getColumns();
 		
 		// Resolve all options, defined in the table type.
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_RESOLVE_OPTIONS);
 		$this->resolveOptions();
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_RESOLVE_OPTIONS);
 		
 		// Build the filters, if the table type implements 
 		// the FilterInterface
 		if($this->isFilterProvider())
 		{
+			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_FILTER);
 			$this->buildFilter();
+			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_FILTER);
 		}
 		
 		if($this->isSelectionProvider())
@@ -355,7 +362,9 @@ class Table
 			$this->tableType->buildSelectionButtons($this->selectionButtonBuilder);
 		}
 		
-		$this->loadTotalItems($loadData);
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
+		$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->calculateTotalItems($loadData);
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		
 		$this->isPreparedForBuild = true;
 	}
@@ -431,7 +440,7 @@ class Table
 	}
 	
 	/**
-	 * Loads the number of total items and configures
+	 * Calculates the number of total items and configures
 	 * the current page and total pages of the pagination 
 	 * component.
 	 * 
@@ -439,12 +448,12 @@ class Table
 	 * 
 	 * @throws NotFoundHttpException	If the given current page is unavailable.
 	 */
-	protected function loadTotalItems($loadData = true)
+	protected function calculateTotalItems($loadData = true)
 	{
 		if($loadData === true && $this->options['table'][TableOptions::LOAD_DATA] === true)
 		{
 			// Read total items.
-			$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->dataSource->getCountItems(
+			$totalItems = $this->dataSource->getCountItems(
 				$this->container,
 				$this->columns,
 				$this->filters
@@ -453,10 +462,7 @@ class Table
 			// Read total pages.
 			if($this->isPaginationProvider())
 			{
-				$countPages = ceil(
-					$this->options['table'][TableOptions::TOTAL_ITEMS] 
-					/ $this->options['pagination'][PaginationOptions::ROWS_PER_PAGE]
-				);
+				$countPages = ceil($totalItems / $this->options['pagination'][PaginationOptions::ROWS_PER_PAGE]);
 				
 				if(	$this->options['pagination'][PaginationOptions::CURRENT_PAGE] < 0 
 					|| $this->options['pagination'][PaginationOptions::CURRENT_PAGE] > $countPages)
@@ -464,9 +470,13 @@ class Table
 					throw new NotFoundHttpException();
 				}
 
-				$this->options['pagination'][PaginationOptions::TOTAL_PAGES] = min($countPages, 1);
+				$this->options['pagination'][PaginationOptions::TOTAL_PAGES] = max($countPages, 1);
 			}
+			
+			return $totalItems;
 		}
+		
+		return 0;
 	}
 
 	/**
@@ -707,6 +717,7 @@ class Table
 
 			$this->tableBuilder->removeColumn($name);
 		}
+		$this->columns = $this->tableBuilder->getColumns();
 	}
 	
 	private function buildFilter()

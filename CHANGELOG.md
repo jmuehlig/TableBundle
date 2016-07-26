@@ -7,6 +7,7 @@ v1.3
 * New: Added options `html_asc` and `html_desc` to order component to create own html views for ordered columns.
 * New: Added possibility to give the choice of lines per page to the user in form of a select input.
 * New: The used version is visible at the toolbar.
+* Improvements for time measurement: Created a more fine-grained structure with measurements for building (table, filters, views), options resolving, data loading and some more. Also removed the measurements for rendering, because twig measurement includes this.
 
 v1.2.3
 ===
