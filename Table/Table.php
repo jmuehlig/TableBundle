@@ -317,7 +317,9 @@ class Table
 			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		}
 		
-		if($this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] === true && $this->totalItems > 0)
+		if(	$this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] === true 
+			&& $this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] > 0
+		)
 		{
 			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
 			$this->hideEmptyColumns();
