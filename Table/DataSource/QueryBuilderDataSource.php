@@ -99,8 +99,6 @@ class QueryBuilderDataSource implements DataSourceInterface
 		{			
 			$queryBuilder->setFirstResult($pagination->getCurrentPage() * $pagination->getItemsPerRow());
 			$queryBuilder->setMaxResults($pagination->getItemsPerRow());
-			
-			return new Paginator($queryBuilder->getQuery(), false);
 		}
 		
 		return $queryBuilder->getQuery()->getResult();

@@ -52,7 +52,7 @@
 {% spaceless %}
 <tbody>
 {% for row in rows %}
-<tr{{ row.attributes|format_attributes }}>
+<tr{{ tableView.rowAttributes(row)|format_attributes }}>
 	{% for column in columns %}
 	<td{{ column.attributes|format_attributes }}>{{ column.content(row)|raw }}</td>
 	{% endfor %}

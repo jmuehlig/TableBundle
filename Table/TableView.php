@@ -17,6 +17,7 @@ use JGM\TableBundle\Table\OptionsResolver\TableOptions;
 use JGM\TableBundle\Table\Order\Model\Order;
 use JGM\TableBundle\Table\Pagination\Model\Pagination;
 use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
+use JGM\TableBundle\Table\Row\Row;
 
 /**
  * TablieView
@@ -76,8 +77,15 @@ class TableView
 	 * @var array
 	 */
 	protected $options;
+	
+	/**
+	 * Callable for row attributes.
+	 * 
+	 * @var callable
+	 */
+	protected $rowAttributeCallback;
 
-	public function __construct($name, array $options, array $columns, array $rows,	array $filters, array $selectionButtons)
+	public function __construct($name, array $options, array $columns, array $rows,	array $filters, array $selectionButtons, $rowAttributeCallback)
 	{
 		// Set up the class vars.
 		$this->name				= $name;
@@ -86,6 +94,7 @@ class TableView
 		$this->rows				= $rows;
 		$this->filters			= $filters;
 		$this->selectionButtons = $selectionButtons;
+		$this->rowAttributeCallback = $rowAttributeCallback;
 	}
 	
 	public function getName()
@@ -168,6 +177,11 @@ class TableView
 	public function getFilterOption($optionName)
 	{
 		return $this->getOptions('filter', $optionName);
+	}
+	
+	public function getRowAttributes(Row $row)
+	{
+		return call_user_func($this->rowAttributeCallback, $row);
 	}
 	
 	private function getOptions($module, $optionName)

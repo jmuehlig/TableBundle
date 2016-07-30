@@ -295,7 +295,8 @@ class Table
 				$this->columns,
 				$this->rows,
 				$this->filters,
-				$this->getSelectionButtons()
+				$this->getSelectionButtons(),
+				array($this->tableType, 'getRowAttributes')
 			);
 			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 		}
@@ -455,8 +456,6 @@ class Table
 		return $this->router;
 	}
 	
-	/************************* PRIVATE FUNCTIONS ****************************************************************************************************************
-	
 	/**
 	 * Returns a column identified by the name.
 	 * 
@@ -558,7 +557,6 @@ class Table
 		}
 
 		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
-
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
 		// For example, the counter should start at 11, if 
@@ -581,12 +579,12 @@ class Table
 		$rows = array();
 		foreach($data as $dataRow)
 		{
-			$row = new Row($dataRow, ++$count, $isSelectionRequested && in_array($dataRow->getId(), $requestedRows));
-			$row->setAttributes( $this->tableType->getRowAttributes($row) );
-
-			$rows[] = $row;
+			$rows[] = new Row(
+				$dataRow, 
+				++$count, 
+				$isSelectionRequested && in_array($dataRow->getId(), $requestedRows)
+			);
 		}
-		
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		$this->state |= self::STATE_DATA_LOADED;
 		

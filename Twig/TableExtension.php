@@ -118,7 +118,8 @@ class TableExtension extends AbstractTwigExtension
 		$content = $template->renderBlock('table_body', array(
 			'columns' => $tableView->getColumns(),
 			'rows' => $tableView->getRows(),
-			'emptyValue' => $tableView->getTableOption(TableOptions::EMPTY_VALUE)
+			'emptyValue' => $tableView->getTableOption(TableOptions::EMPTY_VALUE),
+			'tableView' => $tableView
 		));
 		
 		return $content;
