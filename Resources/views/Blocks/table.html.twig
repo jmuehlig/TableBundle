@@ -13,7 +13,8 @@
 {% block table_begin %}
 {% spaceless %}
 {% if isSelectable %}
-<form name="selection_{{ name }}" method="post">
+<form name="form_selection_{{ name }}" method="post">
+<input type="hidden" name="is_selection_{{ name }}" value="{{ name }}" />
 {% endif %}
 <table id="{{ name }}"{{ attributes|format_attributes }}>
 {% endspaceless %}

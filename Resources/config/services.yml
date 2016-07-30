@@ -6,7 +6,7 @@ services:
         class: JGM\TableBundle\DependencyInjection\Service\TableContext
     jgm.table_collector:
         class: JGM\TableBundle\DataCollector\TableCollector
-        arguments: ["@jgm.table_context","@jgm.table_stopwatch"]
+        arguments: ["@jgm.table_context","@jgm.table_stopwatch","@jgm.table_hint"]
         public: false
         tags:
             - { name: data_collector, template: 'JGMTableBundle:DataCollector:table_collector', id: 'jgm.table_collector' }
@@ -15,10 +15,13 @@ services:
         arguments: ["%kernel.debug%"]
     jgm.table_factory:
         class: JGM\TableBundle\DependencyInjection\Service\TableFactoryService
-        arguments: ["@service_container","@doctrine.orm.entity_manager","@request_stack","@router","@logger","@jgm.table_stopwatch"]
+        arguments: ["@service_container","@doctrine.orm.entity_manager","@request_stack","@router","@jgm.table_stopwatch","@jgm.table_hint"]
         tags:
             - { name: jgm.table, channel: jgm }
     jgm.table: '@jgm.table_factory'
+    jgm.table_hint:
+        class: JGM\TableBundle\DependencyInjection\Service\TableHintService
+        arguments: ["%kernel.debug%"]
     jgm.table.twig.attributes_formater:
         class: JGM\TableBundle\Twig\AttributesFormaterExtension
         tags:

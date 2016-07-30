@@ -36,9 +36,9 @@ class SelectionColumn extends AbstractColumn
 	{
 		$type = $this->options['single_selection'] === true ? "radio" : "checkbox";
 		return sprintf(
-			"<input type=\"%s\" name=\"selection_%s\" value=\"%s\" />", 
+			"<input type=\"%s\" name=\"selection_column[]\" value=\"%s\" />", 
 			$type, 
-			$this->getName(), 
+//			$this->getName(), 
 			$row->get('id')
 		);
 	}

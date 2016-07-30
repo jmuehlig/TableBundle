@@ -42,10 +42,19 @@ class Row
 	 */
 	private $attributes;
 	
-	function __construct($entity, $count)
+	/**
+	 * True, if this row is selected
+	 * by the user.
+	 * 
+	 * @var boolean
+	 */
+	private $isSelected;
+	
+	function __construct($entity, $count, $isSelected = false)
 	{
 		$this->entity = $entity;
 		$this->count = $count;
+		$this->isSelected = $isSelected;
 		$this->attributes = array();
 	}
 	
@@ -80,5 +89,16 @@ class Row
 	public function getAttributes()
 	{
 		return $this->attributes;
+	}
+	
+	/**
+	 * True, if this row is selected
+	 * by the user.
+	 * 
+	 * @return boolean
+	 */
+	public function isSelected()
+	{
+		return $this->isSelected;
 	}
 }

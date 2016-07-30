@@ -14,6 +14,7 @@ namespace JGM\TableBundle\Table;
 use Doctrine\DBAL\Schema\View;
 use Doctrine\ORM\EntityManager;
 use JGM\TableBundle\DependencyInjection\Service\TableContext;
+use JGM\TableBundle\DependencyInjection\Service\TableHintService;
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use JGM\TableBundle\Table\DataSource\DataSourceInterface;
@@ -35,7 +36,6 @@ use JGM\TableBundle\Table\Row\Row;
 use JGM\TableBundle\Table\Selection\SelectionButtonBuilder;
 use JGM\TableBundle\Table\Selection\Type\SelectionTypeInterface;
 use JGM\TableBundle\Table\Type\AbstractTableType;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -50,26 +50,10 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class Table
 {
-	/**
-	 * TableBuilder for this table.
-	 * 
-	 * @var TableBuilder 
-	 */
-	protected $tableBuilder;
-	
-	/**
-	 * FilterBuilder for this table.
-	 * 
-	 * @var FilterBuilder
-	 */
-	protected $filterBuilder;
-	
-	/**
-	 * Builder for selection buttons.
-	 * 
-	 * @var SelectionButtonBuilder
-	 */
-	protected $selectionButtonBuilder;
+	const STATE_INSTANTIATED = 1;
+	const STATE_PREPARED_FOR_BUILD = 2;
+	const STATE_BUILD = 4;
+	const STATE_DATA_LOADED = 8;
 
 	/**
 	 * Container.
@@ -105,9 +89,35 @@ class Table
 	private $stopwatchService;
 	
 	/**
+	 * @var TableHintService
+	 */
+	private $hintService;
+	
+	/**
 	 * @var TableContext 
 	 */
 	private $tableContext;
+		
+	/**
+	 * TableBuilder for this table.
+	 * 
+	 * @var TableBuilder 
+	 */
+	protected $tableBuilder;
+	
+	/**
+	 * FilterBuilder for this table.
+	 * 
+	 * @var FilterBuilder
+	 */
+	protected $filterBuilder;
+	
+	/**
+	 * Builder for selection buttons.
+	 * 
+	 * @var SelectionButtonBuilder
+	 */
+	protected $selectionButtonBuilder;
 	
 	/**
 	 * Table type.
@@ -151,30 +161,6 @@ class Table
 	private $dataSource;
 	
 	/**
-	 * State of this table: is the table prepared 
-	 * for for huilding the table view?
-	 * 
-	 * @var boolean
-	 */
-	private $isPreparedForBuild = false;
-	
-	/**
-	 * State of this table: is the table 
-	 * already build?
-	 * 
-	 * @var boolean
-	 */
-	private $isBuild = false;
-	
-	/**
-	 * State of this table: is the data
-	 * already loaded?
-	 * 
-	 * @var boolean
-	 */
-	private $isDataLoaded = false;
-	
-	/**
 	 * Is a prefix for this
 	 * table necessary because of
 	 * a multi table response?
@@ -184,9 +170,18 @@ class Table
 	private $usePrefix;
 	
 	/**
+	 * Table view.
+	 * 
 	 * @var TableView
 	 */
 	private $view;
+	
+	/**
+	 * State of the table.
+	 * 
+	 * @var int
+	 */
+	private $state = self::STATE_INSTANTIATED;
 	
 	/**
 	 * Creates a new instance of an table.
@@ -198,7 +193,7 @@ class Table
 	 * @param boolean $usePrefix						Should the table use a prefix for filter, pagenination and order?
 	 * @param TableStopwatchService $stopwatchService	Stopwatch-Service.
 	 */
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, LoggerInterface $logger, $usePrefix = false, TableStopwatchService $stopwatchService = null)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix, TableStopwatchService $stopwatchService, TableHintService $hintService)
 	{
 		// Save the parameters: Symfonys container, curent request,
 		// url router and doctrines entityManager
@@ -208,12 +203,14 @@ class Table
 		$this->router = $router;
 		$this->usePrefix = $usePrefix;
 		$this->stopwatchService = $stopwatchService;
+		$this->hintService = $hintService;
 		$this->tableContext = $container->get('jgm.table_context');
 		
 		// Set up rows, filters and optionsResolver
 		// for the table type.
 		$this->options = array();
 		$this->rows = array();
+		$this->selectedRows = array();
 		$this->columns = array();
 		$this->filters = array();
 	}
@@ -296,6 +293,7 @@ class Table
 			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 			$this->tableContext->unregisterTable($this);
 		}
+		
 		return $this->view;
 	}
 	
@@ -308,6 +306,11 @@ class Table
 	 */
 	private function buildTable($loadData)
 	{	
+		if($this->isBuild())
+		{
+			return;
+		}
+		
 		$this->prepareTableForBuild($loadData);
 		
 		if(($loadData && $this->options['table'][TableOptions::LOAD_DATA]) === true)
@@ -325,6 +328,8 @@ class Table
 			$this->hideEmptyColumns();
 			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
 		}
+		
+		$this->state &= self::STATE_BUILD;
 	}
 	
 	/**
@@ -334,7 +339,7 @@ class Table
 	 */
 	private function prepareTableForBuild($loadData)
 	{
-		if($this->isPreparedForBuild)
+		if($this->isPreparedForBuild())
 		{
 			return;
 		}
@@ -368,12 +373,12 @@ class Table
 		$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->calculateTotalItems($loadData);
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		
-		$this->isPreparedForBuild = true;
+		$this->state &= self::STATE_PREPARED_FOR_BUILD;
 	}
 	
 	protected function loadData()
 	{
-		if($this->isDataLoaded)
+		if($this->isDataLoaded())
 		{
 			return;
 		}
@@ -395,15 +400,21 @@ class Table
 		$pagination = $this->isPaginationProvider() ? new Pagination($this->options['pagination']) : null;
 		$data = $this->dataSource->getData(	$this->container, $this->columns, $this->filters, $pagination, $order );
 
+		$isSelectionRequested = $this->isSelectionRequested();
+		$requestedRows = $this->request->request->get(sprintf("selection_column", $this->getName()), array());
 		foreach($data as $dataRow)
 		{
 			$row = new Row($dataRow, ++$count);
 			$row->setAttributes( $this->tableType->getRowAttributes($row) );
 
 			$this->rows[] = $row;
+			if($isSelectionRequested && in_array($row->get('id'), $requestedRows))
+			{
+				$this->selectedRows[] = $row;
+			}
 		}
 
-		$this->isDataLoaded = true;
+		$this->state &= self::STATE_DATA_LOADED;
 	}
 	
 	/**
@@ -688,7 +699,7 @@ class Table
 	
 	public function handleRequest(Request $request)
 	{
-		if($this->isBuild)
+		if($this->isBuild())
 		{
 			TableException::canNotHandleRequestAfterBuild($this->getName());
 		}
@@ -703,6 +714,10 @@ class Table
 	
 	private function hideEmptyColumns()
 	{
+		$this->hintService->addHint(
+			$this->getName(), 
+			'Hiding columns with no content can be high priced.'
+		);
 		foreach($this->columns as $name => $column)
 		{
 			/* @var $column ColumnInterface */
@@ -758,5 +773,29 @@ class Table
 
 			$filter->setValue($values);
 		}
+	}
+	
+	private function isSelectionRequested()
+	{
+		$inputName = sprintf("is_selection_%s", $this->getName());
+		return	$this->request->isMethod('post') 
+				&& $this->request->request->has($inputName)
+				&& $this->request->request->get($inputName) === $this->getName();
+				
+	}
+	
+	private function isPreparedForBuild()
+	{
+		return $this->state & 7 === 8;
+	}
+	
+	private function isBuild()
+	{
+		return $this->state & 3 === 8;
+	}
+	
+	private function isDataLoaded()
+	{
+		return $this->state & 5 === 8;
 	}
 }

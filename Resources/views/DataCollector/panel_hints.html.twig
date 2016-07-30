@@ -1,0 +1,18 @@
+<h2>Hints</h2>
+{% if collector.hints|length < 1 %}
+	<p>No hints found.</p>
+{% else %}
+	<table>
+		<tr>
+			<th style="width: 200px">Name of table type</th>
+			<th>Hint</th>
+		</tr>
+	{% for hint in collector.hints %}
+		<tr>
+			<td>{{ hint.table }}</td>
+			<td>{{ hint.message }}</td>
+		</tr>
+	{% endfor %}
+		
+	</table>
+{% endif %}

@@ -13,6 +13,7 @@ namespace JGM\TableBundle\DataCollector;
 
 use Exception;
 use JGM\TableBundle\DependencyInjection\Service\TableContext;
+use JGM\TableBundle\DependencyInjection\Service\TableHintService;
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\TableException;
 use JGM\TableBundle\Version;
@@ -40,10 +41,16 @@ class TableCollector extends DataCollector
 	 */
 	private $stopwatchService;
 	
-	public function __construct(TableContext $tableContext, TableStopwatchService $stopwatchService)
+	/**
+	 * @var TableHintService
+	 */
+	private $hintService;
+	
+	public function __construct(TableContext $tableContext, TableStopwatchService $stopwatchService, TableHintService $hintService)
 	{
 		$this->tableContext = $tableContext;
 		$this->stopwatchService = $stopwatchService;
+		$this->hintService = $hintService;
 		$this->data = array();
 	}
 	
@@ -52,6 +59,7 @@ class TableCollector extends DataCollector
 		$this->data['count'] = count($this->tableContext->getAllRegisteredTables());
 		$this->data['duration'] = $this->stopwatchService->getDuration();
 		$this->data['table-times'] = $this->stopwatchService->getStopwatchesData();
+		$this->data['hints'] = $this->hintService->getHints();
 		
 		
 		if($exception instanceof TableException)
@@ -87,6 +95,11 @@ class TableCollector extends DataCollector
 	public function getException()
 	{
 		return $this->data['exception'];
+	}
+	
+	public function getHints()
+	{
+		return $this->data['hints'];
 	}
 
 	public function getVersion()

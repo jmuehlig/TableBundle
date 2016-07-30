@@ -5,6 +5,13 @@
         <span class="icon">{{ include('JGMTableBundle:DataCollector:icon.svg.twig') }}</span>
 		<span class="sf-toolbar-value sf-toolbar-status{% if not collector.exception is null %} sf-toolbar-status-red{% elseif collector.duration > 1000 %} sf-toolbar-status-yellow{% endif %}">{{ collector.count }}</span>
 		<span class="sf-toolbar-value">in {{ collector.duration }} ms</span>
+		{% if collector.hints|length > 0 %}
+			<span class="sf-toolbar-value">
+				with 
+				<span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.hints|length }}</span>
+				hint{% if collector.hints|length != 1 %}s{% endif %}
+			</span>
+		{% endif %}
     {% endset %}
 
     {% set text %}
@@ -25,6 +32,11 @@
 		<div class="sf-toolbar-info-piece">
             <b>{% if collector.tableTimes|length > 1 %}All Tables{% else %}Time{% endif %}</b>
             <span>{{ collector.duration }} ms</span>
+        </div>
+		
+		<div class="sf-toolbar-info-piece">
+            <b>Hints</b>
+			<span class="sf-toolbar-status sf-toolbar-status-{% if collector.hints|length > 0 %}yellow{% else %}green{% endif %}">{{ collector.hints|length }}</span>
         </div>
 		
 		<div class="sf-toolbar-info-piece">
@@ -61,5 +73,6 @@
 
 {% block panel %}
     {{ include('JGMTableBundle:DataCollector:panel_times.html.twig') }}
+	{{ include('JGMTableBundle:DataCollector:panel_hints.html.twig') }}
 	{{ include('JGMTableBundle:DataCollector:panel_exception.html.twig') }}
 {% endblock %}

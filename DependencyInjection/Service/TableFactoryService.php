@@ -60,16 +60,14 @@ class TableFactoryService
 	private $router;
 	
 	/**
-	 * Logger.
-	 * 
-	 * @var LoggerInterface
-	 */
-	private $logger;
-	
-	/**
 	 * @var TableStopwatchService
 	 */
 	private $stopwatchService;
+	
+	/**
+	 * @var TableHintService
+	 */
+	private $hintService;
 	
 	/**
 	 * Are there multiple instances of tables
@@ -79,14 +77,14 @@ class TableFactoryService
 	 */
 	private $isMulti = false;
 	
-	function __construct(ContainerInterface $container, EntityManager $entityManager, RequestStack $requestStack, RouterInterface $router, LoggerInterface $logger, TableStopwatchService $stopwatchService)
+	function __construct(ContainerInterface $container, EntityManager $entityManager, RequestStack $requestStack, RouterInterface $router, TableStopwatchService $stopwatchService, TableHintService $hintService)
 	{
 		$this->container = $container;
 		$this->entityManager = $entityManager;
 		$this->request = $requestStack->getCurrentRequest();
 		$this->router = $router;
-		$this->logger = $logger;
 		$this->stopwatchService = $stopwatchService;
+		$this->hintService = $hintService;
 	}
 	
 	/**
@@ -98,7 +96,7 @@ class TableFactoryService
 	 */
 	public function createTable(AbstractTableType $tableType, array $options = array())
 	{
-		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->logger, $this->isMulti, $this->stopwatchService);
+		$table = new Table($this->container, $this->entityManager, $this->request, $this->router, $this->isMulti, $this->stopwatchService, $this->hintService);
 		
 		$this->isMulti = true;
 		
