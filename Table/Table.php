@@ -50,10 +50,10 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class Table
 {
-	const STATE_INSTANTIATED = 1;
-	const STATE_PREPARED_FOR_BUILD = 2;
-	const STATE_BUILD = 4;
-	const STATE_DATA_LOADED = 8;
+	const STATE_INSTANTIATED = 0;
+	const STATE_PREPARED_FOR_BUILD = 1;
+	const STATE_BUILD = 2;
+	const STATE_DATA_LOADED = 4;
 
 	/**
 	 * Container.
@@ -84,11 +84,17 @@ class Table
 	private $router;
 	
 	/**
+	 * Service for time measurement in
+	 * debug mode.
+	 * 
 	 * @var TableStopwatchService
 	 */
 	private $stopwatchService;
 	
 	/**
+	 * Service for creating hints
+	 * in debug mode,
+	 * 
 	 * @var TableHintService
 	 */
 	private $hintService;
@@ -149,6 +155,13 @@ class Table
 	private $rows;
 	
 	/**
+	 * Cache for selected rows.
+	 * 
+	 * @var array
+	 */
+	private $selectedRowsCache;
+	
+	/**
 	 * Array of filters.
 	 * 
 	 * @var array
@@ -156,6 +169,9 @@ class Table
 	private $filters;
 	
 	/**
+	 * DataSource for fetching 
+	 * table data.
+	 * 
 	 * @var DataSourceInterface
 	 */
 	private $dataSource;
@@ -210,11 +226,19 @@ class Table
 		// for the table type.
 		$this->options = array();
 		$this->rows = array();
-		$this->selectedRows = array();
 		$this->columns = array();
 		$this->filters = array();
 	}
 	
+	/**
+	 * Creates a buildable table instance by instantiating
+	 * column/filter/selection builder and fetching data
+	 * source from table type.
+	 * 
+	 * @param AbstractTableType $tableType	Type of the table.
+	 * @param array $options				Options for the table.
+	 * @return Table
+	 */
 	public function create(AbstractTableType $tableType, array $options = array())
 	{
 		$this->options['table'] = $options;
@@ -238,27 +262,11 @@ class Table
 		$this->tableType->setContainer($this->container);
 		$this->tableType->setEntityManager($this->entityManager);
 		
-		$this->container->get('jgm.table_context')->unregisterTable($this);
+		$this->tableContext->unregisterTable($this);
 		
 		$this->stopwatchService->stop($tableType->getName(), TableStopwatchService::CATEGORY_INSTANTIATION);
 		
 		return $this;
-	}
-	
-	/**
-	 * Returns a column identified by the name.
-	 * 
-	 * @param string $columnName Name of the column.
-	 * @return ColumnInterface
-	 */
-	public function getColumn($columnName)
-	{
-		if(!array_key_exists($columnName, $this->columns))
-		{
-			TableException::noSuchColumn($this->getName(), $columnName);
-		}
-		
-		return $this->columns[$columnName];
 	}
 	
 	/**
@@ -279,7 +287,6 @@ class Table
 		
 		if($this->view === null)
 		{
-			$this->tableContext->registerTable($this);
 			$this->buildTable($loadData);
 			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 			$this->view = new TableView(
@@ -291,10 +298,179 @@ class Table
 				$this->getSelectionButtons()
 			);
 			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
-			$this->tableContext->unregisterTable($this);
 		}
 		
 		return $this->view;
+	}
+	
+		
+	/**
+	 * Sets the request, which should be handled
+	 * by the table.
+	 * 
+	 * @param Request $request
+	 */
+	public function handleRequest(Request $request)
+	{
+		if($this->isBuild())
+		{
+			TableException::canNotHandleRequestAfterBuild($this->getName());
+		}
+		
+		$this->request = $request;
+	}
+	
+	/**
+	 * Returning all Entities, described by the data source,
+	 * which is defined at the table type.
+	 * 
+	 * @param boolean $isFiltered	Should the entities be filtered by the filters?
+	 * @param boolean $isOrdered	Should the entites ordered, like the table?
+	 * 
+	 * @return array
+	 */
+	public function getData($isFiltered = true, $isOrdered = true)
+	{
+		$this->prepareTableForBuild(true);
+		
+		return $this->dataSource->getData(
+			$this->container,
+			$this->columns,
+			$isFiltered ? $this->filters : null,
+			null, 
+			$isOrdered ? new Order($this->options['order']) : null
+		);
+	}
+	
+	/**
+	 * Returning the name of the table,
+	 * defined at the table type.
+	 * 
+	 * @return string|null
+	 */
+	public function getName()
+	{
+		if($this->tableType !== null)
+		{
+			return $this->tableType->getName();
+		}
+	
+		return null;
+	}
+	/**
+	 * Returning the selected rows.
+	 * If the table is not a selection provider or
+	 * there is now post request with selected rows,
+	 * the returned array will be empty.
+	 * 
+	 * @return array
+	 */
+	public function getSelectedRows()
+	{
+		if($this->isSelectionProvider() === false || $this->isSelectionRequested() === false)
+		{
+			return array();
+		}
+		
+		if($this->isBuild() === false)
+		{
+			$this->buildTable(true);
+		}
+		
+		if($this->isDataLoaded() === false)
+		{
+			$this->rows = $this->loadData();
+		}
+		if(!is_array($this->selectedRowsCache))
+		{
+			$this->selectedRowsCache = array();
+			foreach($this->rows as $row)
+			{
+				/* @var $row Row */
+				if($row->isSelected())
+				{
+					$this->selectedRowsCache[] = $row;
+				}
+			}
+		}
+				
+		return $this->selectedRowsCache;
+	}
+	
+	/**
+	 * Returning true, if the selection button with the
+	 * given name was pressed by the user.
+	 * 
+	 * @param string $name	Name of the selection button.
+	 * @return boolean
+	 */
+	public function isSelectionButtonPressed($name)
+	{
+		if($this->isSelectionProvider() == false || $this->isSelectionRequested() === false)
+		{
+			return false;
+		}
+		
+		return $this->request->request->has(sprintf("selection_submit_%s", $name));
+	}
+	
+	/**
+	 * Returning the table view of this table,
+	 * which is used for render the table at twig.
+	 * 
+	 * @return TableView
+	 */
+	public function getTableView()
+	{
+		return $this->view;
+	}
+	
+	/**
+	 * Returning the tables container.
+	 * 
+	 * @return ContainerInterface
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
+
+	/**
+	 * Returning the tables request.
+	 * 
+	 * @return Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Returning the tables router.
+	 * 
+	 * @return RouterInterface
+	 */
+	public function getRouter()
+	{
+		return $this->router;
+	}
+	
+	/************************* PRIVATE FUNCTIONS ****************************************************************************************************************
+	
+	/**
+	 * Returns a column identified by the name.
+	 * 
+	 * @param string $columnName Name of the column.
+	 * @return ColumnInterface
+	 */
+	private function getColumn($columnName)
+	{
+		if(!array_key_exists($columnName, $this->columns))
+		{
+			TableException::noSuchColumn($this->getName(), $columnName);
+		}
+		
+		return $this->columns[$columnName];
 	}
 	
 	/**
@@ -311,25 +487,23 @@ class Table
 			return;
 		}
 		
+		$this->tableContext->registerTable($this);
 		$this->prepareTableForBuild($loadData);
 		
 		if(($loadData && $this->options['table'][TableOptions::LOAD_DATA]) === true)
 		{
-			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
-			$this->loadData();
-			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
+			$this->rows = $this->loadData();
 		}
 		
 		if(	$this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] === true 
-			&& $this->options['table'][TableOptions::HIDE_EMPTY_COLUMNS] > 0
+			&& $this->options['table'][TableOptions::TOTAL_ITEMS] > 0
 		)
 		{
-			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
-			$this->hideEmptyColumns();
-			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
+			$this->columns = $this->hideEmptyColumns();
 		}
 		
-		$this->state &= self::STATE_BUILD;
+		$this->state |= self::STATE_BUILD;
+		$this->tableContext->unregisterTable($this);
 	}
 	
 	/**
@@ -352,7 +526,7 @@ class Table
 		
 		// Resolve all options, defined in the table type.
 		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_RESOLVE_OPTIONS);
-		$this->resolveOptions();
+		$this->options = $this->resolveOptions();
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_RESOLVE_OPTIONS);
 		
 		// Build the filters, if the table type implements 
@@ -360,7 +534,7 @@ class Table
 		if($this->isFilterProvider())
 		{
 			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_FILTER);
-			$this->buildFilter();
+			$this->filters = $this->buildFilter();
 			$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_BUILD_FILTER);
 		}
 		
@@ -373,7 +547,7 @@ class Table
 		$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->calculateTotalItems($loadData);
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		
-		$this->state &= self::STATE_PREPARED_FOR_BUILD;
+		$this->state |= self::STATE_PREPARED_FOR_BUILD;
 	}
 	
 	protected function loadData()
@@ -382,7 +556,9 @@ class Table
 		{
 			return;
 		}
-		
+
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
+
 		// Initialise the row counter, raise the counter,
 		// if the table uses pagination.
 		// For example, the counter should start at 11, if 
@@ -401,20 +577,20 @@ class Table
 		$data = $this->dataSource->getData(	$this->container, $this->columns, $this->filters, $pagination, $order );
 
 		$isSelectionRequested = $this->isSelectionRequested();
-		$requestedRows = $this->request->request->get(sprintf("selection_column", $this->getName()), array());
+		$requestedRows = $this->request->request->get("selection_column", array());
+		$rows = array();
 		foreach($data as $dataRow)
 		{
-			$row = new Row($dataRow, ++$count);
+			$row = new Row($dataRow, ++$count, $isSelectionRequested && in_array($dataRow->getId(), $requestedRows));
 			$row->setAttributes( $this->tableType->getRowAttributes($row) );
 
-			$this->rows[] = $row;
-			if($isSelectionRequested && in_array($row->get('id'), $requestedRows))
-			{
-				$this->selectedRows[] = $row;
-			}
+			$rows[] = $row;
 		}
-
-		$this->state &= self::STATE_DATA_LOADED;
+		
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
+		$this->state |= self::STATE_DATA_LOADED;
+		
+		return $rows;
 	}
 	
 	/**
@@ -426,30 +602,32 @@ class Table
 	 */
 	protected function resolveOptions()
 	{
-		$this->options = array();
+		$options = array();
 		
 		// Resolve Options of the table.
 		$optionsResolver = new TableOptionsResolver($this->container);
 		$this->tableType->configureOptions($optionsResolver);
-		$this->options['table'] = $optionsResolver->resolve();
+		$options['table'] = $optionsResolver->resolve($this->options['table']);
 		
 		// Resolve options of pagination.
-		if($this->isPaginationProvider())
+		if($this->tableType instanceof PaginationTypeInterface && $options['table'][TableOptions::USE_PAGINATION])
 		{
-			$this->options['pagination'] = $this->resolvePaginationOptions();
+			$options['pagination'] = $this->resolvePaginationOptions();
 		}
 		
 		// Resolve sortable options.
-		if($this->isOrderProvider())
+		if($this->tableType instanceof OrderTypeInterface && $options['table'][TableOptions::USE_ORDER])
 		{
-			$this->options['order'] = $this->resolveOrderOptions();
+			$options['order'] = $this->resolveOrderOptions();
 		}
 		
 		// Resole filter options.
-		if($this->isFilterProvider())
+		if($this->tableType instanceof FilterTypeInterface && $options['table'][TableOptions::USE_FILTER])
 		{
-			$this->options['filter'] = $this->resolveFilterOptions();
+			$options['filter'] = $this->resolveFilterOptions();
 		}
+		
+		return $options;
 	}
 	
 	/**
@@ -461,7 +639,7 @@ class Table
 	 * 
 	 * @throws NotFoundHttpException	If the given current page is unavailable.
 	 */
-	protected function calculateTotalItems($loadData = true)
+	private function calculateTotalItems($loadData = true)
 	{
 		if($loadData === true && $this->options['table'][TableOptions::LOAD_DATA] === true)
 		{
@@ -477,12 +655,8 @@ class Table
 			{
 				$countPages = ceil($totalItems / $this->options['pagination'][PaginationOptions::ROWS_PER_PAGE]);
 				
-				if(	$this->options['pagination'][PaginationOptions::CURRENT_PAGE] < 0 
-					|| $this->options['pagination'][PaginationOptions::CURRENT_PAGE] > $countPages)
-				{
-					throw new NotFoundHttpException();
-				}
-
+				$this->validateCurrentPage($countPages);
+				
 				$this->options['pagination'][PaginationOptions::TOTAL_PAGES] = max($countPages, 1);
 			}
 			
@@ -491,15 +665,28 @@ class Table
 		
 		return 0;
 	}
+	
+	/**
+	 * Validates the current page, stored at the 
+	 * pagination options. Throws a NotFoundHttpException,
+	 * if the current page is lower than zero
+	 * or greater than the page count.
+	 * 
+	 * @param int $countPages
+	 */
+	private function validateCurrentPage($countPages)
+	{
+		if(	$this->options['pagination'][PaginationOptions::CURRENT_PAGE] < 0 
+			|| $this->options['pagination'][PaginationOptions::CURRENT_PAGE] > $countPages)
+		{
+			throw new NotFoundHttpException();
+		}
+	}
 
 	/**
-	 * Builds the _pagination-array from the current tableBuilder.
+	 * Resolves the pagination-options from the current tableBuilder.
 	 * 
-	 * Following keys are used:
-	 *	rows_per_page:		Maximal num of items per page.
-	 *	param:				Name of the request-parameter for the page.
-	 *	page:				Current page.
-	 *	classes:			Classes for rendering, containing classnames for "ul", "li", "li-active" and "li-disabled".
+	 * @return array
 	 */
 	private function resolvePaginationOptions()
 	{	
@@ -516,21 +703,11 @@ class Table
 			$pagination[PaginationOptions::PARAM] = sprintf("%s%s", $this->getPrefix(), PaginationOptions::PARAM);
 		}
 		
-		$userItemsPerPage = null;
-		$itemsPerPageCookieName = sprintf("%s_items_per_page", $this->getName());
-		$itemsPerPagePostName = sprintf("%s_option_values", $this->getName());
-		if($this->request->isMethod('post') && $this->request->request->has($itemsPerPagePostName))
+		// Check if the user made another decision for rows per page.
+		$userRowsPerPage = $this->getUserRowsPerPage();
+		if(in_array($userRowsPerPage, $pagination[PaginationOptions::OPTION_VALUES]))
 		{
-			$userItemsPerPage = (int) $this->request->get($itemsPerPagePostName);
-		}
-		else if($this->request->cookies->has($itemsPerPageCookieName))
-		{
-			$userItemsPerPage = (int) $this->request->cookies->get($itemsPerPageCookieName);
-		}
-		
-		if(in_array($userItemsPerPage, $pagination[PaginationOptions::OPTION_VALUES]))
-		{
-			$pagination[PaginationOptions::ROWS_PER_PAGE] = $userItemsPerPage;
+			$pagination[PaginationOptions::ROWS_PER_PAGE] = $userRowsPerPage;
 		}
 		
 		// Read current page.
@@ -542,6 +719,36 @@ class Table
 		return $pagination;		
 	}
 	
+	/**
+	 * Reads the users decision of rows per page
+	 * from post parameter or cookie. If this is not
+	 * happen, the returned value will be null.
+	 * 
+	 * @return int|null
+	 */
+	private function getUserRowsPerPage()
+	{
+		$userRowsPerPage = null;
+		$itemsPerPageCookieName = sprintf("%s_items_per_page", $this->getName());
+		$itemsPerPagePostName = sprintf("%s_option_values", $this->getName());
+		if($this->request->isMethod('post') && $this->request->request->has($itemsPerPagePostName))
+		{
+			$userRowsPerPage = (int) $this->request->get($itemsPerPagePostName);
+		}
+		else if($this->request->cookies->has($itemsPerPageCookieName))
+		{
+			$userRowsPerPage = (int) $this->request->cookies->get($itemsPerPageCookieName);
+		}
+		
+		return $userRowsPerPage;
+	}
+	
+	/**
+	 * Resolves the order options.
+	 * 
+	 * @return array
+	 * @throws NotFoundHttpException
+	 */
 	private function resolveOrderOptions()
 	{		
 		// Configure the options resolver for the order options.
@@ -556,35 +763,13 @@ class Table
 		}
 		
 		// Read the column and direction from $request-object.
-		$column = $this->request->get( $order[OrderOptions::PARAM_COLUMN] );
+		$column = $this->request->get( $order[OrderOptions::PARAM_COLUMN], $order[OrderOptions::EMPTY_COLUMN] );
 		$direction = $this->request->get( $order[OrderOptions::PARAM_DIRECTION] );
 
 		// Find column and direction if the are empty.
 		if($column === null)
 		{
-			if($order[OrderOptions::EMPTY_COLUMN] !== null)
-			{
-				$column = $order[OrderOptions::EMPTY_COLUMN];
-			}
-			else
-			{
-				// If no default column is defined, look for the first sortable.
-				foreach($this->columns as $tmpColumn)
-				{
-					/* @var $tmpColumn ColumnInterface */
-
-					if($tmpColumn->isSortable() === true)
-					{
-						$column = $tmpColumn->getName();
-						break;
-					}
-				}
-				
-				if($column === null)
-				{
-					TableException::noSortableColumn($this->getName());
-				}
-			}
+			$column = $this->getFirstOrderColumn();
 		}
 		$order[OrderOptions::CURRENT_COLUMN] = $column;
 
@@ -595,8 +780,7 @@ class Table
 		$order[OrderOptions::CURRENT_DIRECTION] = $direction;
 		
 		// Require a sortable column, otherwise redirect to 404.
-		$sortedColumn = $this->getColumn($column);
-		if($sortedColumn->isSortable() !== true)
+		if($this->getColumn($column)->isSortable() !== true)
 		{
 			throw new NotFoundHttpException();
 		}
@@ -604,6 +788,43 @@ class Table
 		return $order;
 	}
 	
+	/**
+	 * Finds the first sortable column of
+	 * all specified columns.
+	 * 
+	 * @return string
+	 */
+	private function getFirstOrderColumn()
+	{
+		$this->hintService->addHint(
+			$this->getName(),
+			sprintf(
+				'There is no default column for ordering the table. '
+				. 'Defining a default column at order options with option'
+				. ' "%s" will save time.', 
+				OrderOptions::EMPTY_COLUMN
+			)
+		);
+		
+		// If no default column is defined, look for the first sortable.
+		foreach($this->columns as $column)
+		{
+			/* @var $column ColumnInterface */
+
+			if($column->isSortable() === true)
+			{
+				return $column->getName();
+			}
+		}
+
+		TableException::noSortableColumn($this->getName());
+	}
+	
+	/**
+	 * Resolves the filter options.
+	 * 
+	 * @return array
+	 */
 	private function resolveFilterOptions()
 	{		
 		// Set button option default values.
@@ -616,42 +837,13 @@ class Table
 		return $filterOptionsResolver->resolve();
 	}
 	
-	public function getContainer()
-	{
-		return $this->container;
-	}
-
-	public function getRequest()
-	{
-		return $this->request;
-	}
-
-	public function getRouter()
-	{
-		return $this->router;
-	}
-	
 	/**
-	 * Returning all Entities.
-	 * 
-	 * @param boolean $isFiltered	Should the entities be filtered by the filters?
-	 * @param boolean $isOrdered	Should the entites ordered, like the table?
+	 * Returns the a list with all selection buttons,
+	 * defined by the table type, if this is implementing
+	 * the selection type interface.
 	 * 
 	 * @return array
 	 */
-	public function getData($isFiltered = true, $isOrdered = true)
-	{
-		$this->prepareTableForBuild(true);
-		
-		return $this->dataSource->getData(
-			$this->container,
-			$this->columns,
-			$isFiltered ? $this->filters : null,
-			null, 
-			$isOrdered ? new Order($this->options['order']) : null
-		);
-	}
-	
 	private function getSelectionButtons()
 	{
 		if($this->selectionButtonBuilder == null)
@@ -662,63 +854,87 @@ class Table
 		return $this->selectionButtonBuilder->getButtons();
 	}
 	
+	/**
+	 * Returns true, if the table type of this table
+	 * implements the pagination type interface and the
+	 * table options allowed the pagination usage.
+	 * 
+	 * @return boolean
+	 */
 	private function isPaginationProvider()
 	{
 		return $this->tableType instanceof PaginationTypeInterface && $this->options['table'][TableOptions::USE_PAGINATION];
 	}
 	
+	/**
+	 * Returns true, if the table type of this table
+	 * implements the order type interface and the
+	 * table options allowed the order usage.
+	 * 
+	 * @return boolean
+	 */
 	private function isOrderProvider()
 	{
 		return $this->tableType instanceof OrderTypeInterface && $this->options['table'][TableOptions::USE_ORDER];
 	}
 	
+	/**
+	 * Returns true, if the table type of this table
+	 * implements the filter type interface and the
+	 * table options allowed the filter usage.
+	 * 
+	 * @return boolean
+	 */
 	private function isFilterProvider()
 	{
 		return $this->tableType instanceof FilterTypeInterface && $this->options['table'][TableOptions::USE_FILTER];
 	}
 	
+	/**
+	 * Returns true, if the table type of this table
+	 * implements the selection type interface and the
+	 * table options allowed the selection usage.
+	 * 
+	 * @return boolean
+	 */
 	private function isSelectionProvider()
 	{
-		return $this->tableType instanceof SelectionTypeInterface;
+		return $this->tableType instanceof SelectionTypeInterface && $this->options['table'][TableOptions::USE_SELECTION];
 	}
 	
+	/**
+	 * Prefix of this table for all request
+	 * parameters.
+	 * 
+	 * @return string
+	 */
 	private function getPrefix()
 	{
 		return $this->tableType->getName() . '_';
 	}
 	
-	public function getName()
-	{
-		if($this->tableType !== null)
-		{
-			return $this->tableType->getName();
-		}
-	
-		return null;
-	}
-	
-	public function handleRequest(Request $request)
-	{
-		if($this->isBuild())
-		{
-			TableException::canNotHandleRequestAfterBuild($this->getName());
-		}
-		
-		$this->request = $request;
-	}
-	
-	public function getTableView()
-	{
-		return $this->view;
-	}
-	
+	/**
+	 * Returns a new list of columns, in which
+	 * the empty columns are removed.
+	 * 
+	 * @return array
+	 */
 	private function hideEmptyColumns()
 	{
+		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
+		
 		$this->hintService->addHint(
 			$this->getName(), 
-			'Hiding columns with no content can be high priced.'
+			sprintf(
+				'Hiding columns with no content is enabled at table options '
+				. '(option "%s"). This option can be high priced.',
+				TableOptions::HIDE_EMPTY_COLUMNS
+			)
 		);
-		foreach($this->columns as $name => $column)
+		
+		$columns = $this->columns;
+
+		foreach($columns as $name => $column)
 		{
 			/* @var $column ColumnInterface */
 
@@ -726,34 +942,40 @@ class Table
 			{
 				/* @var $row Row */
 				$content = $column->getContent($row);
-				if($content !== null && $content !== "")
+				if($content !== null && strlen($content) > 0)
 				{
 					continue 2;
 				}
 			}
 
-			$this->tableBuilder->removeColumn($name);
+			unset($columns[$name]);
 		}
-		$this->columns = $this->tableBuilder->getColumns();
+		
+		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_HIDE_EMPTY_COLUMNS);
+		
+		return $columns;
 	}
 	
+	/**
+	 * Returns a list of the filters,
+	 * specified by the table type.
+	 * 
+	 * @return array
+	 */
 	private function buildFilter()
 	{
 		$this->tableType->buildFilter($this->filterBuilder);
-		$this->filters = $this->filterBuilder->getFilters();
-		if($this->usePrefix)
-		{
-			foreach($this->filters as $filter)
-			{
-				/* @var $filter FilterInterface */
-				$filter->setName(sprintf("%s%s", $this->getPrefix(), $filter->getName()));
-			}
-		}
+		$filters = $this->filterBuilder->getFilters();
 
 		// Sets value of all filters.
-		foreach($this->filters as $filter)
+		foreach($filters as $filter)
 		{
 			/* @var $filter FilterInterface */
+			
+			if($this->usePrefix)
+			{
+				$filter->setName(sprintf("%s%s", $this->getPrefix(), $filter->getName()));
+			}
 
 			$values = array();
 
@@ -773,8 +995,16 @@ class Table
 
 			$filter->setValue($values);
 		}
+		
+		return $filters;
 	}
 	
+	/**
+	 * Returns true, if this request includes selections
+	 * for this table.
+	 * 
+	 * @return boolean
+	 */
 	private function isSelectionRequested()
 	{
 		$inputName = sprintf("is_selection_%s", $this->getName());
@@ -783,19 +1013,34 @@ class Table
 				&& $this->request->request->get($inputName) === $this->getName();
 				
 	}
-	
+
+	/**
+	 * Returns true, if the table is prepared for build.
+	 * 
+	 * @return boolean
+	 */
 	private function isPreparedForBuild()
 	{
-		return $this->state & 7 === 8;
+		return ($this->state | 6) === 7;
 	}
 	
+	/**
+	 * Returns true, if the table is build.
+	 * 
+	 * @return boolean
+	 */
 	private function isBuild()
 	{
-		return $this->state & 3 === 8;
+		return ($this->state | 5) === 7;
 	}
 	
+	/**
+	 * Returns true, if the data of this table is laoded.
+	 * 
+	 * @return boolean
+	 */
 	private function isDataLoaded()
 	{
-		return $this->state & 5 === 8;
+		return ($this->state | 3) === 7;
 	}
 }
