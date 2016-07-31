@@ -50,13 +50,58 @@ class AppKernel extends Kernel
 * doctrine/common: >=2.3
 
 ## Basic usage
-TODO
+### Step 1: Create a table type
+```
+// src/YourBundle/Table/Type/StudentTableType.php
+class StudentTableType extends JGM\TableBundle\Table\Type\AbstractTableType
+{
+    public function buildTable(TableBuilder $builder) 
+    {
+		$builder
+			->add('text', 'name', ['label' => 'Name'])
+			->add('number', 'term', ['label' => 'Term'])
+			->add('date', 'birthday', ['label' => 'Day of birth']);
+    }
 
-## Next development steps
-The next release (version 1.3) will contain the following new features:
+    public function getDataSource(ContainerInterface $container)
+    {
+      return new EntityDataSource('YourBundle:Student');
+    }
 
-* [#6](https://github.com/jangemue/TableBundle/issues/6) Adding support for defining aggregation columns.
-* [#7](https://github.com/jangemue/TableBundle/issues/7) New component, called "Selection", which allows you to select rows from a table do stuff with them (e.g. delete all selected or export them).
+    public function getName()
+    {
+        return 'student_table';
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+		$optionsResolver->setDefaults(array(
+			'attr' => array('width' => '600px', 'class' => 'table-css'),
+			'empty_value' => 'There is no student...'
+		));
+    }
+}
+```
+
+### Step 2: Instantiate the table
+```
+// src/YourBundle/Controller/StudentController.php
+<?
+class StudentController extends Symfony\Bundle\FrameworkBundle\Controller\Controller
+{
+    public function showAction()
+    {
+        $table = $this->get('jgm.table')->createTable(new StudentTableType());
+		return array('studentTable' => $table->createView());
+    }
+}
+```
+
+### Step 3: Render the table at twig template
+```
+<h1>Students</h1>
+{{ table(studentTable) }}
+```
 
 ## Documentation
 For more information take a look at the [Documentation Website](http://tablebundle.org).
