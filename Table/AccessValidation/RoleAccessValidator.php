@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace JGM\TableBundle\Table\Column\AccessValidation;
+namespace JGM\TableBundle\Table\AccessValidation;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Access validation, which get the accessibility of 
  * the user by his role(s).
  * 
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0
+ * @since	1.3
  */
-class RoleAccess implements ColumnAccessInterface
+class RoleAccessValidator implements AccessValidatorInterface
 {
 	/**
 	 * @var array
@@ -43,11 +43,11 @@ class RoleAccess implements ColumnAccessInterface
 		}
 	}
 	
-	public function isAccessGranted(SecurityContextInterface $securityContext)
+	public function isAccessGranted(AuthorizationCheckerInterface $checker)
 	{
 		foreach($this->roles as $role)
 		{
-			if($securityContext->isGranted($role) === false)
+			if($checker->isGranted($role) === false)
 			{
 				return false;
 			}

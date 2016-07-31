@@ -256,7 +256,7 @@ class Table
 		
 		if($this->tableType instanceof SelectionTypeInterface) 
 		{
-			$this->selectionButtonBuilder = new SelectionButtonBuilder();
+			$this->selectionButtonBuilder = new SelectionButtonBuilder($this->container);
 		}
 		
 		$this->tableType->setContainer($this->container);
@@ -368,20 +368,22 @@ class Table
 	 */
 	public function getSelectedRows()
 	{
-		if($this->isSelectionProvider() === false || $this->isSelectionRequested() === false)
-		{
-			return array();
-		}
 		
 		if($this->isBuild() === false)
 		{
 			$this->buildTable(true);
 		}
 		
+		if($this->isSelectionProvider() === false || $this->isSelectionRequested() === false)
+		{
+			return array();
+		}
+
 		if($this->isDataLoaded() === false)
 		{
 			$this->rows = $this->loadData();
 		}
+		
 		if(!is_array($this->selectedRowsCache))
 		{
 			$this->selectedRowsCache = array();
@@ -407,6 +409,11 @@ class Table
 	 */
 	public function isSelectionButtonPressed($name)
 	{
+		if($this->isBuild() === false)
+		{
+			$this->buildTable();
+		}
+		
 		if($this->isSelectionProvider() == false || $this->isSelectionRequested() === false)
 		{
 			return false;
@@ -479,7 +486,7 @@ class Table
 	 * 
 	 * @param boolean $loadData	Load data?
 	 */
-	private function buildTable($loadData)
+	private function buildTable($loadData = true)
 	{	
 		if($this->isBuild())
 		{

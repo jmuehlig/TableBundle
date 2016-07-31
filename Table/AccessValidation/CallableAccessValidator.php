@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace JGM\TableBundle\Table\Column\AccessValidation;
+namespace JGM\TableBundle\Table\AccessValidation;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Access validation, which can execute an anonymous 
  * function get the users access.
  * 
  * @author	Jan Mühlig <mail@janmuehlig.de>
- * @since	1.0
+ * @since	1.3
  */
-class CallableAccess implements ColumnAccessInterface
+class CallableAccessValidator implements AccessValidatorInterface
 {
 	/**
 	 * @var callable
@@ -32,13 +32,13 @@ class CallableAccess implements ColumnAccessInterface
 		$this->callable = $callable;
 	}
 	
-	public function isAccessGranted(SecurityContextInterface $securityContext)
+	public function isAccessGranted(AuthorizationCheckerInterface $checker)
 	{
 		if(is_callable($this->callable))
 		{
-			return call_user_func($this->callable, $securityContext);
+			return call_user_func($this->callable, $checker);
 		}
 		
-		return true;
+		return false;
 	}
 }

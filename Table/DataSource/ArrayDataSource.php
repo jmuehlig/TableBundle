@@ -82,6 +82,11 @@ class ArrayDataSource implements DataSourceInterface
 	
 	public function getData(ContainerInterface $container, array $columns, array $filters = null, Pagination $pagination = null, Order $sortable = null)
 	{
+		$container->get('jgm.table_hint')->addHint(
+			$container->get('jgm.table_context')->getCurrentTableName(),
+			'The used ArrayDataSource may be slower than other data sources, espaccially on filtering.'
+		);
+		
 		// Get the filtered data.
 		if($this->cachedData !== null && $this->cacheHash === $this->generateHash($columns, $filters))
 		{

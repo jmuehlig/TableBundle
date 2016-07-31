@@ -17,8 +17,8 @@ use JGM\TableBundle\Table\Column\AccessValidation\RoleAccess;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * The TableBuilder is concerned for the visualised columns.
@@ -48,6 +48,11 @@ class TableBuilder
 	 * @var ContainerInterface 
 	 */
 	private $container;
+	
+	/**
+	 * @var AuthorizationCheckerInterface
+	 */
+	private $authorizationChecker;
 
 
 	/**
@@ -67,6 +72,7 @@ class TableBuilder
 	function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
+		$this->authorizationChecker = $this->container->get('security.authorization_checker');
 		
 		$this->columns = array();
 		
@@ -128,7 +134,8 @@ class TableBuilder
 	/**
 	 * Removes a column by its name.
 	 * 
-	 * @param string $columnName	Name of the column.
+	 * @param string	$columnName	Name of the column.
+	 * @deprecated		since version 1.3
 	 */
 	public function removeColumn($columnName)
 	{
@@ -148,7 +155,6 @@ class TableBuilder
 		return $this->columns;
 	}
 	
-	
 	/**
 	 * Checks whether the logged user has access to see this column.
 	 * 
@@ -158,37 +164,12 @@ class TableBuilder
 	 */
 	private function isAccessGranted($accessOption)
 	{
-		$securityContext = $this->container->get('security.authorization_checker');
-		/* @var $securityContext SecurityContextInterface */
-
-		// If we found an array or string, it may be a role or a list of them.
-		if(is_string($accessOption) || is_array($accessOption))
+		$accessValidator = AccessValidation\AccessValidatorFactory::getValidator($accessOption);
+		if($accessValidator === null)
 		{
-			$accessOption = new RoleAccess($accessOption);
+			return false;
 		}
-
-		// If the option is callable, call them and check the result.
-		else if(is_callable($accessOption))
-		{
-			$accessOption = new CallableAccess($accessOption);
-		}
-
-		// If the option is a column access interface, call it and check the result.
-		if($accessOption instanceof ColumnAccessInterface)
-		{
-			try
-			{
-				if($accessOption->isAccessGranted($securityContext) !== true)
-				{
-					return false;
-				}
-			}
-			catch(AccessDeniedException $ex)
-			{
-				return false;
-			}
-		}
-
-		return true;
+		
+		return $accessValidator->isAccessGranted($this->authorizationChecker);
 	}
 }

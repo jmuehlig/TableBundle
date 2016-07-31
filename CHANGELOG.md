@@ -6,6 +6,7 @@ v1.3
 * New: Support for [Propel ORM library](http://propelorm.org/) via `PropelQueryBuilderDataSource`. Thanks to [purrucker](https://github.com/purrucker)!
 * New: Added options `html_asc` and `html_desc` to order component to create own html views for ordered columns.
 * New: Added possibility to give the choice of lines per page to the user in form of a select input.
+* New: Security validation for columns. Set a callable or a string or array of roles for controlling, which user can see which columns.
 * New: The used version is visible at the toolbar.
 * New: All components can raise hints at runtime (e.g. for configuration). This hints are visible at the profiler.
 * Improvements for time measurement: Created a more fine-grained structure with measurements for building (table, filters, views), options resolving, data loading and some more. Also removed the measurements for rendering, because twig measurement includes this.
