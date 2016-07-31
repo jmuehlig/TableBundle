@@ -194,6 +194,11 @@ class TableView
 	 */
 	public function getPagination()
 	{
+		@trigger_error(
+			'The method TableView::getPagination is deprecated since v1.3 and will be removed in 1.4. Use TableView::getPaginationOption($name) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		if($this->hasPagination() === false)
 		{
 			return null;
@@ -207,6 +212,11 @@ class TableView
 	 */
 	public function getOrder()
 	{
+		@trigger_error(
+			'The method TableView::getOrder is deprecated since v1.3 and will be removed in 1.4. Use TableView::getOrderOption($name) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		if($this->hasOrder() === false)
 		{
 			return null;
@@ -220,6 +230,11 @@ class TableView
 	 */
 	public function getFilter()
 	{
+		@trigger_error(
+			'The method TableView::getFilter is deprecated since v1.3 and will be removed in 1.4. Use TableView::getFilterOption($name) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		if($this->hasFilter() === false)
 		{
 			return null;
@@ -233,6 +248,11 @@ class TableView
 	 */
 	public function getEmptyValue()
 	{
+		@trigger_error(
+			'The method TableView::getEmptyValue is deprecated since v1.3 and will be removed in 1.4. Use TableView::getTableOption(TableOptions::EMPTY_VALUE) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return $this->getTableOption(TableOptions::EMPTY_VALUE);
 	}
 
@@ -241,6 +261,11 @@ class TableView
 	 */
 	public function getAttributes()
 	{
+		@trigger_error(
+			'The method TableView::getAttributes is deprecated since v1.3 and will be removed in 1.4. Use TableView::getTableOption(TableOptions::ATTRIBUTES) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return $this->getTableOption(TableOptions::ATTRIBUTES);
 	}
 	
@@ -249,6 +274,11 @@ class TableView
 	 */
 	public function getHeadAttributes()
 	{
+		@trigger_error(
+			'The method TableView::getHeadAttributes is deprecated since v1.3 and will be removed in 1.4. Use TableView::getTableOption(TableOptions::HEAD_ATTRIBUTES) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return $this->getTableOption(TableOptions::HEAD_ATTRIBUTES);
 	}
 	
@@ -257,6 +287,11 @@ class TableView
 	 */
 	public function getTotalPages()
 	{
+		@trigger_error(
+			'The method TableView::getTotalPages is deprecated since v1.3 and will be removed in 1.4. Use TableView::getPaginationOption(PaginationOptions::TOTAL_PAGES) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return $this->getPaginationOption(PaginationOptions::TOTAL_PAGES);
 	}
 
@@ -265,6 +300,11 @@ class TableView
 	 */
 	public function getTotalItems()
 	{
+		@trigger_error(
+			'The method TableView::getTotalItems is deprecated since v1.3 and will be removed in 1.4. Use TableView::getTableOption(TableOptions::TOTAL_ITEMS) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return $this->getTableOption(TableOptions::TOTAL_ITEMS);
 	}
 	
@@ -273,6 +313,11 @@ class TableView
 	 */
 	public function getTemplateName()
 	{
+		@trigger_error(
+			'The method TableView::getTemplateName is deprecated since v1.3 and will be removed in 1.4. Use TableView::getTableOption(TableOptions::TEMPLATE_NAME) instead.',
+			E_USER_DEPRECATED
+		);
+		
 		return $this->getTableOption(TableOptions::TEMPLATE);
 	}
 }

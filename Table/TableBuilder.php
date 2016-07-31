@@ -11,14 +11,11 @@
 
 namespace JGM\TableBundle\Table;
 
-use JGM\TableBundle\Table\Column\AccessValidation\CallableAccess;
-use JGM\TableBundle\Table\Column\AccessValidation\ColumnAccessInterface;
-use JGM\TableBundle\Table\Column\AccessValidation\RoleAccess;
+use JGM\TableBundle\Table\AccessValidation\AccessValidatorFactory;
 use JGM\TableBundle\Table\Column\ColumnInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * The TableBuilder is concerned for the visualised columns.
@@ -139,6 +136,11 @@ class TableBuilder
 	 */
 	public function removeColumn($columnName)
 	{
+		 @trigger_error(
+			'The method TableBuilder::removeColumn is deprecated since v1.3 and will be removed in 1.4.',
+			E_USER_DEPRECATED
+		);
+		 
 		if(array_key_exists($columnName, $this->columns))
 		{
 			unset($this->columns[$columnName]);
@@ -164,7 +166,7 @@ class TableBuilder
 	 */
 	private function isAccessGranted($accessOption)
 	{
-		$accessValidator = AccessValidation\AccessValidatorFactory::getValidator($accessOption);
+		$accessValidator = AccessValidatorFactory::getValidator($accessOption);
 		if($accessValidator === null)
 		{
 			return false;

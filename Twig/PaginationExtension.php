@@ -12,6 +12,7 @@
 namespace JGM\TableBundle\Twig;
 
 use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
+use JGM\TableBundle\Table\OptionsResolver\TableOptions;
 use JGM\TableBundle\Table\Pagination\OptionsResolver\PaginationOptions;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyFactory;
 use JGM\TableBundle\Table\Pagination\Strategy\StrategyInterface;
@@ -97,7 +98,10 @@ class PaginationExtension extends AbstractTwigExtension
 		}
 		
 		// Get the page strategy.
-		$strategy = StrategyFactory::getStrategy($tableView->getTotalPages(), $tableView->getPaginationOption(PaginationOptions::MAX_PAGES));
+		$strategy = StrategyFactory::getStrategy(
+			$tableView->getTableOption(TableOptions::TOTAL_ITEMS),
+			$tableView->getPaginationOption(PaginationOptions::MAX_PAGES)
+		);
 		/* @var $strategy StrategyInterface */ 
 
 		$template = $this->loadTemplate($environment, $tableView->getPaginationOption(PaginationOptions::TEMPLATE));
