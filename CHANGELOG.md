@@ -4,6 +4,7 @@ v1.3
 ===
 * New: The TableBundle is now symfony3 compatible.
 * New: Support for [Propel ORM library](http://propelorm.org/) via `PropelQueryBuilderDataSource`. Thanks to [purrucker](https://github.com/purrucker)!
+* New component "Selection": You can add a selection column to your table and define buttons. The table can be asked for the clicked button and the selected rows.
 * New: Added options `html_asc` and `html_desc` to order component to create own html views for ordered columns.
 * New: Added possibility to give the choice of lines per page to the user in form of a select input.
 * New: Security validation for columns. Set a callable or a string or array of roles for controlling, which user can see which columns.
