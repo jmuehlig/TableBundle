@@ -14,7 +14,6 @@ namespace JGM\TableBundle\Table\DataSource;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use JGM\TableBundle\Table\Filter\EntityFilter;
 use JGM\TableBundle\Table\Filter\FilterInterface;
 use JGM\TableBundle\Table\Filter\FilterOperator;

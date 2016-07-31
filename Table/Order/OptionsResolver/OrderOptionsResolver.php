@@ -11,7 +11,6 @@
 
 namespace JGM\TableBundle\Table\Order\OptionsResolver;
 
-use JGM\TableBundle\Table\Order\Model\Order;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

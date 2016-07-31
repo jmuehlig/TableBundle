@@ -1,7 +1,5 @@
 <?php
 
-namespace JGM\TableBundle\DataCollector;
-
 /*
  * This file is part of the TableBundle.
  *
@@ -10,6 +8,8 @@ namespace JGM\TableBundle\DataCollector;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace JGM\TableBundle\DataCollector;
 
 use Exception;
 use JGM\TableBundle\DependencyInjection\Service\TableContext;

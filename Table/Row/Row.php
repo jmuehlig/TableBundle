@@ -95,7 +95,8 @@ class Row
 	 * True, if this row is selected
 	 * by the user.
 	 * 
-	 * @return boolean
+	 * @since	1.3
+	 * @return	boolean
 	 */
 	public function isSelected()
 	{

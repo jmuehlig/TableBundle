@@ -16,12 +16,10 @@ use JGM\TableBundle\DependencyInjection\Service\TableStopwatchService;
 use JGM\TableBundle\Table\Table;
 use JGM\TableBundle\Table\TableTypeBuilder;
 use JGM\TableBundle\Table\Type\AbstractTableType;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-
 
 /**
  * Service TableFactory for creating tables from controller.

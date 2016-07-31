@@ -1,13 +1,24 @@
 <?php
 
+/*
+ * This file is part of the TableBundle.
+ *
+ * (c) Jan Mühlig <mail@janmuehlig.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace JGM\TableBundle\Table\Selection\Button;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Description of SubmitButton
+ * Submit button options holder for
+ * the selection buttons.
  *
- * @author Jan
+ * @author	Jan Mühlig <mail@janmuehlig.de>
+ * @since	1.3
  */
 class SubmitButton
 {
