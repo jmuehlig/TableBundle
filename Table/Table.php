@@ -274,20 +274,11 @@ class Table
 	 * 
 	 * @return View of the table.
 	 */
-	public function createView($loadData = true)
-	{
-		
-		if($loadData !== true)
-		{
-			 @trigger_error(
-				'The signatur ($loadData) of Table::createView is deprecated since v1.2 and will be removed in 1.4. Use table option named "load_data".',
-				E_USER_DEPRECATED
-			);
-		}
-		
+	public function createView()
+	{		
 		if($this->view === null)
 		{
-			$this->buildTable($loadData);
+			$this->buildTable();
 			$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_BUILD_VIEW);
 			$this->view = new TableView(
 				$this->tableType->getName(),
@@ -332,7 +323,7 @@ class Table
 	 */
 	public function getData($isFiltered = true, $isOrdered = true)
 	{
-		$this->prepareTableForBuild(true);
+		$this->prepareTableForBuild();
 		
 		return $this->dataSource->getData(
 			$this->container,
@@ -371,7 +362,7 @@ class Table
 		
 		if($this->isBuild() === false)
 		{
-			$this->buildTable(true);
+			$this->buildTable();
 		}
 		
 		if($this->isSelectionProvider() === false || $this->isSelectionRequested() === false)
@@ -386,15 +377,10 @@ class Table
 		
 		if(!is_array($this->selectedRowsCache))
 		{
-			$this->selectedRowsCache = array();
-			foreach($this->rows as $row)
-			{
+			$this->selectedRowsCache = array_filter($this->rows, function($row) {
 				/* @var $row Row */
-				if($row->isSelected())
-				{
-					$this->selectedRowsCache[] = $row;
-				}
-			}
+				return $row->isSelected();
+			});
 		}
 				
 		return $this->selectedRowsCache;
@@ -414,7 +400,7 @@ class Table
 			$this->buildTable();
 		}
 		
-		if($this->isSelectionProvider() == false || $this->isSelectionRequested() === false)
+		if($this->isSelectionProvider() === false || $this->isSelectionRequested() === false)
 		{
 			return false;
 		}
@@ -486,7 +472,7 @@ class Table
 	 * 
 	 * @param boolean $loadData	Load data?
 	 */
-	private function buildTable($loadData = true)
+	private function buildTable()
 	{	
 		if($this->isBuild())
 		{
@@ -494,9 +480,10 @@ class Table
 		}
 		
 		$this->tableContext->registerTable($this);
-		$this->prepareTableForBuild($loadData);
 		
-		if(($loadData && $this->options['table'][TableOptions::LOAD_DATA]) === true)
+		$this->prepareTableForBuild();
+		
+		if($this->options['table'][TableOptions::LOAD_DATA] === true)
 		{
 			$this->rows = $this->loadData();
 		}
@@ -517,7 +504,7 @@ class Table
 	 * 
 	 * @param boolean $loadData	Load data?
 	 */
-	private function prepareTableForBuild($loadData)
+	private function prepareTableForBuild()
 	{
 		if($this->isPreparedForBuild())
 		{
@@ -550,7 +537,7 @@ class Table
 		}
 		
 		$this->stopwatchService->start($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
-		$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->calculateTotalItems($loadData);
+		$this->options['table'][TableOptions::TOTAL_ITEMS] = $this->calculateTotalItems($this->options['table'][TableOptions::LOAD_DATA]);
 		$this->stopwatchService->stop($this->getName(), TableStopwatchService::CATEGORY_LOAD_DATA);
 		
 		$this->state |= self::STATE_PREPARED_FOR_BUILD;
