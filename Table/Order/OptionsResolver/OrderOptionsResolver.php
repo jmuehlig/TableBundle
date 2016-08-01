@@ -34,8 +34,6 @@ class OrderOptionsResolver extends OptionsResolver
 			OrderOptions::PARAM_COLUMN => $globalDefaults[OrderOptions::PARAM_COLUMN],
 			OrderOptions::EMPTY_DIRECTION => $globalDefaults[OrderOptions::EMPTY_DIRECTION],
 			OrderOptions::EMPTY_COLUMN => $globalDefaults[OrderOptions::EMPTY_COLUMN],
-			OrderOptions::CLASS_ASC => $globalDefaults[OrderOptions::CLASS_ASC],
-			OrderOptions::CLASS_DESC => $globalDefaults[OrderOptions::CLASS_DESC],
 			OrderOptions::HTML_ASC => $globalDefaults[OrderOptions::HTML_ASC],
 			OrderOptions::HTML_DESC => $globalDefaults[OrderOptions::HTML_DESC]
 		));
@@ -45,8 +43,6 @@ class OrderOptionsResolver extends OptionsResolver
 		$this->setAllowedTypes(OrderOptions::PARAM_COLUMN, 'string');
 		$this->setAllowedTypes(OrderOptions::PARAM_DIRECTION, 'string');
 		$this->setAllowedTypes(OrderOptions::EMPTY_COLUMN, array('string', 'null'));
-		$this->setAllowedTypes(OrderOptions::CLASS_ASC, array('string', 'null'));
-		$this->setAllowedTypes(OrderOptions::CLASS_DESC, array('string', 'null'));
 		$this->setAllowedTypes(OrderOptions::HTML_ASC, array('string', 'null'));
 		$this->setAllowedTypes(OrderOptions::HTML_DESC, array('string', 'null'));
 	}

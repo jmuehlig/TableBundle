@@ -24,8 +24,6 @@ class OrderOptions
 	const PARAM_COLUMN		= 'param_column';
 	const EMPTY_DIRECTION	= 'empty_direction';
 	const EMPTY_COLUMN		= 'empty_column';
-	const CLASS_ASC			= 'class_asc';
-	const CLASS_DESC		= 'class_desc';
 	const HTML_ASC			= 'html_asc';
 	const HTML_DESC			= 'html_desc';
 	
