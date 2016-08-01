@@ -49,9 +49,27 @@ class ArrayDataSource implements DataSourceInterface
 	 */
 	protected $data;
 	
+	/**
+	 * Array with filter functions.
+	 * 
+	 * @var array
+	 */
+	protected $filterFunctions;
+	
 	public function __construct(array $data)
 	{
 		$this->data = $data;
+		
+		$this->filterFunctions = array(
+			FilterOperator::EQ			=> function($item, $filter) { return $item == $filter; },
+			FilterOperator::NOT_EQ		=> function($item, $filter) { return $item != $filter; },
+			FilterOperator::GEQ			=> function($item, $filter) { return $item >= $filter; },
+			FilterOperator::GT			=> function($item, $filter) { return $item > $filter; },
+			FilterOperator::LEQ			=> function($item, $filter) { return $item <= $filter; },
+			FilterOperator::LT			=> function($item, $filter) { return $item < $filter; },
+			FilterOperator::LIKE		=> function($item, $filter) { return strpos(strtolower($item), strtolower($filter)) !== false; },
+			FilterOperator::NOT_LIKE	=> function($item, $filter) { return strpos(strtolower($item), strtolower($filter)) === false; },
+		);
 	}
 	
 	public function getCountItems(ContainerInterface $container, array $columns, array $filters = null)
@@ -65,14 +83,9 @@ class ArrayDataSource implements DataSourceInterface
 		
 		if($filters !== null)
 		{
-			$data = array();
-			foreach($this->data as $row)
-			{
-				if($this->survivesFilters($row, $filters) === true)
-				{
-					$data[] = $row;
-				}
-			}
+			$data = array_filter($this->data, function($row)use($filters) {
+				return $this->survivesFilters($row, $filters);
+			});
 			
 			return count( $this->cache($data, $columns, $filters) );
 		}
@@ -98,14 +111,9 @@ class ArrayDataSource implements DataSourceInterface
 
 			if($filters !== null)
 			{
-				$tmpData = array();
-				foreach($this->data as $row)
-				{
-					if($this->survivesFilters($row, $filters) === true)
-					{
-						$tmpData[] = $row;
-					}
-				}
+				$tmpData = array_filter($this->data, function($row) use($filters) {
+					return $this->survivesFilters($row, $filters);
+				});
 
 				$data = $this->cache($tmpData, $columns, $filters);
 			}
@@ -120,15 +128,11 @@ class ArrayDataSource implements DataSourceInterface
 		// Paginate.
 		if($pagination !== null)
 		{
-			$start = $pagination->getCurrentPage() * $pagination->getItemsPerRow();
-			$end = min( array($start + $pagination->getItemsPerRow(), count($data)) );
-			$result = [];
-			for($i = $start; $i < $end; $i++)
-			{
-				$result[] = $data[$i];
-			}
-		
-			return $result;
+			return array_slice(
+				$data, 
+				$pagination->getCurrentPage() * $pagination->getItemsPerRow(), 
+				$pagination->getItemsPerRow()
+			);
 		}
 		
 		return $data;
@@ -213,20 +217,12 @@ class ArrayDataSource implements DataSourceInterface
 	 */
 	protected function survivesFilters($item, array $filters)
 	{
-		foreach($filters as $filter)
+		$activeFilters = array_filter($filters, function($filter) {
+			return $filter->isActive();
+		});
+		foreach($activeFilters as $filter)
 		{
 			/* @var $filter FilterInterface */
-			
-			$filterValue = $filter->getValue();
-			if($filter->isActive() !== true)
-			{
-				continue;
-			}
-			
-			if($filter->getOperator() === FilterOperator::LIKE || $filter->getOperator() === FilterOperator::NOT_LIKE)
-			{
-				$filterValue = strtolower($filterValue);
-			}
 			
 			$surviveFilter = false;
 			foreach($filter->getColumns() as $column)
@@ -243,38 +239,11 @@ class ArrayDataSource implements DataSourceInterface
 					$itemValue = ReflectionHelper::getPropertyOfEntity($itemValue, 'id');
 				}
 				
-				if($filter->getOperator() === FilterOperator::EQ)
-				{
-					$surviveFilter = $surviveFilter || $itemValue == $filterValue;
-				}
-				else if($filter->getOperator() === FilterOperator::NOT_EQ)
-				{
-					$surviveFilter = $surviveFilter || $itemValue != $filterValue;
-				}
-				else if($filter->getOperator() === FilterOperator::GEQ)
-				{
-					$surviveFilter = $surviveFilter || $itemValue >= $filterValue;
-				}
-				else if($filter->getOperator() === FilterOperator::GT)
-				{
-					$surviveFilter = $surviveFilter || $itemValue > $filterValue;
-				}
-				else if($filter->getOperator() === FilterOperator::LEQ)
-				{
-					$surviveFilter = $surviveFilter || $itemValue <= $filterValue;
-				}
-				else if($filter->getOperator() === FilterOperator::LT)
-				{
-					$surviveFilter = $surviveFilter || $itemValue < $filterValue;
-				}
-				else if($filter->getOperator() === FilterOperator::LIKE)
-				{
-					$surviveFilter = $surviveFilter || strpos(strtolower($itemValue), $filterValue) !== false;
-				}
-				else if($filter->getOperator() === FilterOperator::NOT_LIKE)
-				{
-					$surviveFilter = $surviveFilter || strpos($itemValue, $filterValue) === false;
-				}
+				$surviveFilter = $surviveFilter || call_user_func(
+					$this->filterFunctions[$filter->getOperator()],
+					$itemValue, 
+					$filter->getValue()
+				);
 			}
 							
 			if($surviveFilter === false)
