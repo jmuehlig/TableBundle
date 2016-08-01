@@ -47,27 +47,20 @@ class EntityDataSource extends QueryBuilderDataSource
 	 */
 	protected $columnNameMap;
 	
-	public function __construct($entity, $aliasOrCallback = 't', $callbackOrAlias = null)
+	/**
+	 * Instantiates an entity data source.
+	 * 
+	 * @param string $entity			Name of the entity.
+	 * @param string $alias				Alias at query builder for the entity.
+	 * @param callback|null $callback	Callback to modify the query builder.
+	 */
+	public function __construct($entity, $alias = 't', $callback = null)
 	{
 		parent::__construct(null);
 		
 		$this->entity = $entity;
-
-		if(is_callable($aliasOrCallback))
-		{
-			 @trigger_error(
-				'The signatur ($entity,$callback) of the EntityDataSource Constructor is deprecated since v1.2 and will be removed in 1.4. Use ($entity,$alias,$callback).',
-				E_USER_DEPRECATED
-			);
-			
-			$this->alias = 't';
-			$this->callback = $aliasOrCallback;
-		}
-		else
-		{
-			$this->alias = $aliasOrCallback;
-			$this->callback = $callbackOrAlias;
-		}
+		$this->alias = $alias;
+		$this->callback = $callback;
 		
 		$this->columnNameMap = [];
 	}
