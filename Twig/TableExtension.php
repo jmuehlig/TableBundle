@@ -94,24 +94,12 @@ class TableExtension extends AbstractTwigExtension
 				$parameters['pagination'] = null;
 			}
 			$viewParameters['parameters'] = $parameters;
-			$viewParameters['classes'] = array(
-				Order::DIRECTION_ASC => $tableView->getOrderOption(OrderOptions::CLASS_ASC),
-				Order::DIRECTION_DESC => $tableView->getOrderOption(OrderOptions::CLASS_DESC)
-			);
+			$viewParameters['currentDirection'] = $tableView->getOrderOption(OrderOptions::CURRENT_DIRECTION);
 			$viewParameters['orderHtml'] =  array(
 				Order::DIRECTION_ASC => $tableView->getOrderOption(OrderOptions::HTML_ASC),
 				Order::DIRECTION_DESC => $tableView->getOrderOption(OrderOptions::HTML_DESC)
 			);
-			$viewParameters['currentDirection'] = $tableView->getOrderOption(OrderOptions::CURRENT_DIRECTION);
 			$viewParameters['currentColumnName'] = $tableView->getOrderOption(OrderOptions::CURRENT_COLUMN);
-			
-			if(!empty($viewParameters['classes'][Order::DIRECTION_ASC]) || !empty($viewParameters['classes'][Order::DIRECTION_DESC]))
-			{
-				@trigger_error(
-					'The oder options "class_asc" and "class_desc" are deprecated since v1.3 and will be removed in 1.4. Use "html_asc" and "html_desc" instead.',
-					E_USER_DEPRECATED
-				);
-			}
 		}
 		
 		$template = $this->loadTemplate($environment, $templateName);

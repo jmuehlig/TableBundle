@@ -7,7 +7,7 @@
 			{% if column.isSortable %}
 			<a href="{{ order_url(parameters.columnName, column.name, parameters.direction, currentDirection, currentColumnName, parameters.pagination) }}">{{ column.label }}</a>
 			{% if currentColumnName == column.name %}
-			{% if not classes[currentDirection] is null %}<span class="{{ classes[currentDirection] }}"></span>{% else %}{{ orderHtml[currentDirection]|raw }}{% endif %}
+			{{ orderHtml[currentDirection]|raw }}
 			{% endif %}
 			{% else %}
 			{{ column.label }}
