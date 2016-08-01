@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OrderOptionsResolver extends OptionsResolver
 {
-	function __construct(ContainerInterface $container) 
+	public function __construct(ContainerInterface $container) 
 	{
 		$globalDefaults = $container->getParameter('jgm_table.order_default_options');
 		

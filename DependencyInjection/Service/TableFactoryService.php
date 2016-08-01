@@ -75,7 +75,7 @@ class TableFactoryService
 	 */
 	private $isMulti = false;
 	
-	function __construct(ContainerInterface $container, EntityManager $entityManager, RequestStack $requestStack, RouterInterface $router, TableStopwatchService $stopwatchService, TableHintService $hintService)
+	public function __construct(ContainerInterface $container, EntityManager $entityManager, RequestStack $requestStack, RouterInterface $router, TableStopwatchService $stopwatchService, TableHintService $hintService)
 	{
 		$this->container = $container;
 		$this->entityManager = $entityManager;

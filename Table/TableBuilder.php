@@ -66,7 +66,7 @@ class TableBuilder
 	 */
 	private $registeredColumns;
 	
-	function __construct(ContainerInterface $container)
+	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
 		$this->authorizationChecker = $this->container->get('security.authorization_checker');
@@ -126,25 +126,6 @@ class TableBuilder
 		$this->columns[$name] = $column;
 		
 		return $this;
-	}
-	
-	/**
-	 * Removes a column by its name.
-	 * 
-	 * @param string	$columnName	Name of the column.
-	 * @deprecated		since version 1.3
-	 */
-	public function removeColumn($columnName)
-	{
-		 @trigger_error(
-			'The method TableBuilder::removeColumn is deprecated since v1.3 and will be removed in 1.4.',
-			E_USER_DEPRECATED
-		);
-		 
-		if(array_key_exists($columnName, $this->columns))
-		{
-			unset($this->columns[$columnName]);
-		}
 	}
 	
 	/**

@@ -27,7 +27,7 @@ class PropelQueryFilter implements PropelQueryFilterInterface
     {
         $this->name = $name;
         $this->value = $value;
-        if(0 != $operator && null == $operator) {
+        if($operator === null) {
             $operator = '-1';
         }
         switch ($operator) {

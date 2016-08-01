@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TableOptionsResolver extends OptionsResolver
 {
-	function __construct(ContainerInterface $container) 
+	public function __construct(ContainerInterface $container) 
 	{
 		$globalDefaults = $container->getParameter('jgm_table.default_options');
 		

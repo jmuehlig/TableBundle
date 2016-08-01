@@ -23,7 +23,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function set_just_one_filter()
+    public function setJustOneFilter()
     {
         $dto = new PropelQueryBuilder('table');
 
@@ -38,7 +38,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function set_multiple_filters()
+    public function setMultipleFilters()
     {
         $dto = new PropelQueryBuilder('table');
 
@@ -59,7 +59,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function set_one_usage_with_one_filter()
+    public function setOneUsageWithOneFilter()
     {
         $dto = new PropelQueryBuilder('table');
 
@@ -77,7 +77,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function set_multiple_usages()
+    public function setMultipleUsages()
     {
         $dto = new PropelQueryBuilder('table');
 
@@ -104,7 +104,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function add_usage_called_but_add_filter_should_called()
+    public function addUsageCalledButAddFilterShouldCalled()
     {
         $dto = new PropelQueryBuilder('table');
 
@@ -121,7 +121,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function add_concat_usages()
+    public function addConcatUsages()
     {
         $dto = new PropelQueryBuilder('table');
 
@@ -147,7 +147,7 @@ class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function choose_correct_criteria()
+    public function chooseCorrectCriteria()
     {
         $this->assertFilterOperatorIsCriteria(FilterOperator::EQ,\Criteria::EQUAL);
         $this->assertFilterOperatorIsCriteria(FilterOperator::GEQ,\Criteria::GREATER_EQUAL);

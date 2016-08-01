@@ -50,7 +50,7 @@ class Row
 	 */
 	private $isSelected;
 	
-	function __construct($entity, $count, $isSelected = false)
+	public function __construct($entity, $count, $isSelected = false)
 	{
 		$this->entity = $entity;
 		$this->count = $count;

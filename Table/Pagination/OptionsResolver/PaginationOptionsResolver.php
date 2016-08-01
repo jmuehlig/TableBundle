@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PaginationOptionsResolver extends OptionsResolver
 {
-	function __construct(ContainerInterface $container) 
+	public function __construct(ContainerInterface $container) 
 	{
 		$globalDefaults = $container->getParameter('jgm_table.pagination_default_options');
 

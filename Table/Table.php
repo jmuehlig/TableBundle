@@ -209,7 +209,7 @@ class Table
 	 * @param boolean $usePrefix						Should the table use a prefix for filter, pagenination and order?
 	 * @param TableStopwatchService $stopwatchService	Stopwatch-Service.
 	 */
-	function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix, TableStopwatchService $stopwatchService, TableHintService $hintService)
+	public function __construct(ContainerInterface $container, EntityManager $entityManager, Request $request, RouterInterface $router, $usePrefix, TableStopwatchService $stopwatchService, TableHintService $hintService)
 	{
 		// Save the parameters: Symfonys container, curent request,
 		// url router and doctrines entityManager
@@ -838,7 +838,7 @@ class Table
 	 */
 	private function getSelectionButtons()
 	{
-		if($this->selectionButtonBuilder == null)
+		if($this->selectionButtonBuilder === null)
 		{
 			return array();
 		}
