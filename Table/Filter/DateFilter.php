@@ -71,4 +71,9 @@ class DateFilter extends AbstractFilter
 			$this->value = null;
 		}
 	}
+	
+	public function isActive()
+	{
+		return isset($this->value);
+	}
 }
