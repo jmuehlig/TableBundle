@@ -1,6 +1,10 @@
 Changelog
 ===========
 
+v1.2.4
+===
+* Bugfix #21: Option max_pages caused execution timeout
+* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object
 v1.2.3
 ===
 * Bugfix on filter module: Boolean Filter `false` option is not working.
