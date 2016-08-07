@@ -59,7 +59,7 @@ class PaginationOptionsResolver extends OptionsResolver
 		$this->setAllowedTypes(PaginationOptions::LI_CLASS_DISABLED, array('string', 'null'));
 		$this->setAllowedTypes(PaginationOptions::PREV_LABEL, 'string');
 		$this->setAllowedTypes(PaginationOptions::NEXT_LABEL, 'string');
-		$this->setAllowedTypes(PaginationOptions::MAX_PAGES, array('string', 'null'));
+		$this->setAllowedTypes(PaginationOptions::MAX_PAGES, array('integer', 'null'));
 		
 		$this->setAllowedTypes(PaginationOptions::OPTION_VALUES, 'array');
 		$this->setAllowedTypes(PaginationOptions::OPTION_ATTRIBUTES, 'array');

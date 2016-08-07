@@ -27,6 +27,11 @@ class SimpleLimitStrategy implements StrategyInterface
 	
 	public function getPages($currentPage, $totalPages, $maxPages) 
 	{
+		if($maxPages === null || $totalPages <= $maxPages)
+		{
+			return range(0, $totalPages - 1);
+		}
+            
 		// Sections and their pointers for spread pages at the pagination.
 		$sections = array( 
 			self::BEGIN => 0,
@@ -34,33 +39,42 @@ class SimpleLimitStrategy implements StrategyInterface
 			self::BEFORE_CURRENT => $currentPage-1,
 			self::AFTER_CURRENT => $currentPage+1
 		);
-
+                
+		$countSections = count($sections);
+		
 		// Array with pages which will be assigned to the pagination.
 		$pages = array($currentPage);
-		
-		// Spread the pages.
-		$i = 0;
-		while(count($pages) < $maxPages)
+                
+		for($i = 0; $i < $maxPages - 1; $i++)
 		{
-			$pointerIndex = $i++ % count($sections);
-			$pointer = $sections[$pointerIndex];
-			if(!in_array($pointer, $pages) && $pointer >= 0 && $pointer < $totalPages)
+			$sectionIndex = $i % $countSections;
+			$page = $sections[$sectionIndex];
+			if($page < 0)
 			{
-				$pages[] = $pointer;
+				$sectionIndex += 1;
+				$page = $sections[$sectionIndex];
+			}
+			else if($page > $totalPages - 1)
+			{
+				$sectionIndex -= 1;
+				$page = $sections[$sectionIndex];
+			}
+			
+			$pages[] = $page;
+
+			$multiplier = 1;
+			if($sectionIndex === self::BEFORE_CURRENT || $sectionIndex === self::END)
+			{
+				$multiplier = -1;
 			}
 
-			if($pointerIndex === self::BEGIN || $pointerIndex === self::AFTER_CURRENT)
-			{
-				$sections[$pointerIndex] += 1;
-			}
-			else if($pointerIndex === self::BEFORE_CURRENT || $pointerIndex === self::END)
-			{
-				$sections[$pointerIndex] -= 1;
-			}
+			$sections[$sectionIndex] += $multiplier;
 		}
+
+		$uniquePages = array_unique($pages, SORT_NUMERIC);
 		
-		sort($pages);
+		sort($uniquePages, SORT_NUMERIC);
 		
-		return $pages;
+		return $uniquePages;
 	}
 }

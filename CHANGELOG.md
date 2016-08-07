@@ -1,5 +1,10 @@
 Changelog
 ===========
+v1.3.1
+===
+* Bugfix #21: Option max_pages caused execution timeout
+* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object
+
 v1.3
 ===
 * New: The TableBundle is now symfony3 compatible.
@@ -12,6 +17,10 @@ v1.3
 * New: All components can raise hints at runtime (e.g. for configuration). This hints are visible at the profiler.
 * Improvements for time measurement: Created a more fine-grained structure with measurements for building (table, filters, views), options resolving, data loading and some more. Also removed the measurements for rendering, because twig measurement includes this.
 
+v1.2.4
+===
+* Bugfix #21: Option max_pages caused execution timeout
+* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object
 v1.2.3
 ===
 * Bugfix on filter component: Boolean Filter `false` option is not working.
