@@ -1,9 +1,14 @@
 Changelog
 ===========
+
+v1.3.2
+===
+* Bugfix #22: Exception on table without pagination.
+
 v1.3.1
 ===
-* Bugfix #21: Option max_pages caused execution timeout
-* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object
+* Bugfix #21: Option max_pages caused execution timeout.
+* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object.
 
 v1.3
 ===
@@ -19,8 +24,8 @@ v1.3
 
 v1.2.4
 ===
-* Bugfix #21: Option max_pages caused execution timeout
-* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object
+* Bugfix #21: Option max_pages caused execution timeout.
+* Bugfix #20: DateFilter::isActive should not use strlen for DateTime object.
 v1.2.3
 ===
 * Bugfix on filter component: Boolean Filter `false` option is not working.
