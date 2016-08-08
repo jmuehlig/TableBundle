@@ -78,14 +78,14 @@ class TableExtension extends AbstractTwigExtension
 	{
 		$templateName = $tableView->getTableOption(TableOptions::TEMPLATE);
 		$viewParameters = array('columns' => $tableView->getColumns());
-		if($tableView->hasOrder() !== null)
+		if($tableView->hasOrder())
 		{
 			$templateName = $tableView->getOrderOption(OrderOptions::TEMPLATE);
 			$parameters = array(
 				'columnName' => $tableView->getOrderOption(OrderOptions::PARAM_COLUMN), 
 				'direction' => $tableView->getOrderOption(OrderOptions::PARAM_DIRECTION),
 			);
-			if($tableView->hasPagination() !== null)
+			if($tableView->hasPagination())
 			{
 				$parameters['pagination'] = $tableView->getPaginationOption(PaginationOptions::PARAM);
 			}
