@@ -17,7 +17,7 @@ A unique feature is the automatic join, which allows you to access and also filt
 ## Installation
 
 ### Using composer
-1. Add the bundle to your `composer.json` by executing the command `composer require jgm/tablebundle` or adding the line `"jgm/tablebundle": "1.2.*"` to the `required`-section.
+1. Add the bundle to your `composer.json` by executing the command `composer require jgm/tablebundle` or adding the line `"jgm/tablebundle": "1.3.*"` to the `required`-section.
 
 2. Add the Bundle to your Kernel (`app/AppKernel.php`):
 
