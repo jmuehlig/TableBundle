@@ -147,4 +147,10 @@ class TableException extends \Exception
 		$message = 'You have to pass a PropelQueryClass into the DataSource.';
 		throw new TableException($tableName, $message);
 	}
+	
+	public static function columnValueIsNotAnArray($columnName)
+	{
+		$message = sprintf("The return value of the given entity for column '%s' is not an array.", $columnName);
+		throw new TableException(null, $message);
+	}
 }

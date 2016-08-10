@@ -12,6 +12,7 @@
 namespace JGM\TableBundle\Table\Column;
 
 use JGM\TableBundle\Table\Row\Row;
+use JGM\TableBundle\Table\TableException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -37,9 +38,14 @@ class ArrayColumn extends AbstractColumn
 	{
 		$values = $this->getValue($row);
 		
-		if($values === null)
+		if($values === null || (is_array($values) && empty($values)))
 		{
 			return $this->options['empty_value'];
+		}
+		
+		if(!is_array($values))
+		{
+			TableException::columnValueIsNotAnArray($this->getName());
 		}
 		
 		$valueStrings = [];
