@@ -72,6 +72,10 @@ class UrlColumn extends AbstractColumn implements ContainerAwareInterface
 			}
 			$url = $this->container->get('router')->generate($this->options['route_name'], $params);
 		}
+		else
+		{
+			$url = $this->getValue($row);
+		}
 		
 		$attr = array();
 		foreach($this->options['link_attr'] as $name => $value)
@@ -85,6 +89,6 @@ class UrlColumn extends AbstractColumn implements ContainerAwareInterface
 			$text = $this->getValue($row);
 		}
 		
-		return sprintf("<a href=\"%s\"%s>%s</a>", $url, implode(" ", $attr), $text);
+		return sprintf("<a href=\"%s\" %s>%s</a>", $url, implode(" ", $attr), $text);
 	}
 }

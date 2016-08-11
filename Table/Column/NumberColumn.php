@@ -38,7 +38,7 @@ class NumberColumn extends AbstractColumn
 	{
 		$value = $this->getValue($row);
 		
-		if($value === null || strlen($value) === 0)
+		if($value === null || strlen($value) === 0 || !is_numeric($value))
 		{
 			return $this->options['empty_value'];
 		}

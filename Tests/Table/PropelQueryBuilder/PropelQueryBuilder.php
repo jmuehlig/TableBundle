@@ -18,7 +18,7 @@ use JGM\TableBundle\Table\PropelQueryBuilder\PropelQueryBuilder;
  * @author	Daniel Purrucker <daniel.purrucker@nordakademie.de>
  * @since	1.3
  */
-class PropelTableFilterDtoTest extends \PHPUnit_Framework_TestCase
+class PropelQueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
