@@ -21,11 +21,11 @@ class SimpleContentGrabberTest extends \PHPUnit_Framework_TestCase
 		
 		$column = $this->getColumn();
 		
-		$this->assertEquals('-', $contentGrabber->getContent(
+		$this->assertEquals('', $contentGrabber->getContent(
 			new Row(new MockEntity(1, ''), 1),
 			$column
 		));
-		$this->assertEquals('-', $contentGrabber->getContent(
+		$this->assertEquals(null, $contentGrabber->getContent(
 			new Row(new MockEntity(2, null), 2),
 			$column
 		));

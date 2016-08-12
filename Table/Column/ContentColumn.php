@@ -55,11 +55,7 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 		
 		$contentGrabber = $this->options['content_grabber'];
 		
-		if($contentGrabber === null)
-		{
-			TableException::noContentDefined($this->container->get('jgm.table_context')->getCurrentTableName(), $this->getName());
-		}
-		else if($contentGrabber instanceof ContentGrabberInterface)
+		if($contentGrabber instanceof ContentGrabberInterface)
 		{
 			$this->contentCallable = array($contentGrabber, 'getContent');
 		}
@@ -69,7 +65,12 @@ class ContentColumn extends AbstractColumn implements ContainerAwareInterface
 		}
 		else
 		{
-			TableException::noContentDefined($this->container->get('jgm.table_context')->getCurrentTableName(), $this->getName());
+			$tableName = null;
+			if($this->container !== null)
+			{
+				$tableName = $this->container->get('jgm.table_context')->getCurrentTableName();
+			}
+			TableException::noContentDefined($tableName, $this->getName());
 		}
 	}
 
