@@ -105,7 +105,7 @@ class UrlColumn extends AbstractColumn implements ContainerAwareInterface
 		$url = null;
 		if($this->options['url'] !== null)
 		{
-			$url = $this->options['url'];
+			$url = $this->replacePlaceholder($this->options['url'], $row);
 		}
 		else if($this->options['route_name'] !== null)
 		{
