@@ -41,12 +41,6 @@ class SimpleContentGrabber implements ContentGrabberInterface, ContainerAwareInt
 
 	public function getContent(Row $row, ColumnInterface $column)
 	{
-		$field = $row->get($column->getName());
-		if($field === null || $field === '')
-		{
-			return $column->getDefaultValue();
-		}
-		
-		return $field;
+		return $column->getContent($row);
 	}
 }
