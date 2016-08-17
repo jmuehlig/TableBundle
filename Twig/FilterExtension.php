@@ -30,7 +30,7 @@ class FilterExtension extends AbstractTwigExtension
 {
 	/**
 	 * Not every filter_* method, called from 
-	 * twig tempalte, needs the view. There are
+	 * twig template, needs the view. There are
 	 * some methods like filter_label, which accepts
 	 * the filter interface only. For these methods,
 	 * we'll save the tableView, which were passed on
@@ -81,7 +81,7 @@ class FilterExtension extends AbstractTwigExtension
 	{
 		$template = $this->loadTemplate(
 			$environment, 
-			$this->tableView->getFilterOption(FilterOptions::TEMPLATE)
+			$tableView->getFilterOption(FilterOptions::TEMPLATE)
 		);
 		
 		return $template->renderBlock('filter', array(
