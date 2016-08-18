@@ -134,6 +134,22 @@ class TableView
 		});
 	}
 	
+	/**
+	 * Returns an array of active filters.
+	 * 
+	 * @return array
+	 * @deprecated since version 1.3
+	 */
+	public function getActiveFilter()
+	{
+		@trigger_error(
+			'The method TableView::getActiveFilter is deprecated since v1.3 and will be removed in 1.4. Use TableView::getActiveFilters() instead.',
+			E_USER_DEPRECATED
+		);
+		
+		return $this->getActiveFilters();
+	}
+	
 	public function hasPagination()
 	{
 		return array_key_exists('pagination', $this->options);
