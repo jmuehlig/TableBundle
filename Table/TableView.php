@@ -129,19 +129,9 @@ class TableView
 	 */
 	public function getActiveFilters()
 	{
-		$filters = array();
-
-		foreach($this->filters as $filter)
-		{
-			/* @var $filter FilterInterface */
-
-			if($filter->isActive() === true)
-			{
-				$filters[] = $filter;
-			}
-		}
-
-		return $filters;
+		return array_filter($this->filters, function(FilterInterface $filter) {
+			return $filter->isActive();
+		});
 	}
 	
 	public function hasPagination()
