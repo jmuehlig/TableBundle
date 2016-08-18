@@ -131,8 +131,13 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationOptionContent(Twig_Environment $environment, TableView $tableView)
 	{
+		if($tableView->hasPagination() === false )
+		{
+			return;
+		}
+		
 		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
-		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
+		if($optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
@@ -147,8 +152,13 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationOptionBeginContent(Twig_Environment $environment, TableView $tableView)
 	{
+		if($tableView->hasPagination() === false )
+		{
+			return;
+		}
+		
 		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
-		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
+		if($optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
@@ -163,8 +173,13 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationOptionLabelContent(Twig_Environment $environment, TableView $tableView)
 	{
+		if($tableView->hasPagination() === false )
+		{
+			return;
+		}
+		
 		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
-		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
+		if($optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
@@ -187,8 +202,13 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationOptionInputContent(Twig_Environment $environment, TableView $tableView)
 	{
+		if($tableView->hasPagination() === false )
+		{
+			return;
+		}
+		
 		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
-		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
+		if($optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
@@ -212,8 +232,13 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationOptionButtonContent(Twig_Environment $environment, TableView $tableView)
 	{
+		if($tableView->hasPagination() === false )
+		{
+			return;
+		}
+		
 		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
-		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
+		if($optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
@@ -230,8 +255,13 @@ class PaginationExtension extends AbstractTwigExtension
 	
 	public function getTablePaginationOptionEndContent(Twig_Environment $environment, TableView $tableView)
 	{
+		if($tableView->hasPagination() === false )
+		{
+			return;
+		}
+		
 		$optionValues = $tableView->getPaginationOption(PaginationOptions::OPTION_VALUES);
-		if(	$tableView->hasPagination() === false || $optionValues  === null || count($optionValues) < 2)
+		if($optionValues  === null || count($optionValues) < 2)
 		{
 			return;
 		}
