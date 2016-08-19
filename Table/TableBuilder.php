@@ -93,11 +93,9 @@ class TableBuilder
 			TableException::duplicatedColumnName($this->container->get('jgm.table_context')->getCurrentTableName(), $name);
 		}
 		
-		$type = strtolower($type);
-		if(!array_key_exists($type, $this->registeredColumns))
-		{
-			TableException::columnTypeNotAllowed($this->container->get('jgm.table_context')->getCurrentTableName(), $type);
-		}
+		$columnClass = $this->getColumnClass($type);
+		$column = new $columnClass;
+		/* @var $column ColumnInterface */
 		
 		// Check the columns access rights and delete option, if it exists.
 		if(array_key_exists('access', $options))
@@ -111,9 +109,6 @@ class TableBuilder
 			
 			unset($options['access']);
 		}
-		
-		$column = new $this->registeredColumns[$type];
-		/* @var $column ColumnInterface */
 		
 		$column->setName($name);
 		$column->setOptions($options);
@@ -154,5 +149,23 @@ class TableBuilder
 		}
 		
 		return $accessValidator->isAccessGranted($this->authorizationChecker);
+	}
+	
+	private function getColumnClass($type)
+	{
+		if(class_exists($type) && is_subclass_of($type, ColumnInterface::class))
+		{
+			return $type;
+		}
+		else if(array_key_exists(strtolower($type), $this->registeredColumns))
+		{
+			@trigger_error(
+				'Using an alias for column type is deprecated since v1.4 and will be removed at v1.6. Use class name like "TextColumn::class" for naming column types.',
+				E_USER_DEPRECATED
+			);
+			return $this->registeredColumns[strtolower($type)];
+		}
+			
+		TableException::columnTypeNotAllowed($this->container->get('jgm.table_context')->getCurrentTableName(), $type);
 	}
 }

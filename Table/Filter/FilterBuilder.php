@@ -54,13 +54,8 @@ class FilterBuilder
 			TableException::duplicatedFilterName($this->container->get('jgm.table_context')->getCurrentTableName(), $name);
 		}
 		
-		$type = strtolower($type);
-		if(!array_key_exists($type, $this->registeredFilters))
-		{
-			TableException::filterTypeNotAllowed($this->container->get('jgm.table_context')->getCurrentTableName(), $type, array_keys($this->registeredFilters));
-		}
-		
-		$filter = new $this->registeredFilters[$type]($this->container);
+		$filterClass = $this->getFilterClass($type);
+		$filter = new $filterClass($this->container);
 		/* @var $filter FilterInterface */
 		
 		if(!$filter instanceof FilterInterface)
@@ -82,5 +77,23 @@ class FilterBuilder
 	public function getFilters()
 	{
 		return $this->filters;
+	}
+	
+	private function getFilterClass($type)
+	{
+		if(class_exists($type) && is_subclass_of($type, FilterInterface::class))
+		{
+			return $type;
+		}
+		else if(array_key_exists(strtolower($type), $this->registeredFilters))
+		{
+			@trigger_error(
+				'Using an alias for column type is deprecated since v1.4 and will be removed at v1.6. Use class name like "TextColumn::class" for naming column types.',
+				E_USER_DEPRECATED
+			);
+			return $this->registeredFilters[strtolower($type)];
+		}
+			
+		TableException::filterTypeNotAllowed($this->container->get('jgm.table_context')->getCurrentTableName(), $type, array_keys($this->registeredFilters));
 	}
 }
