@@ -129,6 +129,17 @@ abstract class AbstractFilter implements FilterInterface
 	 * @var ValueManipulatorInterface
 	 */
 	protected $valueManipulator;
+
+	/**
+	 * Value of Mapped.
+	 *
+	 * If you wish the filter to be ignored
+	 * when the queryBuilder will be created set
+	 * the mapped option to false.
+	 *
+	 * @var bool
+	 */
+	protected $mapped;
 	
 	public function __construct(ContainerInterface $container)
 	{
@@ -199,6 +210,12 @@ abstract class AbstractFilter implements FilterInterface
 	public function getOperator()
 	{
 		return $this->operator;
+	}
+	
+
+	public function getMapped()
+	{
+		return $this->mapped;
 	}
 	
 	/**
@@ -280,6 +297,7 @@ abstract class AbstractFilter implements FilterInterface
 		$this->labelAttributes = $this->options['label_attr'];
 		$this->defaultValue = $this->options['default_value'];
 		$this->valueManipulator = $this->options['value_manipulator'];
+		$this->mapped = $this->options['mapped'];
 		FilterOperator::validate($this->operator);
 	}
 	
@@ -298,7 +316,8 @@ abstract class AbstractFilter implements FilterInterface
 			'attr' => array(),
 			'label_attr' => array('styles' => 'font-weight: bold'),
 			'default_value' => null,
-			'value_manipulator' => null
+			'value_manipulator' => null,
+			'mapped' => true
 		));
 	}
 	
@@ -372,6 +391,10 @@ abstract class AbstractFilter implements FilterInterface
 	
 	public function isActive()
 	{
+		if ($this->mapped === false) {
+			return false;
+		}
+
 		return isset($this->value) && strlen($this->value) > 0;
 	}
 }
