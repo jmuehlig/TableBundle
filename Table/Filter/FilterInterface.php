@@ -103,6 +103,12 @@ interface FilterInterface
 	 */
 	public function getWidgetBlockName();
 	
+
+	/**
+	 * @return bool			Mapped value.
+	 */
+	public function getMapped();
+
 	/**
 	 * Returns True, if the filter is active.
 	 * 
